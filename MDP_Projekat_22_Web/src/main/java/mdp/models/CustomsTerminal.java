@@ -2,18 +2,20 @@ package mdp.models;
 
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.util.List;
 
 // TODO CRUD
 public class CustomsTerminal implements Serializable {
 	private static final long serialVersionUID = -1292723516097991850L;
 
-	private List<CustomsEntry> entries;
-	private List<CustomsExit> exits;
+	private CustomsEntry[] entries;
+	private CustomsExit[] exits;
 	private BigInteger id;
 	private String name;
 
-	public CustomsTerminal(List<CustomsEntry> entries, List<CustomsExit> exits, BigInteger id, String name) {
+	public CustomsTerminal() {
+	}
+
+	public CustomsTerminal(CustomsEntry[] entries, CustomsExit[] exits, BigInteger id, String name) {
 		super();
 		this.entries = entries;
 		this.exits = exits;
@@ -21,11 +23,11 @@ public class CustomsTerminal implements Serializable {
 		this.name = name;
 	}
 
-	public List<CustomsEntry> getEntries() {
+	public CustomsEntry[] getEntries() {
 		return entries;
 	}
 
-	public List<CustomsExit> getExits() {
+	public CustomsExit[] getExits() {
 		return exits;
 	}
 
@@ -37,23 +39,19 @@ public class CustomsTerminal implements Serializable {
 		return name;
 	}
 
-	public void setEntries(
-		List<CustomsEntry> entries) {
+	public void setEntries(CustomsEntry[] entries) {
 		this.entries = entries;
 	}
 
-	public void setExits(
-		List<CustomsExit> exits) {
+	public void setExits(CustomsExit[] exits) {
 		this.exits = exits;
 	}
 
-	public void setId(
-		BigInteger id) {
+	public void setId(BigInteger id) {
 		this.id = id;
 	}
 
-	public void setName(
-		String name) {
+	public void setName(String name) {
 		this.name = name;
 	}
 

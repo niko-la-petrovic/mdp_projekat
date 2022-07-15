@@ -1,4 +1,4 @@
-package mdp.models.dtos;
+package mdp.register.dtos;
 
 import java.io.Serializable;
 

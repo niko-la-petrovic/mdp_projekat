@@ -5,6 +5,9 @@ public abstract class CustomsPassageStep implements ICustomsPassageStep {
 
 	protected boolean isCustomsCheck;
 
+	public CustomsPassageStep() {
+	}
+
 	public CustomsPassageStep(boolean isCustomsCheck) {
 		super();
 		this.isCustomsCheck = isCustomsCheck;

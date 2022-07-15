@@ -1,8 +1,6 @@
 package mdp.models;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.List;
 
 public abstract class CustomsPassage implements ICustomsPassage {
 	private static final long serialVersionUID = -2894127198803998101L;
@@ -10,9 +8,12 @@ public abstract class CustomsPassage implements ICustomsPassage {
 	private BigInteger id;
 	private boolean isOpen;
 	private boolean isEntry;
-	private List<ICustomsPassageStep> passageSteps;
+	private ICustomsPassageStep[] passageSteps;
 
-	public CustomsPassage(BigInteger id, boolean isOpen, boolean isEntry, List<ICustomsPassageStep> passageSteps) {
+	public CustomsPassage() {
+	}
+
+	public CustomsPassage(BigInteger id, boolean isOpen, boolean isEntry, ICustomsPassageStep[] passageSteps) {
 		super();
 		this.id = id;
 		this.isOpen = isOpen;
@@ -41,11 +42,11 @@ public abstract class CustomsPassage implements ICustomsPassage {
 	}
 
 	@Override
-	public List<ICustomsPassageStep> getPassageSteps() {
+	public ICustomsPassageStep[] getPassageSteps() {
 		return passageSteps;
 	}
 
-	public static List<ICustomsPassageStep> customsPassageSteps() {
-		return Arrays.asList(new PoliceCheckStep(), new CustomsCheckStep());
+	public static ICustomsPassageStep[] customsPassageSteps() {
+		return new ICustomsPassageStep[] { new PoliceCheckStep(), new CustomsCheckStep() };
 	}
 }
