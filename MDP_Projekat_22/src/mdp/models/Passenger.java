@@ -20,8 +20,7 @@ public class Passenger implements Serializable {
 		return id;
 	}
 
-	public void setId(
-		BigInteger id) {
+	public void setId(BigInteger id) {
 		this.id = id;
 	}
 

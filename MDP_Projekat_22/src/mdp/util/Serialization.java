@@ -5,13 +5,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
-import java.lang.reflect.Type;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+//import java.util.Random;
 import java.util.Random;
-import java.util.function.Consumer;
 
 import javax.naming.OperationNotSupportedException;
 
@@ -33,11 +31,8 @@ public class Serialization {
 	}
 
 	// TODO accept serialization type
-	public static void randomSerializeToFile(
-		Serializable obj,
-		String folderPath,
-		String fileNamePartial,
-		String extension) throws IOException, Exception {
+	public static void randomSerializeToFile(Serializable obj, String folderPath, String fileNamePartial,
+			String extension) throws IOException, Exception {
 
 		var isSuppliedExtension = extension != null;
 		var id = Util.getStringUuid();
@@ -45,8 +40,6 @@ public class Serialization {
 
 		//
 		var fileName = serializationType.toString() + "_" + id + "_" + fileNamePartial;
-
-		Consumer<File> serializeFile = null;
 
 		if (!isSuppliedExtension)
 			switch (serializationType) {
@@ -99,9 +92,8 @@ public class Serialization {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T> T randomDeserializeFromFile(
-		String filePath,
-		Class<T> type) throws IOException, OperationNotSupportedException {
+	public static <T> T randomDeserializeFromFile(String filePath, Class<T> type)
+			throws IOException, OperationNotSupportedException {
 
 		File file = new File(filePath);
 		var fileName = FilenameUtils.removeExtension(file.toPath().getFileName().toString());
