@@ -3,7 +3,6 @@ package mdp.register;
 import java.math.BigInteger;
 
 import mdp.exceptions.TerminalNotFoundException;
-import mdp.models.CustomsTerminal;
 import mdp.register.dtos.CreateTerminalDto;
 import mdp.register.dtos.GetTerminalDto;
 import mdp.register.dtos.UpdateTerminalDto;
