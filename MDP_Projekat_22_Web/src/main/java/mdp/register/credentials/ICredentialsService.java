@@ -1,4 +1,4 @@
-package mdp.register;
+package mdp.register.credentials;
 
 public interface ICredentialsService {
 

@@ -1,27 +1,28 @@
 package mdp.register;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.Properties;
 
 import mdp.exceptions.TerminalNotFoundException;
 import mdp.register.dtos.CreateTerminalDto;
 import mdp.register.dtos.GetTerminalDto;
 import mdp.register.dtos.UpdateTerminalDto;
-import mdp.settings.Constants;
+import mdp.util.SettingsLoader;
 
 public class TerminalRegisterService implements ITerminalRegisterService {
+	private static final String TERMINAL_REGISTER_SETTINGS_NAME = "terminalRegister";
 	private TerminalRegisterSettings settings;
 
 	public TerminalRegisterService() throws FileNotFoundException, IOException {
-		var props = new Properties();
-		var loadPath = Constants.getpropertiesLocation("terminalRegister");
-		props.load(new FileInputStream(loadPath));
+		loadSettings();
+	}
 
-		var saveFolderPath = props.getProperty("saveFolderPath");
-		settings = new TerminalRegisterSettings(saveFolderPath);
+	private void loadSettings() throws IOException, FileNotFoundException {
+		SettingsLoader.loadSettings(TERMINAL_REGISTER_SETTINGS_NAME, props -> {
+			var saveFolderPath = props.getProperty("saveFolderPath");
+			settings = new TerminalRegisterSettings(saveFolderPath);
+		});
 	}
 
 	@Override

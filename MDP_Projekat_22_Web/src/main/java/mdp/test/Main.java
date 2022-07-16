@@ -1,9 +1,14 @@
 package mdp.test;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.UUID;
 
+import mdp.db.redis.JedisConnectionPool;
 import mdp.models.Passenger;
+import mdp.register.credentials.CredentialsController;
+import mdp.register.credentials.CredentialsService;
 import mdp.util.Serialization;
 import mdp.util.Util;
 
@@ -11,11 +16,20 @@ public class Main {
 
 	private static final String serializationTestDir = "I:\\downloads\\mdp_data\\test";
 
-	public static void main(
-		String[] args) throws Exception {
-//		testUuid();
+	public static void main(String[] args) throws Exception {
+		// testUuid();
 
-		testSerialization();
+		// testSerialization();
+
+		testRedis();
+	}
+
+	private static void testRedis() throws Exception {
+		var jedis = JedisConnectionPool.getConnection();
+		jedis.set("key", "value");
+
+		var value = jedis.get("key");
+		System.out.println(value);
 	}
 
 	private static void testSerialization() throws Exception {

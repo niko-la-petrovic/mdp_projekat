@@ -1,4 +1,4 @@
-package mdp.register;
+package mdp.register.credentials;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -9,7 +9,7 @@ import javax.ws.rs.core.MediaType;
 public class CredentialsController {
 	private ICredentialsService credentialsService;
 
-	public CredentialsController() {
+	public CredentialsController() throws Exception {
 		credentialsService = new CredentialsService();
 	}
 
