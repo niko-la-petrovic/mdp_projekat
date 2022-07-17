@@ -9,6 +9,7 @@ import mdp.db.redis.JedisConnectionPool;
 import mdp.models.Passenger;
 import mdp.register.credentials.CredentialsController;
 import mdp.register.credentials.CredentialsService;
+import mdp.util.PasswordUtil;
 import mdp.util.Serialization;
 import mdp.util.Util;
 
@@ -21,7 +22,17 @@ public class Main {
 
 		// testSerialization();
 
-		testRedis();
+//		testRedis();
+		testPassword();
+	}
+
+	private static void testPassword() {
+		var pwd = "testpwd";
+		var hash = PasswordUtil.hashPassword(pwd);
+		System.out.println(hash);
+		if(!PasswordUtil.checkPassword(pwd, hash))
+			System.err.println("Failed password check");
+		System.out.println("Password matches");
 	}
 
 	private static void testRedis() throws Exception {
