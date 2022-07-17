@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigInteger;
 
+import mdp.dtos.SearchTerminalDto;
 import mdp.exceptions.TerminalNotFoundException;
 import mdp.register.dtos.CreateTerminalDto;
 import mdp.register.dtos.GetTerminalDto;
@@ -18,29 +19,10 @@ public class TerminalRegisterService implements ITerminalRegisterService {
 		loadSettings();
 	}
 
-	private void loadSettings() throws IOException, FileNotFoundException {
-		SettingsLoader.loadSettings(TERMINAL_REGISTER_SETTINGS_NAME, props -> {
-			var saveFolderPath = props.getProperty("saveFolderPath");
-			settings = new TerminalRegisterSettings(saveFolderPath);
-		});
-	}
-
-	@Override
-	public GetTerminalDto[] getTerminals() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	@Override
 	public GetTerminalDto createTerminal(CreateTerminalDto dto) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	@Override
-	public GetTerminalDto updateTerminal(UpdateTerminalDto dto) throws TerminalNotFoundException {
-		// TODO Auto-generated method stub
-		return new GetTerminalDto();
 	}
 
 	// TODO
@@ -53,6 +35,31 @@ public class TerminalRegisterService implements ITerminalRegisterService {
 			throws TerminalNotFoundException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public GetTerminalDto[] getTerminals() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private void loadSettings() throws IOException, FileNotFoundException {
+		SettingsLoader.loadSettings(TERMINAL_REGISTER_SETTINGS_NAME, props -> {
+			var saveFolderPath = props.getProperty("saveFolderPath");
+			settings = new TerminalRegisterSettings(saveFolderPath);
+		});
+	}
+
+	@Override
+	public GetTerminalDto searchTerminal(SearchTerminalDto dto) throws TerminalNotFoundException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public GetTerminalDto updateTerminal(UpdateTerminalDto dto) throws TerminalNotFoundException {
+		// TODO Auto-generated method stub
+		return new GetTerminalDto();
 	}
 
 }

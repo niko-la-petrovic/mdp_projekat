@@ -7,8 +7,8 @@
   <ns1:parameter name="dotNetSoapEncFix" value="true"/>
   <ns1:parameter name="enableNamespacePrefixOptimization" value="false"/>
   <ns1:parameter name="sendXMLDeclaration" value="true"/>
-  <ns1:parameter name="sendXsiTypes" value="true"/>
   <ns1:parameter name="attachments.implementation" value="org.apache.axis.attachments.AttachmentsImpl"/>
+  <ns1:parameter name="sendXsiTypes" value="true"/>
   <ns1:requestFlow>
    <ns1:handler type="java:org.apache.axis.handlers.JWSHandler">
     <ns1:parameter name="scope" value="session"/>
@@ -63,11 +63,11 @@
    <ns1:fault class="mdp.exceptions.TerminalNotFoundException" qname="ns12:fault" type="ns13:TerminalNotFoundException" xmlns:ns13="http://exceptions.mdp"/>
   </ns1:operation>
   <ns1:parameter name="allowedMethods" value="updateTerminal getTerminal getTerminals createTerminal deleteTerminal"/>
-  <ns1:parameter name="typeMappingVersion" value="1.2"/>
   <ns1:parameter name="wsdlPortType" value="TerminalRegisterService"/>
-  <ns1:parameter name="className" value="mdp.register.TerminalRegisterService"/>
-  <ns1:parameter name="wsdlServicePort" value="TerminalRegisterService"/>
+  <ns1:parameter name="typeMappingVersion" value="1.2"/>
   <ns1:parameter name="schemaQualified" value="http://dtos.register.mdp,http://exceptions.mdp,http://register.mdp"/>
+  <ns1:parameter name="wsdlServicePort" value="TerminalRegisterService"/>
+  <ns1:parameter name="className" value="mdp.register.TerminalRegisterService"/>
   <ns1:parameter name="wsdlTargetNamespace" value="http://register.mdp"/>
   <ns1:parameter name="wsdlServiceElement" value="TerminalRegisterServiceService"/>
   <ns1:typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns14:GetTerminalDto" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:mdp.register.dtos.GetTerminalDto" xmlns:ns14="http://dtos.register.mdp"/>
