@@ -12,7 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import mdp.dtos.SearchTerminalDto;
-import mdp.register.terminal.client.TestSoapServiceService;
+import mdp.test.client.TestSoapServiceService;
 import mdp.util.ui.UiUtil;
 
 public class Main {

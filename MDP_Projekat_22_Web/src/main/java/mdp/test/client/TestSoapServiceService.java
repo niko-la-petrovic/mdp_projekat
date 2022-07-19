@@ -1,5 +1,5 @@
 
-package mdp.register.terminal.client;
+package mdp.test.client;
 
 import java.net.MalformedURLException;
 import java.net.URL;

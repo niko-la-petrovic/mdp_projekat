@@ -1,4 +1,4 @@
-package mdp.register;
+package mdp.register.terminals;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -6,38 +6,54 @@ import java.math.BigInteger;
 
 import mdp.dtos.SearchTerminalDto;
 import mdp.exceptions.TerminalNotFoundException;
-import mdp.register.dtos.CreateTerminalDto;
-import mdp.register.dtos.GetTerminalDto;
-import mdp.register.dtos.UpdateTerminalDto;
+import mdp.register.terminals.dtos.CreateTerminalDto;
+import mdp.register.terminals.dtos.GetTerminalDto;
+import mdp.register.terminals.dtos.UpdateTerminalDto;
 import mdp.util.SettingsLoader;
 
-public class TerminalRegisterService implements ITerminalRegisterService {
+public class TerminalRegisterService
+//implements ITerminalRegisterService 
+{
 	private static final String TERMINAL_REGISTER_SETTINGS_NAME = "terminalRegister";
 	private TerminalRegisterSettings settings;
 
 	public TerminalRegisterService() throws FileNotFoundException, IOException {
-		loadSettings();
+//		loadSettings();
 	}
 
-	@Override
+//	@Override
 	public GetTerminalDto createTerminal(CreateTerminalDto dto) {
-		// TODO Auto-generated method stub
+//		var id = Util.getIntUuid();
+//		int entryPassageCount = dto.getEntryPassageCount();
+//		var entries = new CustomsEntry[entryPassageCount];
+//		int exitPassageCount = dto.getExitPassageCount();
+//		var exits = new CustomsExit[exitPassageCount];
+//		var name = dto.getTerminalName();
+//
+//		for (int i = 0; i < entryPassageCount; i++)
+//			entries[i] = new CustomsEntry(Util.getIntUuid(), true);
+//		for (int i = 0; i < exitPassageCount; i++)
+//			exits[i] = new CustomsExit(Util.getIntUuid(), true);
+//
+//		var terminal = new CustomsTerminal(entries, exits, id, name);
+
+		// TODO save to file
 		return null;
 	}
 
 	// TODO
-	@Override
+//	@Override
 	public void deleteTerminal(BigInteger id) throws TerminalNotFoundException {
 	}
 
-	@Override
+//	@Override
 	public GetTerminalDto getTerminal(BigInteger passageId, boolean isCustomsStep, String terminalName)
 			throws TerminalNotFoundException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+//	@Override
 	public GetTerminalDto[] getTerminals() {
 		// TODO Auto-generated method stub
 		return null;
@@ -50,16 +66,15 @@ public class TerminalRegisterService implements ITerminalRegisterService {
 		});
 	}
 
-	@Override
+//	@Override
 	public GetTerminalDto searchTerminal(SearchTerminalDto dto) throws TerminalNotFoundException {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	@Override
+//
+////	@Override
 	public GetTerminalDto updateTerminal(UpdateTerminalDto dto) throws TerminalNotFoundException {
 		// TODO Auto-generated method stub
 		return new GetTerminalDto();
 	}
-
 }

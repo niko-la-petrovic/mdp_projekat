@@ -1,4 +1,4 @@
-package mdp.register.dtos;
+package mdp.register.terminals.dtos;
 
 import java.io.Serializable;
 

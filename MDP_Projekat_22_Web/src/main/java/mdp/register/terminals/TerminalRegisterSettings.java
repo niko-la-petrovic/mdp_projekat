@@ -1,7 +1,14 @@
-package mdp.register;
+package mdp.register.terminals;
 
-public class TerminalRegisterSettings {
+import java.io.Serializable;
+
+public class TerminalRegisterSettings implements Serializable {
+	private static final long serialVersionUID = -2465892459936299840L;
+
 	private String saveFolderPath;
+
+	public TerminalRegisterSettings() {
+	}
 
 	public TerminalRegisterSettings(String saveFolderPath) {
 		super();

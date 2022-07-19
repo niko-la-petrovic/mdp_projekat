@@ -1,5 +1,5 @@
 
-package mdp.register.terminal.client;
+package mdp.test.client;
 
 import jakarta.jws.WebMethod;
 import jakarta.jws.WebResult;
@@ -29,8 +29,8 @@ public interface TestSoapService {
      */
     @WebMethod
     @WebResult(name = "resultReturn", targetNamespace = "http://test.mdp")
-    @RequestWrapper(localName = "result", targetNamespace = "http://test.mdp", className = "mdp.register.terminal.client.Result")
-    @ResponseWrapper(localName = "resultResponse", targetNamespace = "http://test.mdp", className = "mdp.register.terminal.client.ResultResponse")
+    @RequestWrapper(localName = "result", targetNamespace = "http://test.mdp", className = "mdp.test.client.Result")
+    @ResponseWrapper(localName = "resultResponse", targetNamespace = "http://test.mdp", className = "mdp.test.client.ResultResponse")
     public String result();
 
 }
