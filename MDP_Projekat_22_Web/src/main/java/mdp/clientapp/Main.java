@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import mdp.dtos.SearchTerminalDto;
+import mdp.register.terminal.client.TestSoapServiceService;
 import mdp.util.ui.UiUtil;
 
 public class Main {
@@ -19,10 +20,6 @@ public class Main {
 	public static void main(String[] args) throws Exception {
 		var mainFrame = new JFrame("Client App");
 		setupMainFrame(mainFrame);
-		test();
-	}
-
-	private static void test() throws Exception {
 	}
 
 	private static void setupMainFrame(JFrame mainFrame) {
@@ -58,6 +55,10 @@ public class Main {
 				var isCustomsPassage = customsOrPoliceCheckbox.isSelected();
 
 				var getDto = new SearchTerminalDto(passageId, terminalName, isCustomsPassage);
+				var locator = new TestSoapServiceService();
+				var client = locator.getTestSoapService();
+
+				var result = client.result();
 				// TODO soap message
 
 			} catch (NumberFormatException ex) {
@@ -70,6 +71,7 @@ public class Main {
 		terminalPanel.add(passageIdPanel);
 		terminalPanel.add(customsOrPolicePanel);
 		terminalPanel.add(terminalNamePanel);
+		terminalPanel.add(terminalSubmitButton);
 		mainFrame.add(terminalPanel);
 		mainFrame.setVisible(true);
 	}
