@@ -7,8 +7,8 @@
   <ns1:parameter name="dotNetSoapEncFix" value="true"/>
   <ns1:parameter name="enableNamespacePrefixOptimization" value="false"/>
   <ns1:parameter name="sendXMLDeclaration" value="true"/>
-  <ns1:parameter name="attachments.implementation" value="org.apache.axis.attachments.AttachmentsImpl"/>
   <ns1:parameter name="sendXsiTypes" value="true"/>
+  <ns1:parameter name="attachments.implementation" value="org.apache.axis.attachments.AttachmentsImpl"/>
   <ns1:requestFlow>
    <ns1:handler type="java:org.apache.axis.handlers.JWSHandler">
     <ns1:parameter name="scope" value="session"/>
@@ -42,43 +42,6 @@
   <ns1:parameter name="schemaQualified" value="http://test.mdp"/>
   <ns1:parameter name="wsdlTargetNamespace" value="http://test.mdp"/>
   <ns1:parameter name="wsdlServiceElement" value="TestSoapServiceService"/>
- </ns1:service>
- <ns1:service name="TerminalRegisterService" provider="java:RPC" style="wrapped" use="literal">
-  <ns1:operation name="createTerminal" qname="ns2:createTerminal" returnQName="ns2:createTerminalReturn" returnType="ns3:GetTerminalDto" soapAction="" xmlns:ns2="http://terminals.register.mdp" xmlns:ns3="http://dtos.terminals.register.mdp">
-   <ns1:parameter qname="ns2:dto" type="ns3:CreateTerminalDto"/>
-  </ns1:operation>
-  <ns1:operation name="getTerminal" qname="ns4:getTerminal" returnQName="ns4:getTerminalReturn" returnType="ns5:GetTerminalDto" soapAction="" xmlns:ns4="http://terminals.register.mdp" xmlns:ns5="http://dtos.terminals.register.mdp">
-   <ns1:parameter qname="ns4:passageId" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <ns1:parameter qname="ns4:isCustomsStep" type="xsd:boolean" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <ns1:parameter qname="ns4:terminalName" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <ns1:fault class="mdp.exceptions.TerminalNotFoundException" qname="ns4:fault" type="ns6:TerminalNotFoundException" xmlns:ns6="http://exceptions.mdp"/>
-  </ns1:operation>
-  <ns1:operation name="getTerminals" qname="ns7:getTerminals" returnQName="ns7:getTerminalsReturn" returnType="ns8:GetTerminalDto" soapAction="" xmlns:ns7="http://terminals.register.mdp" xmlns:ns8="http://dtos.terminals.register.mdp"/>
-  <ns1:operation name="updateTerminal" qname="ns9:updateTerminal" returnQName="ns9:updateTerminalReturn" returnType="ns10:GetTerminalDto" soapAction="" xmlns:ns10="http://dtos.terminals.register.mdp" xmlns:ns9="http://terminals.register.mdp">
-   <ns1:parameter qname="ns9:dto" type="ns10:UpdateTerminalDto"/>
-   <ns1:fault class="mdp.exceptions.TerminalNotFoundException" qname="ns9:fault" type="ns11:TerminalNotFoundException" xmlns:ns11="http://exceptions.mdp"/>
-  </ns1:operation>
-  <ns1:operation name="searchTerminal" qname="ns12:searchTerminal" returnQName="ns12:searchTerminalReturn" returnType="ns13:GetTerminalDto" soapAction="" xmlns:ns12="http://terminals.register.mdp" xmlns:ns13="http://dtos.terminals.register.mdp">
-   <ns1:parameter qname="ns12:dto" type="ns14:SearchTerminalDto" xmlns:ns14="http://dtos.mdp"/>
-   <ns1:fault class="mdp.exceptions.TerminalNotFoundException" qname="ns12:fault" type="ns15:TerminalNotFoundException" xmlns:ns15="http://exceptions.mdp"/>
-  </ns1:operation>
-  <ns1:operation name="deleteTerminal" qname="ns16:deleteTerminal" soapAction="" xmlns:ns16="http://terminals.register.mdp">
-   <ns1:parameter qname="ns16:id" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
-   <ns1:fault class="mdp.exceptions.TerminalNotFoundException" qname="ns16:fault" type="ns17:TerminalNotFoundException" xmlns:ns17="http://exceptions.mdp"/>
-  </ns1:operation>
-  <ns1:parameter name="allowedMethods" value="updateTerminal getTerminal searchTerminal getTerminals createTerminal deleteTerminal"/>
-  <ns1:parameter name="typeMappingVersion" value="1.2"/>
-  <ns1:parameter name="wsdlPortType" value="TerminalRegisterService"/>
-  <ns1:parameter name="className" value="mdp.register.terminals.TerminalRegisterService"/>
-  <ns1:parameter name="wsdlServicePort" value="TerminalRegisterService"/>
-  <ns1:parameter name="schemaQualified" value="http://dtos.mdp,http://exceptions.mdp,http://terminals.register.mdp,http://dtos.terminals.register.mdp"/>
-  <ns1:parameter name="wsdlTargetNamespace" value="http://terminals.register.mdp"/>
-  <ns1:parameter name="wsdlServiceElement" value="TerminalRegisterServiceService"/>
-  <ns1:typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns18:UpdateTerminalDto" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:mdp.register.terminals.dtos.UpdateTerminalDto" xmlns:ns18="http://dtos.terminals.register.mdp"/>
-  <ns1:typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns19:CreateTerminalDto" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:mdp.register.terminals.dtos.CreateTerminalDto" xmlns:ns19="http://dtos.terminals.register.mdp"/>
-  <ns1:typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns20:TerminalNotFoundException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:mdp.exceptions.TerminalNotFoundException" xmlns:ns20="http://exceptions.mdp"/>
-  <ns1:typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns21:SearchTerminalDto" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:mdp.dtos.SearchTerminalDto" xmlns:ns21="http://dtos.mdp"/>
-  <ns1:typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="" qname="ns22:GetTerminalDto" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:mdp.register.terminals.dtos.GetTerminalDto" xmlns:ns22="http://dtos.terminals.register.mdp"/>
  </ns1:service>
  <ns1:transport name="http">
   <ns1:requestFlow>

@@ -45,7 +45,25 @@ public class CredentialsController {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response postCredentials(PostCredentialsDto dto) throws UsernameExistsException {
+	@Path("/login")
+	public Response loginWithCredentials(PostCredentialsDto dto) {
+		if (dto == null)
+			return Response.status(Status.BAD_REQUEST).build();
+
+		var violations = validator.validate(dto);
+		if (!violations.isEmpty())
+			return Response.status(Status.BAD_REQUEST).build();
+
+		if (credentialsService.checkCredentials(dto))
+			return Response.status(Status.OK).build();
+		else
+			return Response.status(Status.UNAUTHORIZED).build();
+	}
+
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response postCredentials(PostCredentialsDto dto) {
 		if (dto == null)
 			return Response.status(Status.BAD_REQUEST).build();
 

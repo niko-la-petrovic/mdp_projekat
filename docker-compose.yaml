@@ -6,10 +6,12 @@ volumes:
 
 services:
   redis:
+    restart: unless-stopped
     image: redislabs/redismod
     ports:
       - 6379:6379
   redisinsight:
+    restart: unless-stopped
     image: redislabs/redisinsight:latest
     ports:
       - '8001:8001'

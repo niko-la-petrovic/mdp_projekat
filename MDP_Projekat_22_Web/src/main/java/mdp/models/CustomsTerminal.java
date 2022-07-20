@@ -2,6 +2,8 @@ package mdp.models;
 
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.List;
 
 // TODO CRUD
 public class CustomsTerminal implements Serializable {
@@ -55,4 +57,9 @@ public class CustomsTerminal implements Serializable {
 		this.name = name;
 	}
 
+	public List<CustomsPassage> getPassages() {
+		var passages = Arrays.asList((CustomsPassage[]) entries);
+		passages.addAll(Arrays.asList(exits));
+		return passages;
+	}
 }

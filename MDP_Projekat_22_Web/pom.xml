@@ -23,10 +23,10 @@
 				<version>4.0.0</version>
 				<configuration>
 					<wsdlUrls>
-						<wsdlUrl>http://localhost:8080/MDP_Projekat_22_Web/services/TestSoapService?wsdl</wsdlUrl>
+						<wsdlUrl>http://localhost:8080/MDP_Projekat_22_Web/services/TerminalRegisterService?wsdl</wsdlUrl>
 					</wsdlUrls>
 					<keep>true</keep>
-					<packageName>mdp.test.client</packageName>
+					<packageName>mdp.register.terminals.client</packageName>
 					<sourceDestDir>src/main/java</sourceDestDir>
 				</configuration>
 			</plugin>

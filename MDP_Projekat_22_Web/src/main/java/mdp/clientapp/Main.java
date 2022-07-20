@@ -1,6 +1,8 @@
 package mdp.clientapp;
 
 import java.awt.Dimension;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.math.BigInteger;
 
 import javax.swing.BorderFactory;
@@ -10,16 +12,63 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MediaType;
 
-import mdp.dtos.SearchTerminalDto;
-import mdp.test.client.TestSoapServiceService;
+import org.glassfish.jersey.client.ClientConfig;
+
+import mdp.register.terminals.client.SearchTerminalDto;
+import mdp.register.terminals.client.TerminalNotFoundException_Exception;
+import mdp.register.terminals.client.TerminalRegisterServiceService;
+import mdp.util.SettingsLoader;
 import mdp.util.ui.UiUtil;
 
 public class Main {
+	private static ClientAppSettings settings;
+
 	// TODO unnecessary throws declarations
 	public static void main(String[] args) throws Exception {
+		loadSettings();
 		var mainFrame = new JFrame("Client App");
 		setupMainFrame(mainFrame);
+	}
+
+	private static void searchTerminalAction(JTextField passageIdTextField, JCheckBox customsOrPoliceCheckbox,
+			JTextField terminalNameTextField) {
+		try {
+			var passageId = new BigInteger(passageIdTextField.getText());
+			var terminalName = terminalNameTextField.getText();
+			var isCustomsPassage = customsOrPoliceCheckbox.isSelected();
+
+			var searchDto = new SearchTerminalDto();
+			searchDto.setPassageId(passageId);
+			searchDto.setTerminalName(terminalName);
+			searchDto.setCustomsPassage(isCustomsPassage);
+
+			var terminalClient = new TerminalRegisterServiceService().getTerminalRegisterService();
+			var searchResult = terminalClient.searchTerminal(searchDto);
+
+			var clientConfig = new ClientConfig();
+			var credentialsClient = ClientBuilder.newClient(clientConfig);
+			var credentialsTarget = credentialsClient.target(settings.getApiHost()).path("api").path("credentials").path("login");
+
+			var invocationBuilder = credentialsTarget.request(MediaType.APPLICATION_JSON);
+			var response = invocationBuilder.method("POST", Entity.json(searchDto));
+
+			// TODO check if response is 2xx
+			// var responseObject = response.readEntity();
+			// if (response == null)
+			// 	System.err.println();
+
+		} catch (NumberFormatException ex) {
+			// TODO ex
+			ex.printStackTrace();
+			// TODO dialog error
+		} catch (TerminalNotFoundException_Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 
 	private static void setupMainFrame(JFrame mainFrame) {
@@ -48,25 +97,8 @@ public class Main {
 		terminalNamePanel.add(terminalNameTextField);
 
 		var terminalSubmitButton = new JButton("Submit");
-		terminalSubmitButton.addActionListener(e -> {
-			try {
-				var passageId = BigInteger.valueOf(Long.valueOf(passageIdTextField.getText()));
-				var terminalName = terminalNameTextField.getText();
-				var isCustomsPassage = customsOrPoliceCheckbox.isSelected();
-
-				var getDto = new SearchTerminalDto(passageId, terminalName, isCustomsPassage);
-				var locator = new TestSoapServiceService();
-				var client = locator.getTestSoapService();
-
-				var result = client.result();
-				// TODO soap message
-
-			} catch (NumberFormatException ex) {
-				// TODO ex
-				ex.printStackTrace();
-				// TODO dialog error
-			}
-		});
+		terminalSubmitButton.addActionListener(
+				e -> searchTerminalAction(passageIdTextField, customsOrPoliceCheckbox, terminalNameTextField));
 
 		terminalPanel.add(passageIdPanel);
 		terminalPanel.add(customsOrPolicePanel);
@@ -76,4 +108,9 @@ public class Main {
 		mainFrame.setVisible(true);
 	}
 
+	private static void loadSettings() throws IOException, FileNotFoundException {
+		var props = SettingsLoader.getLoadedProperties("clientApp");
+		var apiHost = props.getProperty("apiHost");
+		settings = new ClientAppSettings(apiHost);
+	}
 }

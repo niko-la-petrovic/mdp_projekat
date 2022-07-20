@@ -24,21 +24,28 @@ import com.google.gson.Gson;
 
 public class Serialization {
 	private static Random random = new Random();
+	private static final Gson gson = new Gson();
+	private static final YAMLMapper yamlMapper = new YAMLMapper();
+	private static final Kryo kryo = new Kryo();
+	private static final XmlMapper xmlMapper = new XmlMapper();
 
 	public static SerializationType getRandomSerializationType() {
 		var values = SerializationType.values();
 		return values[random.nextInt(values.length)];
 	}
 
-	// TODO accept serialization type
 	public static void randomSerializeToFile(Serializable obj, String folderPath, String fileNamePartial,
 			String extension) throws IOException, Exception {
+		var serializationType = getRandomSerializationType();
+		serializeToFile(obj, serializationType, folderPath, fileNamePartial, extension);
+	}
+
+	public static void serializeToFile(Serializable obj, SerializationType serializationType, String folderPath,
+			String fileNamePartial, String extension) throws IOException, Exception {
 
 		var isSuppliedExtension = extension != null;
 		var id = Util.getStringUuid();
-		var serializationType = getRandomSerializationType();
 
-		//
 		var fileName = serializationType.toString() + "_" + id + "_" + fileNamePartial;
 
 		if (!isSuppliedExtension)
@@ -64,17 +71,14 @@ public class Serialization {
 
 		switch (serializationType) {
 		case GSON:
-			var gson = new Gson();
 			var json = gson.toJson(obj);
 			Files.write(filePath, json.getBytes());
 			break;
 		case YAML:
-			var yamlMapper = new YAMLMapper();
 			yamlMapper.writeValue(file, obj);
 			break;
 		case KRYO:
 			try (var output = new Output(new FileOutputStream(file))) {
-				var kryo = new Kryo();
 				kryo.setRegistrationRequired(false);
 				kryo.writeClassAndObject(output, obj);
 				output.flush();
@@ -82,7 +86,6 @@ public class Serialization {
 			}
 			break;
 		case XML:
-			var xmlMapper = new XmlMapper();
 			xmlMapper.writeValue(file, obj);
 			break;
 		default:
@@ -92,7 +95,7 @@ public class Serialization {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T> T randomDeserializeFromFile(String filePath, Class<T> type)
+	public static <T> T deserializeFromFile(String filePath, Class<T> type)
 			throws IOException, OperationNotSupportedException {
 
 		File file = new File(filePath);

@@ -9,15 +9,25 @@ import java.util.function.Consumer;
 import mdp.settings.Constants;
 
 public class SettingsLoader {
-	public static void loadSettings(String propertiesFileName, Consumer<Properties> useProperties)
-			throws FileNotFoundException, IOException {
+	public static Properties getLoadedProperties(String propertiesFileName) throws FileNotFoundException, IOException {
 		var props = new Properties();
 
 		var loadPath = Constants.getpropertiesLocation(propertiesFileName);
-
 		try (var in = new FileInputStream(loadPath)) {
 			props.load(in);
-			useProperties.accept(props);
 		}
+
+		return props;
+	}
+
+	public static void loadSettings(String propertiesFileName, Consumer<Properties> useProperties)
+			throws FileNotFoundException, IOException {
+		var props = getLoadedProperties(propertiesFileName);
+
+		useProperties.accept(props);
+	}
+
+	public static void test() {
+
 	}
 }

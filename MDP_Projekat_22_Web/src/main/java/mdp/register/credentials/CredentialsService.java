@@ -17,13 +17,26 @@ public class CredentialsService implements ICredentialsService {
 		jedis = JedisConnectionPool.getConnection();
 	}
 
+	@Override
+	public boolean checkCredentials(PostCredentialsDto dto) {
+		String username = dto.getUsername();
+		if (username == null)
+			throw new IllegalArgumentException();
+
+		var existingPasswordHash = jedis.get(getUsernameKey(username));
+		if (existingPasswordHash == null)
+			return false;
+
+		return PasswordUtil.checkPassword(dto.getPassword(), existingPasswordHash);
+	}
+
 	public void addCredentials(PostCredentialsDto dto) throws UsernameExistsException {
 		String username = dto.getUsername();
 		if (username == null)
 			throw new IllegalArgumentException();
 
-		var existingUsername = jedis.get(getUsernameKey(username));
-		if (existingUsername != null)
+		var existingPasswordHash = jedis.get(getUsernameKey(username));
+		if (existingPasswordHash != null)
 			throw new UsernameExistsException();
 
 		var hash = PasswordUtil.hashPassword(dto.getPassword());
@@ -36,8 +49,8 @@ public class CredentialsService implements ICredentialsService {
 		if (username == null)
 			throw new IllegalArgumentException();
 
-		var existingUsername = jedis.get(getUsernameKey(username));
-		if (existingUsername == null)
+		var existingPasswordHash = jedis.get(getUsernameKey(username));
+		if (existingPasswordHash == null)
 			throw new UsernameNotFoundException();
 
 		var hash = PasswordUtil.hashPassword(dto.getPassword());

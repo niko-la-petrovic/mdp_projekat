@@ -11,4 +11,6 @@ public interface ICredentialsService {
 
 	void updateCredentials(PutCredentialsDto dto) throws UsernameNotFoundException;
 
+	boolean checkCredentials(PostCredentialsDto dto);
+
 }
