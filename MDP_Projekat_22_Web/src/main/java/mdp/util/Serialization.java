@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 //import java.util.Random;
@@ -34,13 +35,13 @@ public class Serialization {
 		return values[random.nextInt(values.length)];
 	}
 
-	public static void randomSerializeToFile(Serializable obj, String folderPath, String fileNamePartial,
+	public static Path randomSerializeToFile(Serializable obj, String folderPath, String fileNamePartial,
 			String extension) throws IOException, Exception {
 		var serializationType = getRandomSerializationType();
-		serializeToFile(obj, serializationType, folderPath, fileNamePartial, extension);
+		return serializeToFile(obj, serializationType, folderPath, fileNamePartial, extension);
 	}
 
-	public static void serializeToFile(Serializable obj, SerializationType serializationType, String folderPath,
+	public static Path serializeToFile(Serializable obj, SerializationType serializationType, String folderPath,
 			String fileNamePartial, String extension) throws IOException, Exception {
 
 		var isSuppliedExtension = extension != null;
@@ -91,7 +92,7 @@ public class Serialization {
 		default:
 			throw new OperationNotSupportedException();
 		}
-
+		return filePath;
 	}
 
 	@SuppressWarnings("unchecked")

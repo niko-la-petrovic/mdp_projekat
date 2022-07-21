@@ -5,32 +5,21 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 
-// TODO CRUD
 public class CustomsTerminal implements Serializable {
 	private static final long serialVersionUID = -1292723516097991850L;
 
-	private CustomsEntry[] entries;
-	private CustomsExit[] exits;
+	private CustomsPassage[] passages;
 	private BigInteger id;
 	private String name;
 
 	public CustomsTerminal() {
 	}
 
-	public CustomsTerminal(CustomsEntry[] entries, CustomsExit[] exits, BigInteger id, String name) {
+	public CustomsTerminal(CustomsPassage[] passages, BigInteger id, String name) {
 		super();
-		this.entries = entries;
-		this.exits = exits;
+		this.passages = passages;
 		this.id = id;
 		this.name = name;
-	}
-
-	public CustomsEntry[] getEntries() {
-		return entries;
-	}
-
-	public CustomsExit[] getExits() {
-		return exits;
 	}
 
 	public BigInteger getId() {
@@ -41,12 +30,8 @@ public class CustomsTerminal implements Serializable {
 		return name;
 	}
 
-	public void setEntries(CustomsEntry[] entries) {
-		this.entries = entries;
-	}
-
-	public void setExits(CustomsExit[] exits) {
-		this.exits = exits;
+	public CustomsPassage[] getPassages() {
+		return passages;
 	}
 
 	public void setId(BigInteger id) {
@@ -57,9 +42,8 @@ public class CustomsTerminal implements Serializable {
 		this.name = name;
 	}
 
-	public List<CustomsPassage> getPassages() {
-		var passages = Arrays.asList((CustomsPassage[]) entries);
-		passages.addAll(Arrays.asList(exits));
-		return passages;
+	public void setPassages(CustomsPassage[] passages) {
+		this.passages = passages;
 	}
+
 }

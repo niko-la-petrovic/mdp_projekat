@@ -1,9 +1,11 @@
 package mdp.models;
 
-public abstract class CustomsPassageStep implements ICustomsPassageStep {
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+public class CustomsPassageStep {
 	private static final long serialVersionUID = 4843414817898076312L;
 
-	protected boolean isCustomsCheck;
+	private boolean isCustomsCheck;
 
 	public CustomsPassageStep() {
 	}
@@ -13,12 +15,15 @@ public abstract class CustomsPassageStep implements ICustomsPassageStep {
 		this.isCustomsCheck = isCustomsCheck;
 	}
 
-	@Override
+	public void setCustomsCheck(boolean isCustomsCheck) {
+		this.isCustomsCheck = isCustomsCheck;
+	}
+
 	public boolean isCustomsCheck() {
 		return isCustomsCheck;
 	}
 
-	@Override
+	@JsonIgnore
 	public boolean isPoliceCheck() {
 		return !isCustomsCheck;
 	}

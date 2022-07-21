@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
@@ -14,10 +16,10 @@ import java.util.stream.Stream;
 import javax.naming.OperationNotSupportedException;
 
 import mdp.dtos.SearchTerminalDto;
+import mdp.exceptions.TerminalNameTakenException;
 import mdp.exceptions.TerminalNotFoundException;
-import mdp.models.CustomsEntry;
-import mdp.models.CustomsExit;
 import mdp.models.CustomsPassage;
+import mdp.models.CustomsPassageStep;
 import mdp.models.CustomsTerminal;
 import mdp.register.terminals.dtos.CreateTerminalDto;
 import mdp.register.terminals.dtos.GetCustomsPassageDto;
@@ -43,168 +45,7 @@ public class TerminalRegisterService
 		serializationTypes = SerializationType.values();
 	}
 
-	protected static int getSerializedCount() {
-		return serializedCount;
-	}
-
-	protected static void setSerializedCount(int serializedCount) {
-		TerminalRegisterService.serializedCount = serializedCount;
-	}
-
-	private TerminalRegisterSettings settings;
-
-	public TerminalRegisterService() throws FileNotFoundException, IOException {
-		loadSettings();
-		loadTerminals();
-	}
-
-	// @Override
-	public GetCustomsTerminalDto createTerminal(CreateTerminalDto dto) {
-		// TODO check if terminal name taken
-		
-		
-		var id = Util.getIntUuid();
-		int entryPassageCount = dto.getEntryPassageCount();
-		var entries = new CustomsEntry[entryPassageCount];
-		int exitPassageCount = dto.getExitPassageCount();
-		var exits = new CustomsExit[exitPassageCount];
-		var name = dto.getTerminalName();
-
-		for (int i = 0; i < entryPassageCount; i++)
-			entries[i] = new CustomsEntry(Util.getIntUuid(), true);
-		for (int i = 0; i < exitPassageCount; i++)
-			exits[i] = new CustomsExit(Util.getIntUuid(), true);
-
-		var terminal = new CustomsTerminal(entries, exits, id, name);
-
-		SerializationType serializationType;
-		serializeTerminal(terminal);
-
-		return mapTerminalToGetDto(terminal);
-	}
-
-//	@Override
-	public void deleteTerminal(BigInteger id) throws TerminalNotFoundException {
-		var filePath = getFilePath(id);
-		if (filePath == null)
-			throw new TerminalNotFoundException();
-
-		var toDelete = new File(filePath);
-		toDelete.delete();
-		terminalIdToFileMap.remove(id);
-	}
-
-	// @Override
-	public GetCustomsTerminalDto getTerminal(BigInteger passageId, boolean isCustomsStep, String terminalName)
-			throws TerminalNotFoundException {
-		var terminal = terminalIdToTerminalMap.entrySet().stream().map(pair -> pair.getValue())
-				.filter(t -> t.getName().equals(terminalName) && t.getPassages().stream()
-						.filter(e -> e.getId().equals(passageId)).findFirst().orElse(null) != null)
-
-				.findFirst().orElse(null);
-
-		if (terminal == null)
-			return null;
-
-		return mapTerminalToGetDto(terminal);
-	}
-
-//	@Override
-	public GetCustomsTerminalDto[] getTerminals() {
-		return (GetCustomsTerminalDto[]) terminalIdToTerminalMap.entrySet().stream()
-				.map(kvp -> mapTerminalToGetDto(kvp.getValue())).toArray();
-
-	}
-
-	// @Override
-	public GetCustomsTerminalDto searchTerminal(SearchTerminalDto dto) throws TerminalNotFoundException {
-		return getTerminal(dto.getPassageId(), dto.isCustomsPassage(), dto.getTerminalName());
-	}
-
-	//
-////	@Override
-	public GetCustomsTerminalDto updateTerminal(UpdateTerminalDto dto) throws TerminalNotFoundException {
-		var terminal = terminalIdToTerminalMap.entrySet().stream().map(kvp -> kvp.getValue())
-				.filter(t -> t.getId().equals(dto.getTerminalId())).findFirst().orElse(null);
-		if (terminal == null)
-			throw new TerminalNotFoundException();
-
-		synchronized (terminal) {
-
-			boolean anyChanges = false;
-			if (!terminal.getName().equals(dto.getName())) {
-				anyChanges = true;
-				terminal.setName(dto.getName());
-			}
-
-			var entryDifference = dto.getEntryPassageCount() - terminal.getEntries().length;
-			if (entryDifference != 0) {
-				anyChanges = true;
-				var entriesToAdd = Arrays.asList(terminal.getEntries());
-				if (entryDifference > 0) {
-					for (int i = 0; i < entryDifference; i++)
-						entriesToAdd.add(new CustomsEntry(Util.getIntUuid(), true));
-					terminal.setEntries((CustomsEntry[]) entriesToAdd.toArray());
-				} else {
-					for (int i = 0; i < entryDifference; i++)
-						entriesToAdd.remove(entriesToAdd.size() - 1);
-					terminal.setEntries((CustomsEntry[]) entriesToAdd.toArray());
-				}
-			}
-
-			var exitDifference = dto.getExitPassageCount() - terminal.getExits().length;
-			if (exitDifference != 0) {
-				anyChanges = true;
-				var exitsToAdd = Arrays.asList(terminal.getExits());
-				if (exitDifference > 0) {
-					for (int i = 0; i < exitDifference; i++)
-						exitsToAdd.add(new CustomsExit(Util.getIntUuid(), true));
-					terminal.setExits(((CustomsExit[]) exitsToAdd.toArray()));
-				} else {
-					for (int i = 0; i < exitDifference; i++)
-						exitsToAdd.remove(exitsToAdd.size() - 1);
-					terminal.setExits((CustomsExit[]) exitsToAdd.toArray());
-				}
-			}
-
-			deleteTerminal(terminal.getId());
-			serializeTerminal(terminal);
-		}
-
-		return new GetCustomsTerminalDto();
-	}
-
-	private String getFilePath(BigInteger id) {
-		var filePath = terminalIdToFileMap.getOrDefault(id, null);
-		return filePath;
-	}
-
-	private void loadSettings() throws IOException, FileNotFoundException {
-		var props = SettingsLoader.getLoadedProperties(TERMINAL_REGISTER_SETTINGS_NAME);
-		var saveFolderPath = props.getProperty("saveFolderPath");
-		settings = new TerminalRegisterSettings(saveFolderPath);
-	}
-
-	private void loadTerminals() {
-		var saveFolderPath = settings.getSaveFolderPath();
-		var terminalFileArray = new File(saveFolderPath).listFiles();
-		var terminalFiles = Stream.of(new File(saveFolderPath).listFiles()).filter(f -> f.isFile())
-				.collect(Collectors.toList());
-
-		for (var terminalFile : terminalFiles) {
-			try {
-				var terminal = Serialization.deserializeFromFile(terminalFile.getAbsolutePath(), CustomsTerminal.class);
-				terminalIdToFileMap.put(terminal.getId(), terminalFile.getAbsolutePath());
-				terminalIdToTerminalMap.put(terminal.getId(), terminal);
-			} catch (OperationNotSupportedException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	private GetCustomsPassageDto[] mapPassagesToDto(CustomsPassage[] entriesToMap) {
+	private static GetCustomsPassageDto[] mapPassagesToDto(CustomsPassage[] entriesToMap) {
 		var entries = new GetCustomsPassageDto[entriesToMap.length];
 		for (int i = 0; i < entriesToMap.length; i++) {
 			var entryToMap = entriesToMap[i];
@@ -221,17 +62,216 @@ public class TerminalRegisterService
 		return entries;
 	}
 
-	private GetCustomsTerminalDto mapTerminalToGetDto(CustomsTerminal terminal) {
-		var entriesToMap = terminal.getEntries();
-		var mappedEntries = mapPassagesToDto(entriesToMap);
+	private static GetCustomsTerminalDto mapTerminalToGetDto(CustomsTerminal terminal) {
+		var passagesToMap = terminal.getPassages();
+		var mappedPassages = Arrays.asList(passagesToMap);
 
-		var exitsToMap = terminal.getExits();
-		var mappedExits = mapPassagesToDto(exitsToMap);
+		var entriesArr = mappedPassages.stream().filter(p -> p.isEntry()).toArray(CustomsPassage[]::new);
+		var entries = mapPassagesToDto(entriesArr);
+		var exitsArr = mappedPassages.stream().filter(p -> !p.isEntry()).toArray(CustomsPassage[]::new);
+		var exits = mapPassagesToDto(exitsArr);
 
-		return new GetCustomsTerminalDto(terminal.getId(), terminal.getName(), mappedEntries, mappedExits);
+		var dto = new GetCustomsTerminalDto(terminal.getId(), terminal.getName(), entries, exits);
+
+		return dto;
 	}
 
-	private void serializeTerminal(CustomsTerminal terminal) {
+	protected static int getSerializedCount() {
+		return serializedCount;
+	}
+
+	protected static void setSerializedCount(int serializedCount) {
+		TerminalRegisterService.serializedCount = serializedCount;
+	}
+
+	private TerminalRegisterSettings settings;
+
+	public TerminalRegisterService() throws FileNotFoundException, IOException, OperationNotSupportedException {
+		loadSettings();
+		loadTerminals();
+	}
+
+	// @Override
+	public GetCustomsTerminalDto createTerminal(CreateTerminalDto dto) throws IOException, Exception {
+		var id = Util.getIntUuid();
+		int entryPassageCount = dto.getEntryPassageCount();
+		var entries = new CustomsPassage[entryPassageCount];
+		int exitPassageCount = dto.getExitPassageCount();
+		var exits = new CustomsPassage[exitPassageCount];
+		var name = dto.getTerminalName();
+
+		var existingTerminal = terminalIdToTerminalMap.entrySet().stream()
+				.filter(t -> t.getValue().getName().equals(name)).findFirst().orElse(null);
+		if (existingTerminal != null)
+			throw new TerminalNameTakenException();
+
+		for (int i = 0; i < entryPassageCount; i++)
+			entries[i] = new CustomsPassage(Util.getIntUuid(), true, true, CustomsPassage.customsPassageSteps());
+		for (int i = 0; i < exitPassageCount; i++)
+			exits[i] = new CustomsPassage(Util.getIntUuid(), true, false, CustomsPassage.customsPassageSteps());
+
+		var passages = Stream.of(entries, Arrays.asList(exits)).toArray();
+		var terminal = new CustomsTerminal(entries, id, name);
+
+		addTerminal(terminal);
+
+		return mapTerminalToGetDto(terminal);
+	}
+
+	// @Override
+	public void deleteTerminal(BigInteger id) throws TerminalNotFoundException {
+		if (id == null)
+			throw new NullPointerException();
+		var filePath = getFilePath(id);
+		if (filePath == null)
+			throw new TerminalNotFoundException();
+
+		removeTerminal(id, filePath);
+	}
+
+// @Override
+	public GetCustomsTerminalDto getTerminal(BigInteger passageId, boolean isCustomsStep, String terminalName)
+			throws TerminalNotFoundException {
+		var terminal = terminalIdToTerminalMap.entrySet().stream().map(pair -> pair.getValue())
+				.filter(t -> t.getName().equals(terminalName) && Arrays.asList(t.getPassages()).stream()
+						.filter(e -> e.getId().equals(passageId)).findFirst().orElse(null) != null)
+
+				.findFirst().orElse(null);
+
+		if (terminal == null)
+			return null;
+
+		return mapTerminalToGetDto(terminal);
+	}
+
+	// @Override
+	public GetCustomsTerminalDto[] getTerminals() {
+		return terminalIdToTerminalMap.entrySet().stream().map(kvp -> mapTerminalToGetDto(kvp.getValue()))
+				.toArray(GetCustomsTerminalDto[]::new);
+
+	}
+
+	// @Override
+	public GetCustomsTerminalDto[] getTerminalsStartingWithName(String namePrefix) {
+		return terminalIdToTerminalMap.entrySet().stream().map(kvp -> mapTerminalToGetDto(kvp.getValue()))
+				.filter(t -> t.getName().startsWith(namePrefix)).toArray(GetCustomsTerminalDto[]::new);
+
+	}
+
+// @Override
+	public GetCustomsTerminalDto searchTerminal(SearchTerminalDto dto) throws TerminalNotFoundException {
+		return getTerminal(dto.getPassageId(), dto.isCustomsPassage(), dto.getTerminalName());
+	}
+
+	//
+////	@Override
+	public GetCustomsTerminalDto updateTerminal(UpdateTerminalDto dto) throws IOException, Exception {
+		var terminal = terminalIdToTerminalMap.entrySet().stream().map(kvp -> kvp.getValue())
+				.filter(t -> t.getId().equals(dto.getTerminalId())).findFirst().orElse(null);
+		if (terminal == null)
+			throw new TerminalNotFoundException();
+
+		synchronized (terminal) {
+
+			boolean anyChanges = false;
+			if (!terminal.getName().equals(dto.getName())) {
+				anyChanges = true;
+				terminal.setName(dto.getName());
+			}
+
+			var entries = Arrays.asList(terminal.getPassages()).stream().filter(p -> p.isEntry())
+					.toArray(CustomsPassage[]::new);
+			var entryDifference = dto.getEntryPassageCount() - entries.length;
+			var entriesToSet = new ArrayList<>(Arrays.asList(entries));
+			if (entryDifference != 0) {
+				anyChanges = true;
+				if (entryDifference > 0) {
+					for (int i = 0; i < entryDifference; i++)
+						entriesToSet.add(new CustomsPassage(Util.getIntUuid(), true, true,
+								CustomsPassage.customsPassageSteps()));
+				} else {
+					for (int i = 0; i < entryDifference; i++)
+						entriesToSet.remove(entriesToSet.size() - 1);
+				}
+			}
+
+			var exits = Arrays.asList(terminal.getPassages()).stream().filter(p -> !p.isEntry())
+					.toArray(CustomsPassage[]::new);
+			var exitDifference = dto.getExitPassageCount() - exits.length;
+			var exitsToSet = new ArrayList<>(Arrays.asList(exits));
+			if (exitDifference != 0) {
+				anyChanges = true;
+				if (exitDifference > 0) {
+					for (int i = 0; i < exitDifference; i++)
+						exitsToSet.add(new CustomsPassage(Util.getIntUuid(), true, false,
+								CustomsPassage.customsPassageSteps()));
+				} else {
+					for (int i = 0; i < exitDifference; i++)
+						exitsToSet.remove(exitsToSet.size() - 1);
+				}
+			}
+
+			var passagesToSet = Stream.concat(entriesToSet.stream(), exitsToSet.stream());
+			terminal.setPassages(passagesToSet.toArray(CustomsPassage[]::new));
+
+			deleteTerminal(terminal.getId());
+			addTerminal(terminal);
+		}
+
+		return new GetCustomsTerminalDto(terminal.getId(), terminal.getName(),
+				mapPassagesToDto(Arrays.asList(terminal.getPassages()).stream().filter(p -> p.isEntry())
+						.toArray(CustomsPassage[]::new)),
+				mapPassagesToDto(Arrays.asList(terminal.getPassages()).stream().filter(p -> !p.isEntry())
+						.toArray(CustomsPassage[]::new)));
+	}
+
+	private void addTerminal(CustomsTerminal terminal) throws IOException, Exception {
+		var terminalFile = serializeTerminal(terminal).toFile();
+		putTerminalInMaps(terminalFile, terminal);
+	}
+
+	private String getFilePath(BigInteger id) {
+		var filePath = terminalIdToFileMap.getOrDefault(id, null);
+		return filePath;
+	}
+
+	private void loadSettings() throws IOException, FileNotFoundException {
+		var props = SettingsLoader.getLoadedProperties(TERMINAL_REGISTER_SETTINGS_NAME);
+		var saveFolderPath = props.getProperty("saveFolderPath");
+		settings = new TerminalRegisterSettings(saveFolderPath);
+	}
+
+	private void loadTerminals() throws OperationNotSupportedException, IOException {
+		var saveFolderPath = settings.getSaveFolderPath();
+		var terminalFileArray = new File(saveFolderPath).listFiles();
+		var terminalFiles = Stream.of(new File(saveFolderPath).listFiles()).filter(f -> f.isFile())
+				.collect(Collectors.toList());
+
+		// TODO for some reason the XML and YAML serializers are incorrectly serializing
+		// the isCustomsCheck field as customsCheck and policeCheck
+		for (var terminalFile : terminalFiles) {
+			var terminal = Serialization.deserializeFromFile(terminalFile.getAbsolutePath(), CustomsTerminal.class);
+			putTerminalInMaps(terminalFile, terminal);
+		}
+	}
+
+	private void putTerminalInMaps(File terminalFile, CustomsTerminal terminal) {
+		terminalIdToFileMap.put(terminal.getId(), terminalFile.getAbsolutePath());
+		terminalIdToTerminalMap.put(terminal.getId(), terminal);
+	}
+
+	private void removeTerminal(BigInteger id, String filePath) {
+		var toDelete = new File(filePath);
+		toDelete.delete();
+		removeTerminalFromMaps(id);
+	}
+
+	private void removeTerminalFromMaps(BigInteger id) {
+		terminalIdToFileMap.remove(id);
+		terminalIdToTerminalMap.remove(id);
+	}
+
+	private Path serializeTerminal(CustomsTerminal terminal) throws IOException, Exception {
 		SerializationType serializationType;
 		synchronized (serializationLock) {
 			int currentSerializedCount = getSerializedCount();
@@ -239,12 +279,7 @@ public class TerminalRegisterService
 			setSerializedCount(currentSerializedCount + 1);
 		}
 
-		try {
-			Serialization.serializeToFile(terminal, serializationType, settings.getSaveFolderPath(), "terminal", null);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		return Serialization.serializeToFile(terminal, serializationType, settings.getSaveFolderPath(), "terminal",
+				null);
 	}
 }

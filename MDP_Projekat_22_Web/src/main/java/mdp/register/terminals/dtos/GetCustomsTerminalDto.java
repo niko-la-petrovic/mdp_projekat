@@ -3,6 +3,8 @@ package mdp.register.terminals.dtos;
 import java.io.Serializable;
 import java.math.BigInteger;
 
+import mdp.models.CustomsPassage;
+
 public class GetCustomsTerminalDto implements Serializable {
 	private static final long serialVersionUID = 9089437379388391421L;
 

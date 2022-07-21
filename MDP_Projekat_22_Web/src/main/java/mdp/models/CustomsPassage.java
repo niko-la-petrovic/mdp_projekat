@@ -1,19 +1,25 @@
 package mdp.models;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 
-public abstract class CustomsPassage implements ICustomsPassage {
+public class CustomsPassage implements Serializable {
 	private static final long serialVersionUID = -2894127198803998101L;
+
+	public static CustomsPassageStep[] customsPassageSteps() {
+		return new CustomsPassageStep[] { new CustomsPassageStep(false), new CustomsPassageStep(true) };
+	}
 
 	private BigInteger id;
 	private boolean isOpen;
 	private boolean isEntry;
-	private ICustomsPassageStep[] passageSteps;
+
+	private CustomsPassageStep[] passageSteps;
 
 	public CustomsPassage() {
 	}
 
-	public CustomsPassage(BigInteger id, boolean isOpen, boolean isEntry, ICustomsPassageStep[] passageSteps) {
+	public CustomsPassage(BigInteger id, boolean isOpen, boolean isEntry, CustomsPassageStep[] passageSteps) {
 		super();
 		this.id = id;
 		this.isOpen = isOpen;
@@ -21,32 +27,43 @@ public abstract class CustomsPassage implements ICustomsPassage {
 		this.passageSteps = passageSteps;
 	}
 
-	@Override
+	public static CustomsPassage getCustomsEntry(BigInteger id, boolean isOpen) {
+		return new CustomsPassage(id, isOpen, true, customsPassageSteps());
+	}
+
+	public static CustomsPassage getCustomsExit(BigInteger id, boolean isOpen) {
+		return new CustomsPassage(id, isOpen, false, customsPassageSteps());
+	}
+
 	public BigInteger getId() {
 		return id;
 	}
 
-	@Override
-	public boolean isOpen() {
-		return isOpen;
+	public CustomsPassageStep[] getPassageSteps() {
+		return passageSteps;
 	}
 
-	@Override
 	public boolean isEntry() {
 		return isEntry;
 	}
 
-	@Override
-	public boolean isExit() {
-		return !isEntry;
+	public boolean isOpen() {
+		return isOpen;
 	}
 
-	@Override
-	public ICustomsPassageStep[] getPassageSteps() {
-		return passageSteps;
+	public void setEntry(boolean isEntry) {
+		this.isEntry = isEntry;
 	}
 
-	public static ICustomsPassageStep[] customsPassageSteps() {
-		return new ICustomsPassageStep[] { new PoliceCheckStep(), new CustomsCheckStep() };
+	public void setId(BigInteger id) {
+		this.id = id;
+	}
+
+	public void setOpen(boolean isOpen) {
+		this.isOpen = isOpen;
+	}
+
+	public void setPassageSteps(CustomsPassageStep[] passageSteps) {
+		this.passageSteps = passageSteps;
 	}
 }

@@ -1,15 +1,25 @@
 package mdp.test;
 
+import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import mdp.db.redis.JedisConnectionPool;
+import mdp.dtos.SearchTerminalDto;
+import mdp.exceptions.TerminalNameTakenException;
+import mdp.models.CustomsPassage;
+import mdp.models.CustomsTerminal;
 import mdp.models.Passenger;
 import mdp.register.terminals.TerminalRegisterService;
 import mdp.register.terminals.dtos.CreateTerminalDto;
+import mdp.register.terminals.dtos.UpdateTerminalDto;
 import mdp.test.client.TestSoapServiceService;
 import mdp.util.PasswordUtil;
 import mdp.util.Serialization;
+import mdp.util.SerializationType;
 import mdp.util.Util;
 
 public class Main {
@@ -19,7 +29,7 @@ public class Main {
 	public static void main(String[] args) throws Exception {
 		// testUuid();
 
-		// testSerialization();
+//		testSerialization();
 
 //		testRedis();
 //		testPassword();
@@ -29,7 +39,39 @@ public class Main {
 
 	private static void testTerminalRegisterService() throws Exception {
 		var service = new TerminalRegisterService();
-		var getTerminalDto = service.createTerminal(new CreateTerminalDto("test", 2, 3));
+		BigInteger terminalIdToDelete = null;
+		for (int i = 0; i < 6; i++) {
+			String terminalName = "test" + i;
+			try {
+				var getTerminalDto = service.createTerminal(new CreateTerminalDto(terminalName, 2, 3));
+				if (i == 2)
+					terminalIdToDelete = getTerminalDto.getId();
+			} catch (TerminalNameTakenException e) {
+				System.err.println("Terminal name taken:" + terminalName);
+			}
+		}
+
+		var terminals = service.getTerminals();
+//		if (terminalIdToDelete != null)
+//			service.deleteTerminal(terminalIdToDelete);
+
+		var foundTerminal = service.searchTerminal(
+				new SearchTerminalDto(new BigInteger("22999505657271045070099198464351983149"), "test0", true));
+
+		var foundTerminals = service.getTerminalsStartingWithName("test");
+
+		try {
+			for (int i = 0; i < 3; i++) {
+				service.updateTerminal(new UpdateTerminalDto(new BigInteger("250284490837732570918661700119854885447"),
+						"test4", 4, 0));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		System.out.println();
 	}
 
 	private static void testSoap() {
@@ -75,6 +117,26 @@ public class Main {
 		var yamlPassenger = Serialization.deserializeFromFile(
 				"I:\\downloads\\mdp_data\\test\\YAML_36dd8465-bf17-41c5-9eee-5e69a0143382_passenger.yaml",
 				Passenger.class);
+
+		var entries = new CustomsPassage[] {
+				new CustomsPassage(Util.getIntUuid(), true, true, CustomsPassage.customsPassageSteps()) };
+		var exits = new CustomsPassage[] {
+				new CustomsPassage(Util.getIntUuid(), true, false, CustomsPassage.customsPassageSteps()) };
+
+		var passages = Stream.concat(Arrays.asList(entries).stream(), Arrays.asList(exits).stream())
+				.toArray(CustomsPassage[]::new);
+		var customsTerminal = new CustomsTerminal(passages, Util.getIntUuid(), "name");
+
+		Serialization.serializeToFile(customsTerminal, SerializationType.GSON, serializationTestDir, "terminal", null);
+		System.out.println("Terminal GSON");
+		Serialization.serializeToFile(customsTerminal, SerializationType.KRYO, serializationTestDir, "terminal", null);
+		System.out.println("Terminal KRYO");
+		Serialization.serializeToFile(customsTerminal, SerializationType.YAML, serializationTestDir, "terminal", null);
+		System.out.println("Terminal YAML");
+		Serialization.serializeToFile(customsTerminal, SerializationType.XML, serializationTestDir, "terminal", null);
+		System.out.println("Terminal XML");
+		System.out.println();
+
 	}
 
 	private static void testUuid() {

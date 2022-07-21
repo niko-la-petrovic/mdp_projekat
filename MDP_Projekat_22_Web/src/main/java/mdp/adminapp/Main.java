@@ -8,7 +8,10 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Iterator;
 
+import javax.naming.OperationNotSupportedException;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -41,6 +44,7 @@ public class Main {
 			terminalExitCount };
 
 	private static TerminalRegisterService client;
+	private static JTable table;
 
 	public static void main(String[] args) {
 		mainFrame = new JFrame("Admin App");
@@ -100,7 +104,8 @@ public class Main {
 		System.out.println();
 	}
 
-	private static TerminalRegisterService getTerminalClient() throws FileNotFoundException, IOException {
+	private static TerminalRegisterService getTerminalClient()
+			throws FileNotFoundException, IOException, OperationNotSupportedException {
 		if (client == null)
 			client = new TerminalRegisterService();
 
@@ -160,13 +165,12 @@ public class Main {
 		var terminalTopPanel = new JPanel();
 		var addButton = new JButton("Add");
 		addButton.addActionListener(e -> addTerminalAction());
+		terminalTopPanel.add(addButton);
 		// TODO move
 //		var deleteButton = new JButton("Delete");
 		// TODO move
 //		var editButton = new JButton("Edit");
-		var searchButton = new JButton("Search");
 
-		terminalTopPanel.add(addButton);
 //		terminalTopPanel.add(deleteButton);
 //		terminalTopPanel.add(editButton);
 
@@ -174,15 +178,37 @@ public class Main {
 		var nameSearchTextField = new JTextField(20);
 		terminalTopPanel.add(nameSearchLabel);
 		terminalTopPanel.add(nameSearchTextField);
+
+		var searchButton = new JButton("Search");
+		searchButton.addActionListener(e -> searchAction(nameSearchTextField.getText()));
 		terminalTopPanel.add(searchButton);
 
 		terminalFrame.add(terminalTopPanel);
 
 		String[] tableColumnNames = { "Id", "Name", "Entries", "Exits" };
 		Object[][] initialTableData = {};
-		var table = new JTable(initialTableData, tableColumnNames);
+		table = new JTable(initialTableData, tableColumnNames);
 		table.setFillsViewportHeight(true);
 
 		terminalFrame.add(new JScrollPane(table));
+	}
+
+	private static void searchAction(String text) {
+		var terminals = client.getTerminalsStartingWithName(text);
+		var tableData = (Object[][]) Arrays.asList(terminals).stream()
+				.map(t -> new Object[] { t.getId(), t.getName(), t.getEntries().length, t.getExits().length })
+				.toArray();
+
+		updateTableData(tableData);
+	}
+
+	private static void updateTableData(Object[][] tableData) {
+		for (int i = 0; i < tableData.length; i++) {
+			Object[] objects = tableData[i];
+			for (int j = 0; j < objects.length; j++) {
+				Object object = objects[j];
+				table.getModel().setValueAt(object, i, j);
+			}
+		}
 	}
 }
