@@ -9,6 +9,7 @@ import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -97,4 +98,18 @@ public class CredentialsController {
 		}
 	}
 
+	@DELETE
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response deleteCredentials(String username) {
+		if (username == null)
+			return Response.status(Status.BAD_REQUEST).build();
+
+		try {
+			credentialsService.deleteCredentials(username);
+			return Response.ok().build();
+		} catch (UsernameNotFoundException e) {
+			e.printStackTrace();
+			return Response.status(Status.NOT_FOUND).build();
+		}
+	}
 }

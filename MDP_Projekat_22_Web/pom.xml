@@ -91,5 +91,10 @@
 			<artifactId>axis</artifactId>
 			<version>1.4</version>
 		</dependency>
+		<dependency>
+			<groupId>com.rabbitmq</groupId>
+			<artifactId>amqp-client</artifactId>
+			<version>5.15.0</version>
+		</dependency>
 	</dependencies>
 </project>

@@ -13,4 +13,6 @@ public interface ICredentialsService {
 
 	boolean checkCredentials(PostCredentialsDto dto);
 
+	void deleteCredentials(String username) throws UsernameNotFoundException;
+
 }

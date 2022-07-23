@@ -3,6 +3,8 @@ version: '3'
 volumes:
   mdp_redis_data:
     external: true
+  mdp_rabbitmq_data:
+    external: true
 
 services:
   redis:
@@ -17,3 +19,14 @@ services:
       - '8001:8001'
     volumes:
       - mdp_redis_data:/db
+  rabbitmq:
+    restart: unless-stopped
+    image: rabbitmq:3-management-alpine
+    environment:
+      - RABBITMQ_DEFAULT_USER=client
+      - RABBITMQ_DEFAULT_PASS=pass
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - mdp_rabbitmq_data:/var/lib/rabbitmq/
