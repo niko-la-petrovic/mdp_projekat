@@ -11,13 +11,13 @@ public class ChatMessage implements Serializable {
 	private BigInteger terminalId;
 	private BigInteger passageId;
 	private boolean isCustomsStep;
-	private MessageType type;
-	
+	private ChatMessageType type;
+
 	public ChatMessage() {
 	}
 
 	public ChatMessage(String text, String username, BigInteger terminalId, BigInteger passageId, boolean isCustomsStep,
-			MessageType type) {
+			ChatMessageType type) {
 		super();
 		this.text = text;
 		this.username = username;
@@ -39,7 +39,7 @@ public class ChatMessage implements Serializable {
 		return text;
 	}
 
-	public MessageType getType() {
+	public ChatMessageType getType() {
 		return type;
 	}
 
@@ -67,7 +67,7 @@ public class ChatMessage implements Serializable {
 		this.text = text;
 	}
 
-	public void setType(MessageType type) {
+	public void setType(ChatMessageType type) {
 		this.type = type;
 	}
 

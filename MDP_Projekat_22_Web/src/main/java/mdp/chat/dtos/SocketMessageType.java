@@ -1,0 +1,5 @@
+package mdp.chat.dtos;
+
+public enum SocketMessageType {
+	ESTABLISHMENT_MESSAGE, TERMINATE, RETRIEVE_ALL, ADD_MESSAGE, TRANSFER_MESSAGE, ERROR;
+}

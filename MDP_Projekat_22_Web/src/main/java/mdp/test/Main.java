@@ -1,27 +1,42 @@
 package mdp.test;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Stream;
 
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
+import com.google.gson.Gson;
 import com.rabbitmq.client.AMQP.BasicProperties;
 
+import mdp.chat.client.ChatClientSettingsLoader;
+import mdp.chat.dtos.SocketMessage;
+import mdp.chat.dtos.SocketMessageType;
 import mdp.db.redis.JedisConnectionPool;
 import mdp.dtos.SearchTerminalDto;
 import mdp.exceptions.TerminalNameTakenException;
 import mdp.models.CustomsPassage;
 import mdp.models.CustomsTerminal;
 import mdp.models.Passenger;
+import mdp.models.chat.ChatMessage;
+import mdp.models.chat.ChatMessageType;
 import mdp.mq.rabbitmq.ConnectionPool;
+import mdp.mq.rabbitmq.Constants;
 import mdp.register.terminals.TerminalRegisterService;
 import mdp.register.terminals.dtos.CreateTerminalDto;
 import mdp.register.terminals.dtos.UpdateTerminalDto;
@@ -37,8 +52,6 @@ public class Main {
 	private static final String QNAME3 = "qname3";
 	private static final String QNAME2 = "qname2";
 	private static final String QNAME1 = "qname1";
-	private static final String BROADCAST_EXCHANGE_NAME = "mdp.broadcast";
-	private static final String TOPIC_EXCHANGE_NAME = "mdp.topic";
 	private static final String terminalId1 = "123";
 	private static final String terminalId2 = "1234";
 	private static final String terminalId3 = "1235";
@@ -57,15 +70,51 @@ public class Main {
 //		testPassword();
 //		testSoap();
 //		testTerminalRegisterService();
-		testRabbitMessageQueue();
+//		testRabbitMessageQueue();
+		testChatServer();
 	}
 
-	private static String getTerminalBindingKey(String terminalId) {
-		return String.format("mdp.%s.#", terminalId);
-	}
+	private static void testChatServer() throws FileNotFoundException, IOException, TimeoutException {
 
-	private static String getTopicMessageRoutingKey(String terminalid12, String passageid12, boolean passagestep12) {
-		return String.format("mdp.%s.%s.", terminalid12, passageid12);
+		var startServerThread = mdp.chat.server.Main.startServer();
+		startServerThread.start();
+
+		try {
+			startServerThread.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		var gson = new Gson();
+
+		var clientSettings = ChatClientSettingsLoader.getSettings();
+		System.setProperty("javax.net.ssl.trustStore", clientSettings.getTrustStorePath());
+		System.setProperty("javax.net.ssl.trustStorePassword", clientSettings.getTrustStorePassword());
+
+		SSLSocketFactory sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
+		SSLSocket s = (SSLSocket) sf.createSocket(clientSettings.getHost(), clientSettings.getPort());
+
+//		s.setSoTimeout(10000);
+		BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+		PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(s.getOutputStream())), true);
+
+		var establishmentMessage = new SocketMessage(SocketMessageType.ESTABLISHMENT_MESSAGE, new ChatMessage(null,
+				"user1", new BigInteger("123"), new BigInteger("456"), true, ChatMessageType.INFO), null, null);
+		var establishmentMessageJson = gson.toJson(establishmentMessage);
+		System.out.println("Sending: " + establishmentMessageJson);
+		out.println(establishmentMessageJson);
+
+		System.out.println();
+		boolean shouldFinish = false;
+		while (!shouldFinish) {
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		System.out.println("Client finished");
 	}
 
 	private static void testPassword() {
@@ -83,34 +132,35 @@ public class Main {
 			var channel = connection.createChannel();
 			System.out.println();
 
-			var broadcastDeclareResult = channel.exchangeDeclare(BROADCAST_EXCHANGE_NAME, BuiltinExchangeType.FANOUT,
+			var broadcastDeclareResult = channel.exchangeDeclare(Constants.BROADCAST_EXCHANGE_NAME,
+					BuiltinExchangeType.FANOUT, true);
+			var topicDeclareResult = channel.exchangeDeclare(Constants.TOPIC_EXCHANGE_NAME, BuiltinExchangeType.TOPIC,
 					true);
-			var topicDeclareResult = channel.exchangeDeclare(TOPIC_EXCHANGE_NAME, BuiltinExchangeType.TOPIC, true);
 
 			var q1DeclareResult = channel.queueDeclare(QNAME1, true, false, false, null);
 			var q2DeclareResult = channel.queueDeclare(QNAME2, true, false, false, null);
 			var q3DeclareResult = channel.queueDeclare(QNAME3, true, false, false, null);
 
-			var bk1 = getTerminalBindingKey(terminalId1);
-			var bk2 = getTerminalBindingKey(terminalId2);
-			var bk3 = getTerminalBindingKey(terminalId3);
+			var bk1 = Constants.getTerminalBindingKey(terminalId1);
+			var bk2 = Constants.getTerminalBindingKey(terminalId2);
+			var bk3 = Constants.getTerminalBindingKey(terminalId3);
 
-			var qbb1 = channel.queueBind(QNAME1, BROADCAST_EXCHANGE_NAME, "");
-			var qbb2 = channel.queueBind(QNAME2, BROADCAST_EXCHANGE_NAME, "");
-			var qbb3 = channel.queueBind(QNAME3, BROADCAST_EXCHANGE_NAME, "");
+			var qbb1 = channel.queueBind(QNAME1, Constants.BROADCAST_EXCHANGE_NAME, "");
+			var qbb2 = channel.queueBind(QNAME2, Constants.BROADCAST_EXCHANGE_NAME, "");
+			var qbb3 = channel.queueBind(QNAME3, Constants.BROADCAST_EXCHANGE_NAME, "");
 
-			var qbt1 = channel.queueBind(QNAME1, TOPIC_EXCHANGE_NAME, bk1);
-			var qbt2 = channel.queueBind(QNAME2, TOPIC_EXCHANGE_NAME, bk2);
-			var qbt3 = channel.queueBind(QNAME3, TOPIC_EXCHANGE_NAME, bk3);
+			var qbt1 = channel.queueBind(QNAME1, Constants.TOPIC_EXCHANGE_NAME, bk1);
+			var qbt2 = channel.queueBind(QNAME2, Constants.TOPIC_EXCHANGE_NAME, bk2);
+			var qbt3 = channel.queueBind(QNAME3, Constants.TOPIC_EXCHANGE_NAME, bk3);
 
 			channel.queuePurge(QNAME1);
 			channel.queuePurge(QNAME2);
 			channel.queuePurge(QNAME3);
 
 			var message1 = "Message 1 text";
-			channel.basicPublish(BROADCAST_EXCHANGE_NAME, "", null, message1.getBytes());
-			var topicMessageRoutingKey = getTopicMessageRoutingKey(terminalId1, passageId1, passageStep1);
-			channel.basicPublish(TOPIC_EXCHANGE_NAME, topicMessageRoutingKey, null, message1.getBytes());
+			channel.basicPublish(Constants.BROADCAST_EXCHANGE_NAME, "", null, message1.getBytes());
+			var topicMessageRoutingKey = Constants.getTopicMessageRoutingKey(terminalId1, passageId1, passageStep1);
+			channel.basicPublish(Constants.TOPIC_EXCHANGE_NAME, topicMessageRoutingKey, null, message1.getBytes());
 
 			setConsumer(channel, QNAME1);
 			setConsumer(channel, QNAME2);
