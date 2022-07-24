@@ -101,7 +101,7 @@ public class SocketMessage implements Serializable {
 		case ERROR:
 			return error != null && message == null && messages == null;
 		case ESTABLISHMENT_MESSAGE:
-			return error != null && message != null && message.getTerminalId() != null && message.getPassageId() != null
+			return error == null && message != null && message.getTerminalId() != null && message.getPassageId() != null
 					&& messages == null;
 		default:
 			return false;

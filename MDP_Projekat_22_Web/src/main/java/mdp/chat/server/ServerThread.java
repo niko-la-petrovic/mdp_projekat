@@ -63,14 +63,18 @@ public class ServerThread extends Thread {
 		try {
 			jsonLine = in.readLine();
 			if (jsonLine == null)
-				handleTerminate();
+				setShouldTerminate(true);
 		} catch (IOException e) {
+			handleTerminate();
+			// TODO log
 			e.printStackTrace();
-			return;
+			setShouldTerminate(true);
 		}
 
-		if (isShouldTerminate())
+		if (isShouldTerminate()) {
+			handleTerminate();
 			return;
+		}
 
 		var socketMessage = gson.fromJson(jsonLine, SocketMessage.class);
 		if (!socketMessage.validateMessage())
@@ -138,9 +142,8 @@ public class ServerThread extends Thread {
 		}
 	}
 
-	private synchronized void sendMessage(SocketMessage createErrorMessage) {
-		var jsonString = gson.toJson(createErrorMessage);
+	private synchronized void sendMessage(SocketMessage message) {
+		var jsonString = gson.toJson(message);
 		out.println(jsonString);
-		out.flush();
 	}
 }

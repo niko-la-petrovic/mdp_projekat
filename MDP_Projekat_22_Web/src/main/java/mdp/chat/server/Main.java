@@ -21,7 +21,8 @@ public class Main {
 	private static ServerSocket ss;
 
 	public static void main(String[] args) throws FileNotFoundException, IOException, TimeoutException {
-		startServer();
+		var serverThread = startServer();
+		serverThread.start();
 	}
 
 	private static void configureMessageQueueing() throws FileNotFoundException, IOException, TimeoutException {

@@ -75,16 +75,16 @@ public class Main {
 	}
 
 	private static void testChatServer() throws FileNotFoundException, IOException, TimeoutException {
-
-		var startServerThread = mdp.chat.server.Main.startServer();
-		startServerThread.start();
-
-		try {
-			startServerThread.join();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+// NOTE: problem with running both
+//		var startServerThread = mdp.chat.server.Main.startServer();
+//		startServerThread.start();
+//
+//		try {
+//			startServerThread.join();
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 
 		var gson = new Gson();
 
