@@ -177,10 +177,6 @@ public class ServerThread extends Thread {
 			sendMessage(SocketMessage.createTerminateMessage());
 			handleTerminate();
 			break;
-		// TODO unnecessary
-		case RETRIEVE_ALL:
-			handleRetrieveAll();
-			break;
 		case TERMINATE:
 			handleTerminate();
 			break;
@@ -252,13 +248,6 @@ public class ServerThread extends Thread {
 		};
 		transferMessageThread.setDaemon(true);
 		transferMessageThread.start();
-	}
-
-	private void handleRetrieveAll() {
-
-		// TODO read through and send messages in queue
-		// by establishing temporary consumer to read through all the messages in the
-		// given queue and then unhook
 	}
 
 	private void handleTerminate() throws IOException {
