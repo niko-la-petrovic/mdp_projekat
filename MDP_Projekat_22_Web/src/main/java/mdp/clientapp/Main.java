@@ -51,7 +51,8 @@ public class Main {
 
 			var clientConfig = new ClientConfig();
 			var credentialsClient = ClientBuilder.newClient(clientConfig);
-			var credentialsTarget = credentialsClient.target(settings.getApiHost()).path("api").path("credentials").path("login");
+			var credentialsTarget = credentialsClient.target(settings.getApiHost()).path("api").path("credentials")
+					.path("login");
 
 			var invocationBuilder = credentialsTarget.request(MediaType.APPLICATION_JSON);
 			var response = invocationBuilder.method("POST", Entity.json(searchDto));
@@ -59,7 +60,7 @@ public class Main {
 			// TODO check if response is 2xx
 			// var responseObject = response.readEntity();
 			// if (response == null)
-			// 	System.err.println();
+			// System.err.println();
 
 		} catch (NumberFormatException ex) {
 			// TODO ex
@@ -74,6 +75,12 @@ public class Main {
 	private static void setupMainFrame(JFrame mainFrame) {
 		UiUtil.setHalfScreenSize(mainFrame);
 
+		var terminalPanel = setupTerminalPanel();
+		mainFrame.add(terminalPanel);
+		mainFrame.setVisible(true);
+	}
+
+	private static JPanel setupTerminalPanel() {
 		var terminalPanel = new JPanel();
 		terminalPanel.setBorder(BorderFactory.createTitledBorder("Terminal"));
 		terminalPanel.setMaximumSize(new Dimension(400, 400));
@@ -104,8 +111,7 @@ public class Main {
 		terminalPanel.add(customsOrPolicePanel);
 		terminalPanel.add(terminalNamePanel);
 		terminalPanel.add(terminalSubmitButton);
-		mainFrame.add(terminalPanel);
-		mainFrame.setVisible(true);
+		return terminalPanel;
 	}
 
 	private static void loadSettings() throws IOException, FileNotFoundException {

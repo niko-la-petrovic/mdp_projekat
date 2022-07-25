@@ -25,17 +25,18 @@ public class Main {
 		serverThread.start();
 	}
 
+	@SuppressWarnings("unused")
 	private static void configureMessageQueueing() throws FileNotFoundException, IOException, TimeoutException {
 		if (ServerThread.connection == null) {
 			ServerThread.connection = ConnectionPool.getConnection();
 			ServerThread.channel = ServerThread.connection.createChannel();
 
-			@SuppressWarnings("unused")
 			var broadcastDeclareResult = ServerThread.channel.exchangeDeclare(Constants.BROADCAST_EXCHANGE_NAME,
 					BuiltinExchangeType.FANOUT, true);
-			@SuppressWarnings("unused")
 			var topicDeclareResult = ServerThread.channel.exchangeDeclare(Constants.TOPIC_EXCHANGE_NAME,
 					BuiltinExchangeType.TOPIC, true);
+			var directDeclareResult = ServerThread.channel.exchangeDeclare(Constants.DIRECT_EXCHANGE_NAME,
+					BuiltinExchangeType.DIRECT, true);
 		}
 	}
 

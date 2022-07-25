@@ -6,6 +6,7 @@ import java.math.BigInteger;
 public class ChatMessage implements Serializable {
 	private static final long serialVersionUID = 2212169997841420794L;
 
+	// TODO add terminal name
 	private String text;
 	private String username;
 	private BigInteger terminalId;

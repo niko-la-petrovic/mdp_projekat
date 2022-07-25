@@ -102,7 +102,7 @@ public class SocketMessage implements Serializable {
 			return error != null && message == null && messages == null;
 		case ESTABLISHMENT_MESSAGE:
 			return error == null && message != null && message.getTerminalId() != null && message.getPassageId() != null
-					&& messages == null;
+					&& message.getTerminalId() != null && messages == null;
 		default:
 			return false;
 		}

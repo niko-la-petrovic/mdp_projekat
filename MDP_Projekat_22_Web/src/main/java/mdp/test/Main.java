@@ -9,6 +9,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Scanner;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Stream;
@@ -58,7 +59,7 @@ public class Main {
 	private static final String passageId1 = "456";
 	private static final String passageId2 = "567";
 	private static final String passageId3 = "5678";
-
+	private static boolean shouldFinish = false;
 	private static final String serializationTestDir = "I:\\downloads\\mdp_data\\test";
 
 	public static void main(String[] args) throws Exception {
@@ -87,6 +88,8 @@ public class Main {
 //		}
 
 		var gson = new Gson();
+		System.out.println(gson.toJson(new ChatMessage("test", "username", new BigInteger(terminalId1),
+				new BigInteger(passageId1), passageStep1, ChatMessageType.UNICAST)));
 
 		var clientSettings = ChatClientSettingsLoader.getSettings();
 		System.setProperty("javax.net.ssl.trustStore", clientSettings.getTrustStorePath());
@@ -100,18 +103,58 @@ public class Main {
 		PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(s.getOutputStream())), true);
 
 		var establishmentMessage = new SocketMessage(SocketMessageType.ESTABLISHMENT_MESSAGE, new ChatMessage(null,
-				"user1", new BigInteger("123"), new BigInteger("456"), true, ChatMessageType.INFO), null, null);
+				"user1", new BigInteger(terminalId1), new BigInteger(passageId1), true, ChatMessageType.INFO), null,
+				null);
 		var establishmentMessageJson = gson.toJson(establishmentMessage);
 		System.out.println("Sending: " + establishmentMessageJson);
 		out.println(establishmentMessageJson);
 
 		System.out.println();
-		boolean shouldFinish = false;
+		var readThread = new Thread() {
+			@Override
+			public void run() {
+				while (!shouldFinish) {
+					try {
+						var line = in.readLine();
+						System.out.println(line);
+						var socketMessage = gson.fromJson(line, SocketMessage.class);
+						if (line == null)
+							shouldFinish = true;
+					} catch (IOException e) {
+						shouldFinish = true;
+					}
+				}
+			}
+		};
+		readThread.start();
+		var writeThread = new Thread() {
+			@Override
+			public void run() {
+				Scanner sin = new Scanner(System.in);
+				while (!shouldFinish) {
+					var line = sin.nextLine();
+					ChatMessageType messageType = null;
+					try {
+						messageType = ChatMessageType.valueOf(line);
+					} catch (IllegalArgumentException e) {
+						System.err.println("Invalid message type");
+						continue;
+					}
+					var chatMessage = new ChatMessage("in", "user", new BigInteger(terminalId1),
+							new BigInteger(passageId1), true, messageType);
+					var socketMessage = new SocketMessage(SocketMessageType.ADD_MESSAGE, chatMessage, null, null);
+					var json = gson.toJson(socketMessage);
+					out.println(json);
+				}
+			}
+		};
+		writeThread.start();
 		while (!shouldFinish) {
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
+				shouldFinish = true;
 			}
 		}
 		System.out.println("Client finished");
@@ -159,7 +202,7 @@ public class Main {
 
 			var message1 = "Message 1 text";
 			channel.basicPublish(Constants.BROADCAST_EXCHANGE_NAME, "", null, message1.getBytes());
-			var topicMessageRoutingKey = Constants.getTopicMessageRoutingKey(terminalId1, passageId1, passageStep1);
+			var topicMessageRoutingKey = Constants.getMessageRoutingKey(terminalId1, passageId1, passageStep1);
 			channel.basicPublish(Constants.TOPIC_EXCHANGE_NAME, topicMessageRoutingKey, null, message1.getBytes());
 
 			setConsumer(channel, QNAME1);
@@ -167,6 +210,8 @@ public class Main {
 			setConsumer(channel, QNAME3);
 			Thread.currentThread().join();
 			System.out.println("Finished thread join");
+
+			// TODO declare direct exchange
 		}
 	}
 

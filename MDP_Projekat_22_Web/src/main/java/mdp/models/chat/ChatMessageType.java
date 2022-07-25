@@ -1,7 +1,7 @@
 package mdp.models.chat;
 
 public enum ChatMessageType {
-	INFO("Info"), UNICAST("Unicast"), Multicast("Multicast"), BROADCAST("Broadcast");
+	INFO("Info"), UNICAST("Unicast"), MULTICAST("Multicast"), BROADCAST("Broadcast");
 
 	private String value;
 
