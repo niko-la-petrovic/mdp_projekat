@@ -43,7 +43,9 @@ import mdp.clientapp.ClientAppSettings;
 import mdp.db.redis.JedisConnectionPool;
 import mdp.dtos.SearchTerminalDto;
 import mdp.exceptions.NoFilesFoundException;
+import mdp.exceptions.PassageNotFoundException;
 import mdp.exceptions.TerminalNameTakenException;
+import mdp.exceptions.TerminalNotFoundException;
 import mdp.models.CustomsPassage;
 import mdp.models.CustomsTerminal;
 import mdp.models.Passenger;
@@ -92,8 +94,8 @@ public class Main {
 //		testRabbitMessageQueue();
 //		testChatServer();
 //		 TODO test further
-//		testWanted();
-		testFileServer();
+		testWanted();
+//		testFileServer();
 	}
 
 	private static void testFileServer()
@@ -133,12 +135,31 @@ public class Main {
 		return file1Bytes;
 	}
 
-	private static void testWanted() throws NotBoundException, FileNotFoundException, IOException {
+	private static void testWanted() throws NotBoundException, FileNotFoundException, IOException,
+			TerminalNotFoundException, PassageNotFoundException {
 		loadClientAppSettings();
 
 		var registry = loadRmiRegistry();
-		var comp = (IPoliceCheckStepService) registry.lookup(settings.getPoliceCheckStepServiceBindingName());
+		var policeCheckService = (IPoliceCheckStepService) registry
+				.lookup(settings.getPoliceCheckStepServiceBindingName());
 
+		BigInteger terminalId = new BigInteger("165458481299780741793080579545399665715");
+		BigInteger passageId = new BigInteger("165630836651969126648801254799355469939");
+
+		try {
+			policeCheckService.isOpenTerminalPassage(new BigInteger("123"), passageStep1, passageId);
+		} catch (TerminalNotFoundException e) {
+		}
+		try {
+			policeCheckService.isOpenTerminalPassage(terminalId, false, passageId);
+		} catch (PassageNotFoundException e) {
+		}
+		var isOpen = policeCheckService.isOpenTerminalPassage(terminalId, true, passageId);
+
+		var isWanted = policeCheckService.isWanted(new BigInteger("123"), terminalId, passageId);
+		if (!isWanted)
+			System.err.println("Unexpected isWanted");
+		System.out.println();
 	}
 
 	private static Registry loadRmiRegistry() throws RemoteException {
@@ -156,7 +177,7 @@ public class Main {
 		var apiHost = props.getProperty("apiHost");
 		var rmiPort = Integer.valueOf(props.getProperty("rmiPort"));
 		var rmiHost = props.getProperty("rmiHost");
-		var policeCheckStepServiceBindingName = props.getProperty("policeCheckStepServiceName");
+		var policeCheckStepServiceBindingName = props.getProperty("policeCheckStepServiceBindingName");
 		var personIdentifyingDocumentsServiceBindingName = props
 				.getProperty("personIdentifyingDocumentsServiceBindingName");
 

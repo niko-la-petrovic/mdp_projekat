@@ -131,7 +131,8 @@ public class PoliceCheckStepService implements IPoliceCheckStepService {
 		}
 
 		var jsonStr = Files.readString(filePath);
-		wantedIds = gson.fromJson(jsonStr, HashSet.class);
+		var wantedIdsArr = gson.fromJson(jsonStr, BigInteger[].class);
+		wantedIds = new HashSet<>(Arrays.asList(wantedIdsArr));
 	}
 
 	private void loadWantedPersonsService() throws FileNotFoundException, IOException {
