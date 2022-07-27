@@ -31,24 +31,21 @@ public class Main {
 		SettingsLoader.loadSettings("wantedRegisterServer", props -> {
 			var rmiPort = Integer.valueOf(props.getProperty("rmiPort"));
 			var policeCheckStepServiceBindingName = props.getProperty("policeCheckStepServiceBindingName");
-			var personIdentifyingDocumentsServiceBindingName = props
-					.getProperty("personIdentifyingDocumentsServiceBindingName");
+			var shouldCreateRegistry = Boolean.valueOf(props.getProperty("shouldCreateRegistry"));
+
 			settings = new WantedRegisterServerSettings(rmiPort, policeCheckStepServiceBindingName,
-					personIdentifyingDocumentsServiceBindingName);
+					shouldCreateRegistry);
 		});
 
 		var policeCheckStepService = new PoliceCheckStepService();
 		var policeServiceStub = (IPoliceCheckStepService) UnicastRemoteObject.exportObject(policeCheckStepService, 0);
 
-		var personIdentifyingDocumentService = new PersonIdentifyingDocumentsService();
-		var personIdentifyingDocumentStub = (IPersonIdentifyingDocumentsService) UnicastRemoteObject
-				.exportObject(personIdentifyingDocumentService, 0);
-
-		LocateRegistry.createRegistry(settings.getRmiPort());
+		if (settings.isShouldCreateRegistry())
+			LocateRegistry.createRegistry(settings.getRmiPort());
 		var registry = LocateRegistry.getRegistry();
 
 		registry.rebind(settings.getPoliceCheckStepServiceBindingName(), policeServiceStub);
-		registry.rebind(settings.getPersonIdentifyingDocumentsServiceBindingName(), personIdentifyingDocumentStub);
+		
 		System.out.println("Bound RMI services");
 
 		setupNotificationSocket(policeCheckStepService);

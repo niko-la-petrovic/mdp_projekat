@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class ClientAppSettings implements Serializable {
 	private static final long serialVersionUID = 8166654348790193632L;
 
+	// TODO add separate host for rmi file server
 	private String apiHost;
 	private int rmiPort;
 	private String rmiHost;

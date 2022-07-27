@@ -7,18 +7,14 @@ public class WantedRegisterServerSettings implements Serializable {
 
 	private int rmiPort;
 	private String policeCheckStepServiceBindingName;
-	private String personIdentifyingDocumentsServiceBindingName;
+	private boolean shouldCreateRegistry;
 
 	public WantedRegisterServerSettings(int rmiPort, String policeCheckStepServiceBindingName,
-			String personIdentifyingDocumentsServiceBindingName) {
+			boolean shouldCreateRegistry) {
 		super();
 		this.rmiPort = rmiPort;
 		this.policeCheckStepServiceBindingName = policeCheckStepServiceBindingName;
-		this.personIdentifyingDocumentsServiceBindingName = personIdentifyingDocumentsServiceBindingName;
-	}
-
-	public String getPersonIdentifyingDocumentsServiceBindingName() {
-		return personIdentifyingDocumentsServiceBindingName;
+		this.shouldCreateRegistry = shouldCreateRegistry;
 	}
 
 	public String getPoliceCheckStepServiceBindingName() {
@@ -29,8 +25,8 @@ public class WantedRegisterServerSettings implements Serializable {
 		return rmiPort;
 	}
 
-	public void setPersonIdentifyingDocumentsServiceBindingName(String personIdentifyingDocumentsServiceBindingName) {
-		this.personIdentifyingDocumentsServiceBindingName = personIdentifyingDocumentsServiceBindingName;
+	public boolean isShouldCreateRegistry() {
+		return shouldCreateRegistry;
 	}
 
 	public void setPoliceCheckStepServiceBindingName(String policeCheckStepServiceBindingName) {
@@ -39,6 +35,10 @@ public class WantedRegisterServerSettings implements Serializable {
 
 	public void setRmiPort(int rmiPort) {
 		this.rmiPort = rmiPort;
+	}
+
+	public void setShouldCreateRegistry(boolean shouldCreateRegistry) {
+		this.shouldCreateRegistry = shouldCreateRegistry;
 	}
 
 }

@@ -92,8 +92,8 @@ public class Main {
 //		testRabbitMessageQueue();
 //		testChatServer();
 //		 TODO test further
-		testWanted();
-//		testFileServer();
+//		testWanted();
+		testFileServer();
 	}
 
 	private static void testFileServer()
