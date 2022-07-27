@@ -2,34 +2,47 @@ package mdp.test;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Scanner;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Stream;
+import java.util.zip.DeflaterInputStream;
+import java.util.zip.DeflaterOutputStream;
 
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
+import com.google.gson.Gson;
+import com.lambdaworks.redis.output.ByteArrayOutput;
+import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
-import com.google.gson.Gson;
-import com.rabbitmq.client.AMQP.BasicProperties;
 
 import mdp.chat.client.ChatClientSettingsLoader;
 import mdp.chat.dtos.SocketMessage;
 import mdp.chat.dtos.SocketMessageType;
+import mdp.clientapp.ClientAppSettings;
 import mdp.db.redis.JedisConnectionPool;
 import mdp.dtos.SearchTerminalDto;
+import mdp.exceptions.NoFilesFoundException;
 import mdp.exceptions.TerminalNameTakenException;
 import mdp.models.CustomsPassage;
 import mdp.models.CustomsTerminal;
@@ -41,10 +54,13 @@ import mdp.mq.rabbitmq.Constants;
 import mdp.register.terminals.TerminalRegisterService;
 import mdp.register.terminals.dtos.CreateTerminalDto;
 import mdp.register.terminals.dtos.UpdateTerminalDto;
+import mdp.register.wanted.services.IPersonIdentifyingDocumentsService;
+import mdp.register.wanted.services.IPoliceCheckStepService;
 import mdp.test.client.TestSoapServiceService;
 import mdp.util.PasswordUtil;
 import mdp.util.Serialization;
 import mdp.util.SerializationType;
+import mdp.util.SettingsLoader;
 import mdp.util.Util;
 
 public class Main {
@@ -57,10 +73,12 @@ public class Main {
 	private static final String terminalId2 = "1234";
 	private static final String terminalId3 = "1235";
 	private static final String passageId1 = "456";
+	@SuppressWarnings("unused")
 	private static final String passageId2 = "567";
 	private static final String passageId3 = "5678";
 	private static boolean shouldFinish = false;
 	private static final String serializationTestDir = "I:\\downloads\\mdp_data\\test";
+	private static ClientAppSettings settings;
 
 	public static void main(String[] args) throws Exception {
 		// testUuid();
@@ -72,7 +90,78 @@ public class Main {
 //		testSoap();
 //		testTerminalRegisterService();
 //		testRabbitMessageQueue();
-		testChatServer();
+//		testChatServer();
+//		 TODO test further
+		testWanted();
+//		testFileServer();
+	}
+
+	private static void testFileServer()
+			throws FileNotFoundException, IOException, NotBoundException, NoFilesFoundException {
+		loadClientAppSettings();
+
+		var registry = loadRmiRegistry();
+		var documentService = (IPersonIdentifyingDocumentsService) registry
+				.lookup(settings.getPersonIdentifyingDocumentsServiceBindingName());
+
+		var file1 = new File("I:\\downloads\\mdp_data\\sampleDocuments\\person1Text.txt");
+		byte[] file1Bytes = getDeflatedBytes(file1);
+
+		var file2 = new File("I:\\downloads\\mdp_data\\sampleDocuments\\person1Docx.docx");
+		byte[] file2Bytes = getDeflatedBytes(file2);
+
+		var fileMap = new HashMap<String, byte[]>();
+		fileMap.put(file1.toString(), file1Bytes);
+		fileMap.put(file2.toString(), file2Bytes);
+
+		BigInteger personId = new BigInteger("123");
+
+		documentService.addPersonDocuments(personId, fileMap);
+
+		var file = documentService.getArchivedPersonDocuments(personId);
+		System.out.println();
+	}
+
+	private static byte[] getDeflatedBytes(File file1) throws IOException, FileNotFoundException {
+		byte[] file1Bytes;
+		try (var sourceFileStream = new FileInputStream(file1);
+				var inDeflaterStream = new DeflaterInputStream(sourceFileStream);
+				var byteStream = new ByteArrayOutputStream();) {
+			inDeflaterStream.transferTo(byteStream);
+			file1Bytes = byteStream.toByteArray();
+		}
+		return file1Bytes;
+	}
+
+	private static void testWanted() throws NotBoundException, FileNotFoundException, IOException {
+		loadClientAppSettings();
+
+		var registry = loadRmiRegistry();
+		var comp = (IPoliceCheckStepService) registry.lookup(settings.getPoliceCheckStepServiceBindingName());
+
+	}
+
+	private static Registry loadRmiRegistry() throws RemoteException {
+		System.setProperty("java.security.policy", "client.policy");
+		if (System.getSecurityManager() == null) {
+			System.setSecurityManager(new SecurityManager());
+		}
+
+		var registry = LocateRegistry.getRegistry(settings.getRmiHost());
+		return registry;
+	}
+
+	private static void loadClientAppSettings() throws FileNotFoundException, IOException {
+		var props = SettingsLoader.getLoadedProperties("clientApp");
+		var apiHost = props.getProperty("apiHost");
+		var rmiPort = Integer.valueOf(props.getProperty("rmiPort"));
+		var rmiHost = props.getProperty("rmiHost");
+		var policeCheckStepServiceBindingName = props.getProperty("policeCheckStepServiceName");
+		var personIdentifyingDocumentsServiceBindingName = props
+				.getProperty("personIdentifyingDocumentsServiceBindingName");
+
+		settings = new ClientAppSettings(apiHost, rmiPort, rmiHost, policeCheckStepServiceBindingName,
+				personIdentifyingDocumentsServiceBindingName);
 	}
 
 	private static void testChatServer() throws FileNotFoundException, IOException, TimeoutException {
@@ -160,7 +249,8 @@ public class Main {
 		System.out.println("Client finished");
 	}
 
-	private static void testPassword() {
+	@SuppressWarnings("unused")
+	private static void testPasword() {
 		var pwd = "testpwd";
 		var hash = PasswordUtil.hashPassword(pwd);
 		System.out.println(hash);
@@ -169,6 +259,7 @@ public class Main {
 		System.out.println("Password matches");
 	}
 
+	@SuppressWarnings("unused")
 	private static void testRabbitMessageQueue()
 			throws FileNotFoundException, IOException, TimeoutException, InterruptedException {
 		try (var connection = ConnectionPool.getConnection()) {
@@ -227,6 +318,7 @@ public class Main {
 		channel.basicConsume(queueName, consumer);
 	}
 
+	@SuppressWarnings("unused")
 	private static void testRedis() throws Exception {
 		var jedis = JedisConnectionPool.getConnection();
 		jedis.set("key", "value");
@@ -235,6 +327,7 @@ public class Main {
 		System.out.println(value);
 	}
 
+	@SuppressWarnings("unused")
 	private static void testSerialization() throws Exception {
 		System.out.println(Serialization.getRandomSerializationType());
 		Serialization.randomSerializeToFile(new Passenger(BigInteger.valueOf(123)), serializationTestDir, "passenger",
@@ -277,12 +370,14 @@ public class Main {
 
 	}
 
+	@SuppressWarnings("unused")
 	private static void testSoap() {
 		var testService = new TestSoapServiceService().getTestSoapService();
 		var result = testService.result();
 		System.out.println(result);
 	}
 
+	@SuppressWarnings("unused")
 	private static void testTerminalRegisterService() throws Exception {
 		var service = new TerminalRegisterService();
 		BigInteger terminalIdToDelete = null;
@@ -320,6 +415,7 @@ public class Main {
 		System.out.println();
 	}
 
+	@SuppressWarnings("unused")
 	private static void testUuid() {
 		System.out.println(mdp.util.Util.getStringUuid());
 		String strUuid = "f2c53aa4-772e-49e9-a067-3c14dd2333dd";

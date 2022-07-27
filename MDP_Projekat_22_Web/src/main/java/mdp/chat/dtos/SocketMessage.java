@@ -17,10 +17,6 @@ public class SocketMessage implements Serializable {
 		return new SocketMessage(SocketMessageType.ERROR, null, null, error);
 	}
 
-	public static SocketMessage createRetrieveAllMessage(ChatMessage[] messages) {
-		return new SocketMessage(SocketMessageType.RETRIEVE_ALL, null, messages, null);
-	}
-
 	// TODO add username, passage id, ... to termination message
 	public static SocketMessage createTerminateMessage() {
 		return new SocketMessage(SocketMessageType.TERMINATE, null, null, null);
@@ -94,8 +90,6 @@ public class SocketMessage implements Serializable {
 			return message == null && messages == null;
 		case ADD_MESSAGE:
 			return message != null && messages == null;
-		case RETRIEVE_ALL:
-			return message == null && messages != null;
 		case TRANSFER_MESSAGE:
 			return message != null && messages == null;
 		case ERROR:

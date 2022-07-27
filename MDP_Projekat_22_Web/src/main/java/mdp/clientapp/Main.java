@@ -117,6 +117,12 @@ public class Main {
 	private static void loadSettings() throws IOException, FileNotFoundException {
 		var props = SettingsLoader.getLoadedProperties("clientApp");
 		var apiHost = props.getProperty("apiHost");
-		settings = new ClientAppSettings(apiHost);
+		var rmiPort = Integer.valueOf(props.getProperty("rmiPort"));
+		var rmiHost = props.getProperty("rmiHost");
+		var policeCheckStepServiceBindingName = props.getProperty("policeCheckStepServiceBindingName");
+		var personIdentifyingDocumentsServiceBindingName = props
+				.getProperty("personIdentifyingDocumentsServiceBindingName");
+		settings = new ClientAppSettings(apiHost, rmiPort, rmiHost, policeCheckStepServiceBindingName,
+				personIdentifyingDocumentsServiceBindingName);
 	}
 }

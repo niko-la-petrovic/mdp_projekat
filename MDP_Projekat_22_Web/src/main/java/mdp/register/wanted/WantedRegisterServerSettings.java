@@ -1,28 +1,20 @@
-package mdp.clientapp;
+package mdp.register.wanted;
 
 import java.io.Serializable;
 
-public class ClientAppSettings implements Serializable {
-	private static final long serialVersionUID = 8166654348790193632L;
+public class WantedRegisterServerSettings implements Serializable {
+	private static final long serialVersionUID = -5779115822411899346L;
 
-	private String apiHost;
 	private int rmiPort;
-	private String rmiHost;
 	private String policeCheckStepServiceBindingName;
 	private String personIdentifyingDocumentsServiceBindingName;
 
-	public ClientAppSettings(String apiHost, int rmiPort, String rmiHost, String policeCheckStepServiceBindingName,
+	public WantedRegisterServerSettings(int rmiPort, String policeCheckStepServiceBindingName,
 			String personIdentifyingDocumentsServiceBindingName) {
 		super();
-		this.apiHost = apiHost;
 		this.rmiPort = rmiPort;
-		this.rmiHost = rmiHost;
 		this.policeCheckStepServiceBindingName = policeCheckStepServiceBindingName;
 		this.personIdentifyingDocumentsServiceBindingName = personIdentifyingDocumentsServiceBindingName;
-	}
-
-	public String getApiHost() {
-		return apiHost;
 	}
 
 	public String getPersonIdentifyingDocumentsServiceBindingName() {
@@ -33,16 +25,8 @@ public class ClientAppSettings implements Serializable {
 		return policeCheckStepServiceBindingName;
 	}
 
-	public String getRmiHost() {
-		return rmiHost;
-	}
-
 	public int getRmiPort() {
 		return rmiPort;
-	}
-
-	public void setApiHost(String apiHost) {
-		this.apiHost = apiHost;
 	}
 
 	public void setPersonIdentifyingDocumentsServiceBindingName(String personIdentifyingDocumentsServiceBindingName) {
@@ -53,11 +37,8 @@ public class ClientAppSettings implements Serializable {
 		this.policeCheckStepServiceBindingName = policeCheckStepServiceBindingName;
 	}
 
-	public void setRmiHost(String rmiHost) {
-		this.rmiHost = rmiHost;
-	}
-
 	public void setRmiPort(int rmiPort) {
 		this.rmiPort = rmiPort;
 	}
+
 }

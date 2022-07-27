@@ -91,6 +91,8 @@ public class TerminalRegisterService
 		loadTerminals();
 	}
 
+	// TODO add method to update terminal passage
+	
 	// @Override
 	public GetCustomsTerminalDto createTerminal(CreateTerminalDto dto) throws IOException, Exception {
 		var id = Util.getIntUuid();
@@ -163,6 +165,8 @@ public class TerminalRegisterService
 		return getTerminal(dto.getPassageId(), dto.isCustomsPassage(), dto.getTerminalName());
 	}
 
+	
+	
 	//
 ////	@Override
 	public GetCustomsTerminalDto updateTerminal(UpdateTerminalDto dto) throws IOException, Exception {
@@ -247,8 +251,6 @@ public class TerminalRegisterService
 		var terminalFiles = Stream.of(new File(saveFolderPath).listFiles()).filter(f -> f.isFile())
 				.collect(Collectors.toList());
 
-		// TODO for some reason the XML and YAML serializers are incorrectly serializing
-		// the isCustomsCheck field as customsCheck and policeCheck
 		for (var terminalFile : terminalFiles) {
 			var terminal = Serialization.deserializeFromFile(terminalFile.getAbsolutePath(), CustomsTerminal.class);
 			putTerminalInMaps(terminalFile, terminal);
