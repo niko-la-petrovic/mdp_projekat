@@ -93,8 +93,7 @@ public class Main {
 //		testTerminalRegisterService();
 //		testRabbitMessageQueue();
 //		testChatServer();
-//		 TODO test further
-		testWanted();
+//		testWanted();
 //		testFileServer();
 	}
 
