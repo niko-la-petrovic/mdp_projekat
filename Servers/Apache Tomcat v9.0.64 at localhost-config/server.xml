@@ -60,11 +60,7 @@
          APR (HTTP/AJP) Connector: /docs/apr.html
          Define a non-SSL/TLS HTTP/1.1 Connector on port 8080
     -->
-    <Connector URIEncoding="UTF-8" connectionTimeout="20000" maxHttpHeaderSize="1715200" maxPostSize="209715200" port="8080" protocol="HTTP/1.1" redirectPort="8443"/>
-
-     
-     <Connector SSLEnabled="true" clientAuth="true" keystoreFile="keystore.jks" keystorePass="sigurnost" maxHttpHeaderSize="1715200" maxPostSize="209715200" maxThreads="150" port="8443" protocol="HTTP/1.1" scheme="https" secure="true" sslProtocol="TLS" truststoreFile="trustedStore.pfx" truststorePass="sigurnost"/>
-
+    <Connector connectionTimeout="20000" maxHttpHeaderSize="200000000" port="8080" protocol="HTTP/1.1" redirectPort="8443"/>
     <!-- A "Connector" using the shared thread pool-->
     <!--
     <Connector executor="tomcatThreadPool"
@@ -79,17 +75,15 @@
          Either JSSE or OpenSSL style configuration may be used regardless of
          the SSLImplementation selected. JSSE style configuration is used below.
     -->
-<!--     
+    <!--
     <Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"
                maxThreads="150" SSLEnabled="true">
         <SSLHostConfig>
-            <Certificate certificateKeystoreFile="keystore.jks"
-                         alias="server"
-                         keystorePass="sigurnost"
+            <Certificate certificateKeystoreFile="conf/localhost-rsa.jks"
                          type="RSA" />
         </SSLHostConfig>
-    </Connector> -->
-   
+    </Connector>
+    -->
     <!-- Define an SSL/TLS HTTP/1.1 Connector on port 8443 with HTTP/2
          This connector uses the APR/native implementation which always uses
          OpenSSL for TLS.
@@ -158,7 +152,7 @@
              Note: The pattern used is equivalent to using pattern="common" -->
         <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs" pattern="%h %l %u %t &quot;%r&quot; %s %b" prefix="localhost_access_log" suffix=".txt"/>
 
-      <Context docBase="MDP_Projekat_22_Web" path="/MDP_Projekat_22_Web" reloadable="true" source="org.eclipse.jst.jee.server:MDP_Projekat_22_Web"/></Host>
+      <Context docBase="MDP_Projekat_22_CentralRegister" path="/MDP_Projekat_22_CentralRegister" reloadable="true" source="org.eclipse.jst.jee.server:MDP_Projekat_22_CentralRegister"/></Host>
     </Engine>
   </Service>
 </Server>
