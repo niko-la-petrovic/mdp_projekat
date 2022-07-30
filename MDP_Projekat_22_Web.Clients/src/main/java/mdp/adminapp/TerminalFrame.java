@@ -18,6 +18,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import javax.xml.rpc.ServiceException;
 
 import mdp.register.terminals.TerminalRegisterService;
@@ -38,6 +40,8 @@ public class TerminalFrame {
 	private static JTable table;
 
 	static JFrame terminalFrame;
+	private static GetCustomsTerminalDto[] terminals;
+	private static JTextField nameSearchTextField;
 
 	static void setupTerminalFrame()
 			throws FileNotFoundException, OperationNotSupportedException, IOException, ServiceException {
@@ -65,7 +69,7 @@ public class TerminalFrame {
 		// terminalTopPanel.add(editButton);
 
 		JLabel nameSearchLabel = new JLabel("Terminal Name");
-		JTextField nameSearchTextField = new JTextField(20);
+		nameSearchTextField = new JTextField(20);
 		terminalTopPanel.add(nameSearchLabel);
 		terminalTopPanel.add(nameSearchTextField);
 
@@ -84,20 +88,57 @@ public class TerminalFrame {
 
 		String[] tableColumnNames = { "Id", "Name", "Entries", "Exits" };
 		Object[][] initialTableData = {};
-		table = new JTable(initialTableData, tableColumnNames);
+		table = new JTable(new DefaultTableModel(initialTableData, tableColumnNames)) {
+
+			public boolean isCellEditable(int row, int column) {
+				if (column == 0)
+					return false;
+
+				return true;
+			};
+		};
 		table.setFillsViewportHeight(true);
 
 		terminalFrame.add(new JScrollPane(table));
+
+		getAllTerminalsAction();
+	}
+
+	private static void getAllTerminalsAction() throws RemoteException {
+		terminals = client.getTerminals();
+		setTerminalsToTableData();
 	}
 
 	static void searchAction(String text) throws RemoteException {
+		terminals = client.getTerminalsStartingWithName(text);
+		setTerminalsToTableData();
+	}
 
-		GetCustomsTerminalDto[] terminals = client.getTerminalsStartingWithName(text);
-		Object[][] tableData = (Object[][]) Arrays.asList(terminals).stream()
+	private static void setTerminalsToTableData() {
+		if (terminals == null || terminals.length == 0) {
+			clearTableData();
+			return;
+		}
+
+		Object[][] tableData = Arrays.asList(terminals).stream()
 				.map(t -> new Object[] { t.getId(), t.getName(), t.getEntries().length, t.getExits().length })
-				.toArray();
+				.toArray(Object[][]::new);
 
-		updateTableData(tableData);
+		setTableData(tableData);
+	}
+
+	static void setTableData(Object[][] tableData) {
+		DefaultTableModel model = clearTableData();
+
+		for (Object[] objects : tableData) {
+			model.addRow(objects);
+		}
+	}
+
+	private static DefaultTableModel clearTableData() {
+		DefaultTableModel model = (DefaultTableModel) (table.getModel());
+		model.setRowCount(0);
+		return model;
 	}
 
 	static void updateTableData(Object[][] tableData) {
@@ -150,22 +191,29 @@ public class TerminalFrame {
 
 		try {
 			createTerminal(createTerminalDto);
-			terminalNameField.setText("");
-			terminalEntryCount.setText("");
-			terminalExitCount.setText("");
+			clearTerminalCreation();
+			JOptionPane.showMessageDialog(terminalFrame, "Successfully created", "Terminal created",
+					JOptionPane.INFORMATION_MESSAGE);
 		} catch (Exception e) {
 			showCreationErrorDialog(e);
 		}
 	}
 
+	private static void clearTerminalCreation() {
+		terminalNameField.setText("");
+		terminalEntryCount.setText("");
+		terminalExitCount.setText("");
+	}
+
 	private static void showCreationErrorDialog(Exception e) {
-		JOptionPane.showMessageDialog(terminalFrame, e.getMessage(), "Failed to create terminal",
-				JOptionPane.ERROR_MESSAGE);
+		JOptionPane.showMessageDialog(terminalFrame, String.format("Failed to create terminal: %s", e.getMessage()),
+				"Create Terminal Error", JOptionPane.ERROR_MESSAGE);
 	}
 
 	private static void createTerminal(CreateTerminalDto createTerminalDto) throws Exception {
 		GetCustomsTerminalDto result = client.createTerminal(createTerminalDto);
-		System.out.println();
+		nameSearchTextField.setText(result.getName());
+		searchAction(nameSearchTextField.getText());
 	}
 
 }
