@@ -1,110 +1,187 @@
+/**
+ * SearchTerminalDto.java
+ *
+ * This file was auto-generated from WSDL
+ * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
+ */
 
 package mdp.register.terminals.client;
 
-import java.math.BigInteger;
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlType;
+public class SearchTerminalDto  implements java.io.Serializable {
+    private boolean customsPassage;
 
+    private java.math.BigInteger passageId;
 
-/**
- * <p>Java class for SearchTerminalDto complex type.
- * 
- * <p>The following schema fragment specifies the expected content contained within this class.
- * 
- * <pre>
- * &lt;complexType name="SearchTerminalDto"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;sequence&gt;
- *         &lt;element name="customsPassage" type="{http://www.w3.org/2001/XMLSchema}boolean"/&gt;
- *         &lt;element name="passageId" type="{http://www.w3.org/2001/XMLSchema}integer"/&gt;
- *         &lt;element name="terminalName" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
- * 
- * 
- */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "SearchTerminalDto", namespace = "http://dtos.mdp", propOrder = {
-    "customsPassage",
-    "passageId",
-    "terminalName"
-})
-public class SearchTerminalDto {
+    private java.lang.String terminalName;
 
-    protected boolean customsPassage;
-    @XmlElement(required = true, nillable = true)
-    protected BigInteger passageId;
-    @XmlElement(required = true, nillable = true)
-    protected String terminalName;
+    public SearchTerminalDto() {
+    }
+
+    public SearchTerminalDto(
+           boolean customsPassage,
+           java.math.BigInteger passageId,
+           java.lang.String terminalName) {
+           this.customsPassage = customsPassage;
+           this.passageId = passageId;
+           this.terminalName = terminalName;
+    }
+
 
     /**
-     * Gets the value of the customsPassage property.
+     * Gets the customsPassage value for this SearchTerminalDto.
      * 
+     * @return customsPassage
      */
     public boolean isCustomsPassage() {
         return customsPassage;
     }
 
-    /**
-     * Sets the value of the customsPassage property.
-     * 
-     */
-    public void setCustomsPassage(boolean value) {
-        this.customsPassage = value;
-    }
 
     /**
-     * Gets the value of the passageId property.
+     * Sets the customsPassage value for this SearchTerminalDto.
      * 
-     * @return
-     *     possible object is
-     *     {@link BigInteger }
-     *     
+     * @param customsPassage
      */
-    public BigInteger getPassageId() {
+    public void setCustomsPassage(boolean customsPassage) {
+        this.customsPassage = customsPassage;
+    }
+
+
+    /**
+     * Gets the passageId value for this SearchTerminalDto.
+     * 
+     * @return passageId
+     */
+    public java.math.BigInteger getPassageId() {
         return passageId;
     }
 
-    /**
-     * Sets the value of the passageId property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BigInteger }
-     *     
-     */
-    public void setPassageId(BigInteger value) {
-        this.passageId = value;
-    }
 
     /**
-     * Gets the value of the terminalName property.
+     * Sets the passageId value for this SearchTerminalDto.
      * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     * @param passageId
      */
-    public String getTerminalName() {
+    public void setPassageId(java.math.BigInteger passageId) {
+        this.passageId = passageId;
+    }
+
+
+    /**
+     * Gets the terminalName value for this SearchTerminalDto.
+     * 
+     * @return terminalName
+     */
+    public java.lang.String getTerminalName() {
         return terminalName;
     }
 
+
     /**
-     * Sets the value of the terminalName property.
+     * Sets the terminalName value for this SearchTerminalDto.
      * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     * @param terminalName
      */
-    public void setTerminalName(String value) {
-        this.terminalName = value;
+    public void setTerminalName(java.lang.String terminalName) {
+        this.terminalName = terminalName;
+    }
+
+    private java.lang.Object __equalsCalc = null;
+    public synchronized boolean equals(java.lang.Object obj) {
+        if (!(obj instanceof SearchTerminalDto)) return false;
+        SearchTerminalDto other = (SearchTerminalDto) obj;
+        if (obj == null) return false;
+        if (this == obj) return true;
+        if (__equalsCalc != null) {
+            return (__equalsCalc == obj);
+        }
+        __equalsCalc = obj;
+        boolean _equals;
+        _equals = true && 
+            this.customsPassage == other.isCustomsPassage() &&
+            ((this.passageId==null && other.getPassageId()==null) || 
+             (this.passageId!=null &&
+              this.passageId.equals(other.getPassageId()))) &&
+            ((this.terminalName==null && other.getTerminalName()==null) || 
+             (this.terminalName!=null &&
+              this.terminalName.equals(other.getTerminalName())));
+        __equalsCalc = null;
+        return _equals;
+    }
+
+    private boolean __hashCodeCalc = false;
+    public synchronized int hashCode() {
+        if (__hashCodeCalc) {
+            return 0;
+        }
+        __hashCodeCalc = true;
+        int _hashCode = 1;
+        _hashCode += (isCustomsPassage() ? Boolean.TRUE : Boolean.FALSE).hashCode();
+        if (getPassageId() != null) {
+            _hashCode += getPassageId().hashCode();
+        }
+        if (getTerminalName() != null) {
+            _hashCode += getTerminalName().hashCode();
+        }
+        __hashCodeCalc = false;
+        return _hashCode;
+    }
+
+    // Type metadata
+    private static org.apache.axis.description.TypeDesc typeDesc =
+        new org.apache.axis.description.TypeDesc(SearchTerminalDto.class, true);
+
+    static {
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://dtos.mdp", "SearchTerminalDto"));
+        org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("customsPassage");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://dtos.mdp", "customsPassage"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("passageId");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://dtos.mdp", "passageId"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"));
+        elemField.setNillable(true);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("terminalName");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://dtos.mdp", "terminalName"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setNillable(true);
+        typeDesc.addFieldDesc(elemField);
+    }
+
+    /**
+     * Return type metadata object
+     */
+    public static org.apache.axis.description.TypeDesc getTypeDesc() {
+        return typeDesc;
+    }
+
+    /**
+     * Get Custom Serializer
+     */
+    public static org.apache.axis.encoding.Serializer getSerializer(
+           java.lang.String mechType, 
+           java.lang.Class _javaType,  
+           javax.xml.namespace.QName _xmlType) {
+        return 
+          new  org.apache.axis.encoding.ser.BeanSerializer(
+            _javaType, _xmlType, typeDesc);
+    }
+
+    /**
+     * Get Custom Deserializer
+     */
+    public static org.apache.axis.encoding.Deserializer getDeserializer(
+           java.lang.String mechType, 
+           java.lang.Class _javaType,  
+           javax.xml.namespace.QName _xmlType) {
+        return 
+          new  org.apache.axis.encoding.ser.BeanDeserializer(
+            _javaType, _xmlType, typeDesc);
     }
 
 }

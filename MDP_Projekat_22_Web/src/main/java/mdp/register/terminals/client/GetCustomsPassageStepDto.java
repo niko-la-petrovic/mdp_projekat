@@ -1,5 +1,5 @@
 /**
- * TerminalNotFoundException.java
+ * GetCustomsPassageStepDto.java
  *
  * This file was auto-generated from WSDL
  * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
@@ -7,14 +7,41 @@
 
 package mdp.register.terminals.client;
 
-public class TerminalNotFoundException  extends org.apache.axis.AxisFault  implements java.io.Serializable {
-    public TerminalNotFoundException() {
+public class GetCustomsPassageStepDto  implements java.io.Serializable {
+    private boolean customsCheck;
+
+    public GetCustomsPassageStepDto() {
+    }
+
+    public GetCustomsPassageStepDto(
+           boolean customsCheck) {
+           this.customsCheck = customsCheck;
+    }
+
+
+    /**
+     * Gets the customsCheck value for this GetCustomsPassageStepDto.
+     * 
+     * @return customsCheck
+     */
+    public boolean isCustomsCheck() {
+        return customsCheck;
+    }
+
+
+    /**
+     * Sets the customsCheck value for this GetCustomsPassageStepDto.
+     * 
+     * @param customsCheck
+     */
+    public void setCustomsCheck(boolean customsCheck) {
+        this.customsCheck = customsCheck;
     }
 
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
-        if (!(obj instanceof TerminalNotFoundException)) return false;
-        TerminalNotFoundException other = (TerminalNotFoundException) obj;
+        if (!(obj instanceof GetCustomsPassageStepDto)) return false;
+        GetCustomsPassageStepDto other = (GetCustomsPassageStepDto) obj;
         if (obj == null) return false;
         if (this == obj) return true;
         if (__equalsCalc != null) {
@@ -22,7 +49,8 @@ public class TerminalNotFoundException  extends org.apache.axis.AxisFault  imple
         }
         __equalsCalc = obj;
         boolean _equals;
-        _equals = true;
+        _equals = true && 
+            this.customsCheck == other.isCustomsCheck();
         __equalsCalc = null;
         return _equals;
     }
@@ -34,16 +62,23 @@ public class TerminalNotFoundException  extends org.apache.axis.AxisFault  imple
         }
         __hashCodeCalc = true;
         int _hashCode = 1;
+        _hashCode += (isCustomsCheck() ? Boolean.TRUE : Boolean.FALSE).hashCode();
         __hashCodeCalc = false;
         return _hashCode;
     }
 
     // Type metadata
     private static org.apache.axis.description.TypeDesc typeDesc =
-        new org.apache.axis.description.TypeDesc(TerminalNotFoundException.class, true);
+        new org.apache.axis.description.TypeDesc(GetCustomsPassageStepDto.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://exceptions.mdp", "TerminalNotFoundException"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://dtos.terminals.register.mdp", "GetCustomsPassageStepDto"));
+        org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("customsCheck");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://dtos.terminals.register.mdp", "customsCheck"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
     }
 
     /**
@@ -77,11 +112,4 @@ public class TerminalNotFoundException  extends org.apache.axis.AxisFault  imple
             _javaType, _xmlType, typeDesc);
     }
 
-
-    /**
-     * Writes the exception data to the faultDetails
-     */
-    public void writeDetails(javax.xml.namespace.QName qname, org.apache.axis.encoding.SerializationContext context) throws java.io.IOException {
-        context.serialize(qname, null, this);
-    }
 }
