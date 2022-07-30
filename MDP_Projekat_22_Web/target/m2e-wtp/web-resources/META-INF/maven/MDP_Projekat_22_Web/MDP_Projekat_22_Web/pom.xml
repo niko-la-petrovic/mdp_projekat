@@ -86,6 +86,7 @@
 			<artifactId>jaxrpc</artifactId>
 			<version>1.1</version>
 		</dependency>
+		<!-- unnecessary?-->
 		<dependency>
 			<groupId>org.apache.axis</groupId>
 			<artifactId>axis</artifactId>
