@@ -35,7 +35,7 @@ public class Main {
 	}
 
 	private static JButton getTerminalAdministrationButton() {
-		var terminalAdministrationButtton = new JButton("Terminals");
+		JButton terminalAdministrationButtton = new JButton("Terminals");
 
 		terminalAdministrationButtton.addActionListener(e -> {
 			if (TerminalFrame.terminalFrame == null) {
@@ -60,13 +60,13 @@ public class Main {
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.getContentPane().setLayout(new BoxLayout(mainFrame.getContentPane(), BoxLayout.Y_AXIS));
 
-		var buttonPanel = new JPanel();
+		JPanel buttonPanel = new JPanel();
 		buttonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 		buttonPanel.setAlignmentY(Component.CENTER_ALIGNMENT);
 		buttonPanel.setBorder(BorderFactory.createTitledBorder("Options"));
 		buttonPanel.setMaximumSize(new Dimension(400, 400));
 
-		var terminalAdministrationButtton = getTerminalAdministrationButton();
+		JButton terminalAdministrationButtton = getTerminalAdministrationButton();
 
 		buttonPanel.add(terminalAdministrationButtton);
 

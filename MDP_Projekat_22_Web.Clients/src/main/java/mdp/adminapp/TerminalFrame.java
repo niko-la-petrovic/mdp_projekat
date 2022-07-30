@@ -4,6 +4,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.util.Arrays;
 
 import javax.naming.OperationNotSupportedException;
@@ -51,8 +52,8 @@ public class TerminalFrame {
 			}
 		});
 
-		var terminalTopPanel = new JPanel();
-		var addButton = new JButton("Add");
+		JPanel terminalTopPanel = new JPanel();
+		JButton addButton = new JButton("Add");
 		addButton.addActionListener(e -> addTerminalAction());
 		terminalTopPanel.add(addButton);
 		// TODO move
@@ -63,13 +64,20 @@ public class TerminalFrame {
 		// terminalTopPanel.add(deleteButton);
 		// terminalTopPanel.add(editButton);
 
-		var nameSearchLabel = new JLabel("Terminal Name");
-		var nameSearchTextField = new JTextField(20);
+		JLabel nameSearchLabel = new JLabel("Terminal Name");
+		JTextField nameSearchTextField = new JTextField(20);
 		terminalTopPanel.add(nameSearchLabel);
 		terminalTopPanel.add(nameSearchTextField);
 
-		var searchButton = new JButton("Search");
-		searchButton.addActionListener(e -> searchAction(nameSearchTextField.getText()));
+		JButton searchButton = new JButton("Search");
+		searchButton.addActionListener(e -> {
+			try {
+				searchAction(nameSearchTextField.getText());
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
 		terminalTopPanel.add(searchButton);
 
 		terminalFrame.add(terminalTopPanel);
@@ -82,10 +90,10 @@ public class TerminalFrame {
 		terminalFrame.add(new JScrollPane(table));
 	}
 
-	static void searchAction(String text) {
+	static void searchAction(String text) throws RemoteException {
 
-		var terminals = client.getTerminalsStartingWithName(text);
-		var tableData = (Object[][]) Arrays.asList(terminals).stream()
+		GetCustomsTerminalDto[] terminals = client.getTerminalsStartingWithName(text);
+		Object[][] tableData = (Object[][]) Arrays.asList(terminals).stream()
 				.map(t -> new Object[] { t.getId(), t.getName(), t.getEntries().length, t.getExits().length })
 				.toArray();
 
@@ -135,7 +143,7 @@ public class TerminalFrame {
 			return;
 		}
 
-		var createTerminalDto = new CreateTerminalDto();
+		CreateTerminalDto createTerminalDto = new CreateTerminalDto();
 		createTerminalDto.setTerminalName(terminalName);
 		createTerminalDto.setEntryPassageCount(entryCount);
 		createTerminalDto.setExitPassageCount(exitCount);
@@ -156,7 +164,7 @@ public class TerminalFrame {
 	}
 
 	private static void createTerminal(CreateTerminalDto createTerminalDto) throws Exception {
-		var result = client.createTerminal(createTerminalDto);
+		GetCustomsTerminalDto result = client.createTerminal(createTerminalDto);
 		System.out.println();
 	}
 
