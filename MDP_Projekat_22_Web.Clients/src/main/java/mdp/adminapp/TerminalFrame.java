@@ -1,22 +1,28 @@
 package mdp.adminapp;
 
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeListener;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 
 import javax.naming.OperationNotSupportedException;
+import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -26,6 +32,7 @@ import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 import javax.xml.rpc.ServiceException;
 
+import mdp.exceptions.TerminalNotFoundException;
 import mdp.register.terminals.TerminalRegisterService;
 import mdp.register.terminals.TerminalRegisterServiceServiceLocator;
 import mdp.register.terminals.dtos.CreateTerminalDto;
@@ -111,14 +118,51 @@ public class TerminalFrame {
 		int row = table.rowAtPoint(e.getPoint());
 
 		if (table.isRowSelected(row))
-			handleShowContextMenu(row);
+			handleShowContextMenu(e, row);
 	}
 
-	private static void handleShowContextMenu(int row) {
+	private static void handleShowContextMenu(MouseEvent e, int row) {
 		GetCustomsTerminalDto terminal = terminals[row];
+
+		JPopupMenu popup = new JPopupMenu("Actions");
+
+		JMenuItem delete = new JMenuItem("Delete");
+		delete.addActionListener(evt -> handleDeleteAction(row));
+
+		JMenuItem openNotification = new JMenuItem("Open");
+
+		popup.add(delete);
+		popup.add(openNotification);
+		popup.show(e.getComponent(), e.getX(), e.getY());
+
 		// TODO
 		System.out.println();
 
+	}
+
+	private static void handleDeleteAction(int row) {
+		GetCustomsTerminalDto terminal = terminals[row];
+
+		try {
+			client.deleteTerminal(terminal.getId());
+			removeTerminalGui(terminal.getId(), row);
+		} catch (TerminalNotFoundException e) {
+			showErrorMessage("Terminal delete error", "Terminal Delete Error",
+					"Terminal with specified ID doesn't exist");
+		} catch (RemoteException e) {
+			showErrorMessage("Terminal delete error", "Terminal Delete Error", e.getMessage());
+		}
+	}
+
+	private static void removeTerminalGui(BigInteger id, int row) {
+		ArrayList<GetCustomsTerminalDto> tempTerminals = new ArrayList<GetCustomsTerminalDto>(Arrays.asList(terminals));
+		tempTerminals.remove(row);
+		terminals = tempTerminals.toArray(new GetCustomsTerminalDto[tempTerminals.size()]);
+		removeTableRow(row);
+	}
+
+	private static void removeTableRow(int row) {
+		((DefaultTableModel) table.getModel()).removeRow(row);
 	}
 
 	protected static boolean handleIsCellEditable(int row, int column) {
