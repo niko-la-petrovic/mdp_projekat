@@ -3,23 +3,18 @@ package mdp.adminapp;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import javax.naming.OperationNotSupportedException;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.xml.rpc.ServiceException;
 
-import mdp.register.terminals.TerminalRegisterService;
-import mdp.register.terminals.dtos.CreateTerminalDto;
+import mdp.util.client.SettingsLoader;
 import mdp.util.ui.UiUtil;
 
 public class Main {
@@ -27,8 +22,26 @@ public class Main {
 	static JFrame mainFrame;
 	public static Toolkit toolkit;
 	public static Dimension screenSize;
+	public static AdminAppSettings settings;
 
 	public static void main(String[] args) {
+		try {
+			SettingsLoader.loadSettings("adminApp", props -> {
+				String notificationSocketHost = props.getProperty("notificationSocketHost");
+				int notificationSocketPort = Integer.valueOf(props.getProperty("notificationSocketPort"));
+
+				settings = new AdminAppSettings(notificationSocketHost, notificationSocketPort);
+			});
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return;
+		}
+
 		mainFrame = new JFrame("Admin App");
 		setupMainFrame(mainFrame);
 		mainFrame.setVisible(true);

@@ -7,8 +7,8 @@
   <ns1:parameter name="dotNetSoapEncFix" value="true"/>
   <ns1:parameter name="enableNamespacePrefixOptimization" value="false"/>
   <ns1:parameter name="sendXMLDeclaration" value="true"/>
-  <ns1:parameter name="sendXsiTypes" value="true"/>
   <ns1:parameter name="attachments.implementation" value="org.apache.axis.attachments.AttachmentsImpl"/>
+  <ns1:parameter name="sendXsiTypes" value="true"/>
   <ns1:requestFlow>
    <ns1:handler type="java:org.apache.axis.handlers.JWSHandler">
     <ns1:parameter name="scope" value="session"/>
@@ -35,11 +35,11 @@
  <ns1:service name="TestSoapService" provider="java:RPC" style="wrapped" use="literal">
   <ns2:operation name="result" qname="ns1:result" returnQName="ns1:resultReturn" returnType="xsd:string" soapAction="" xmlns:ns1="http://test.mdp" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://xml.apache.org/axis/wsdd/"/>
   <ns1:parameter name="allowedMethods" value="result"/>
-  <ns1:parameter name="typeMappingVersion" value="1.2"/>
   <ns1:parameter name="wsdlPortType" value="TestSoapService"/>
-  <ns1:parameter name="className" value="mdp.test.TestSoapService"/>
-  <ns1:parameter name="wsdlServicePort" value="TestSoapService"/>
+  <ns1:parameter name="typeMappingVersion" value="1.2"/>
   <ns1:parameter name="schemaQualified" value="http://test.mdp"/>
+  <ns1:parameter name="wsdlServicePort" value="TestSoapService"/>
+  <ns1:parameter name="className" value="mdp.test.TestSoapService"/>
   <ns1:parameter name="wsdlTargetNamespace" value="http://test.mdp"/>
   <ns1:parameter name="wsdlServiceElement" value="TestSoapServiceService"/>
  </ns1:service>

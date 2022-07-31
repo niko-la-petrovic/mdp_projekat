@@ -8,7 +8,11 @@ import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeListener;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
 import java.math.BigInteger;
+import java.net.Socket;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +22,7 @@ import java.util.function.Function;
 import javax.naming.OperationNotSupportedException;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -36,6 +41,7 @@ import mdp.exceptions.TerminalNotFoundException;
 import mdp.register.terminals.TerminalRegisterService;
 import mdp.register.terminals.TerminalRegisterServiceServiceLocator;
 import mdp.register.terminals.dtos.CreateTerminalDto;
+import mdp.register.terminals.dtos.GetCustomsPassageDto;
 import mdp.register.terminals.dtos.GetCustomsTerminalDto;
 import mdp.register.terminals.dtos.UpdateTerminalDto;
 import mdp.util.ui.UiUtil;
@@ -48,7 +54,7 @@ public class TerminalFrame {
 			terminalNameField, new JLabel("Entry Count"), terminalEntryCount, new JLabel("Exit Count"),
 			terminalExitCount };
 
-	private static TerminalRegisterService client;
+	private static TerminalRegisterService terminalRegisterClient;
 	private static JTable table;
 
 	static JFrame terminalFrame;
@@ -68,13 +74,13 @@ public class TerminalFrame {
 	}
 
 	private static void createTerminal(CreateTerminalDto createTerminalDto) throws Exception {
-		GetCustomsTerminalDto result = client.createTerminal(createTerminalDto);
+		GetCustomsTerminalDto result = terminalRegisterClient.createTerminal(createTerminalDto);
 		nameSearchTextField.setText(result.getName());
 		searchAction(nameSearchTextField.getText());
 	}
 
 	private static void getAllTerminalsAction() throws RemoteException {
-		terminals = client.getTerminals();
+		terminals = terminalRegisterClient.getTerminals();
 		setTerminalsToTableData();
 	}
 
@@ -122,29 +128,71 @@ public class TerminalFrame {
 	}
 
 	private static void handleShowContextMenu(MouseEvent e, int row) {
-		GetCustomsTerminalDto terminal = terminals[row];
-
 		JPopupMenu popup = new JPopupMenu("Actions");
 
 		JMenuItem delete = new JMenuItem("Delete");
 		delete.addActionListener(evt -> handleDeleteAction(row));
 
 		JMenuItem openNotification = new JMenuItem("Open");
+		openNotification.addActionListener(evt -> handleInputPassageId(row));
 
 		popup.add(delete);
 		popup.add(openNotification);
 		popup.show(e.getComponent(), e.getX(), e.getY());
+	}
 
-		// TODO
-		System.out.println();
+	private static void handleInputPassageId(int row) {
+		GetCustomsTerminalDto terminal = terminals[row];
+		BigInteger terminalId = terminal.getId();
 
+		ArrayList<String> passageIdList = new ArrayList<>();
+		for (GetCustomsPassageDto passage : terminal.getEntries()) {
+			passageIdList.add(passage.getId().toString());
+		}
+		for (GetCustomsPassageDto passage : terminal.getExits()) {
+			passageIdList.add(passage.getId().toString());
+		}
+
+		Object[] passageIdOptions = passageIdList.toArray(new Object[passageIdList.size()]);
+		if (passageIdOptions.length == 0)
+			showErrorMessage("Terminal has no passages");
+
+		String selection = (String) JOptionPane.showInputDialog(terminalFrame, "Select the passage ID",
+				"Open Terminal Passages", JOptionPane.PLAIN_MESSAGE, null, passageIdOptions, passageIdOptions[0]);
+
+		try {
+			BigInteger selectedId = new BigInteger(selection);
+		} catch (Exception e) {
+			showErrorMessage("Selecting passage ID", "Error Selecting Passage", e.getMessage());
+		}
+
+		handleSendOpenNotification(terminalId, terminalId);
+	}
+
+	private static void handleSendOpenNotification(BigInteger terminalId, BigInteger passageId) {
+		String host = Main.settings.getNotificationSocketHost();
+		int port = Main.settings.getNotificationSocketPort();
+		try {
+			Socket socket = new Socket(host, port);
+			try (ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+					ObjectInputStream in = new ObjectInputStream(socket.getInputStream());) {
+				out.writeObject(terminalId);
+				out.writeObject(passageId);
+				String result = (String) in.readObject();
+			} catch (ClassNotFoundException e) {
+				showErrorMessage("Implementation error", "Failed to communicate with notification server socket",
+						e.getMessage());
+			}
+		} catch (IOException e) {
+			showErrorMessage("Sending open notification error", "Open Terminal Error", e.getMessage());
+		}
 	}
 
 	private static void handleDeleteAction(int row) {
 		GetCustomsTerminalDto terminal = terminals[row];
 
 		try {
-			client.deleteTerminal(terminal.getId());
+			terminalRegisterClient.deleteTerminal(terminal.getId());
 			removeTerminalGui(terminal.getId(), row);
 		} catch (TerminalNotFoundException e) {
 			showErrorMessage("Terminal delete error", "Terminal Delete Error",
@@ -207,7 +255,7 @@ public class TerminalFrame {
 		}
 
 		try {
-			client.updateTerminal(dto);
+			terminalRegisterClient.updateTerminal(dto);
 		} catch (RemoteException e) {
 			showErrorMessage("Update failed", "Update Error", e.getMessage());
 		}
@@ -286,14 +334,14 @@ public class TerminalFrame {
 
 	static TerminalRegisterService getTerminalClient()
 			throws FileNotFoundException, IOException, OperationNotSupportedException, ServiceException {
-		if (client == null)
-			client = new TerminalRegisterServiceServiceLocator().getTerminalRegisterService();
+		if (terminalRegisterClient == null)
+			terminalRegisterClient = new TerminalRegisterServiceServiceLocator().getTerminalRegisterService();
 
-		return client;
+		return terminalRegisterClient;
 	}
 
 	static void searchAction(String text) throws RemoteException {
-		terminals = client.getTerminalsStartingWithName(text);
+		terminals = terminalRegisterClient.getTerminalsStartingWithName(text);
 		setTerminalsToTableData();
 	}
 
@@ -307,7 +355,7 @@ public class TerminalFrame {
 
 	static void setupTerminalFrame()
 			throws FileNotFoundException, OperationNotSupportedException, IOException, ServiceException {
-		client = getTerminalClient();
+		terminalRegisterClient = getTerminalClient();
 
 		terminalFrame = new JFrame("Terminal Administration");
 		terminalFrame.setLayout(new BoxLayout(terminalFrame.getContentPane(), BoxLayout.Y_AXIS));

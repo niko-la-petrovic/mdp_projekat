@@ -13,7 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import mdp.util.SettingsLoader;
+import mdp.util.client.SettingsLoader;
 import mdp.util.ui.UiUtil;
 
 public class Main {

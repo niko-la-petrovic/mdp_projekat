@@ -1,4 +1,4 @@
-package mdp.util;
+package mdp.util.client;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.function.Consumer;
 
-import mdp.settings.Constants;
+import mdp.settings.client.Constants;
 
 public class SettingsLoader {
 	public static Properties getLoadedProperties(String propertiesFileName) throws FileNotFoundException, IOException {
