@@ -179,6 +179,7 @@ public class TerminalFrame {
 				out.writeObject(terminalId);
 				out.writeObject(passageId);
 				String result = (String) in.readObject();
+				JOptionPane.showMessageDialog(terminalFrame, result);
 			} catch (ClassNotFoundException e) {
 				showErrorMessage("Implementation error", "Failed to communicate with notification server socket",
 						e.getMessage());

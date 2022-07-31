@@ -2,16 +2,19 @@ package mdp.register.wanted;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.BindException;
 import java.net.ServerSocket;
+import java.rmi.AccessException;
 import java.rmi.AlreadyBoundException;
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 
 import javax.naming.OperationNotSupportedException;
 
-import mdp.register.wanted.services.IPersonIdentifyingDocumentsService;
+import com.rabbitmq.client.impl.Environment;
+
 import mdp.register.wanted.services.IPoliceCheckStepService;
-import mdp.register.wanted.services.PersonIdentifyingDocumentsService;
 import mdp.register.wanted.services.PoliceCheckStepService;
 import mdp.util.SettingsLoader;
 
@@ -40,12 +43,22 @@ public class Main {
 		var policeCheckStepService = new PoliceCheckStepService();
 		var policeServiceStub = (IPoliceCheckStepService) UnicastRemoteObject.exportObject(policeCheckStepService, 0);
 
-		if (settings.isShouldCreateRegistry())
-			LocateRegistry.createRegistry(settings.getRmiPort());
-		var registry = LocateRegistry.getRegistry();
+		try {
+			if (settings.isShouldCreateRegistry())
+				LocateRegistry.createRegistry(settings.getRmiPort());
+			var registry = LocateRegistry.getRegistry();
 
-		registry.rebind(settings.getPoliceCheckStepServiceBindingName(), policeServiceStub);
-		
+			registry.rebind(settings.getPoliceCheckStepServiceBindingName(), policeServiceStub);
+		} catch (AccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.exit(1);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.exit(1);
+		}
+
 		System.out.println("Bound RMI services");
 
 		setupNotificationSocket(policeCheckStepService);
