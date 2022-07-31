@@ -244,7 +244,7 @@ public class TerminalRegisterService
 						entriesToSet.add(new CustomsPassage(Util.getIntUuid(), true, true,
 								CustomsPassage.customsPassageSteps()));
 				} else {
-					for (int i = 0; i < entryDifference; i++)
+					for (int i = 0; i < -entryDifference; i++)
 						entriesToSet.remove(entriesToSet.size() - 1);
 				}
 			}
@@ -258,7 +258,7 @@ public class TerminalRegisterService
 						exitsToSet.add(new CustomsPassage(Util.getIntUuid(), true, false,
 								CustomsPassage.customsPassageSteps()));
 				} else {
-					for (int i = 0; i < exitDifference; i++)
+					for (int i = 0; i < -exitDifference; i++)
 						exitsToSet.remove(exitsToSet.size() - 1);
 				}
 			}
@@ -271,6 +271,7 @@ public class TerminalRegisterService
 				passagesToSetList.add(passage);
 			}
 			var passagesToSet = passagesToSetList.toArray(new CustomsPassage[passagesToSetList.size()]);
+			terminal.setPassages(passagesToSet);
 
 			deleteTerminal(terminal.getId());
 			addTerminal(terminal);
