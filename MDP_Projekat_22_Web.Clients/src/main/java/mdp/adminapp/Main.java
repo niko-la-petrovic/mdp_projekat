@@ -29,8 +29,9 @@ public class Main {
 			SettingsLoader.loadSettings("adminApp", props -> {
 				String notificationSocketHost = props.getProperty("notificationSocketHost");
 				int notificationSocketPort = Integer.valueOf(props.getProperty("notificationSocketPort"));
+				String wantedServerHost = props.getProperty("wantedServerHost");
 
-				settings = new AdminAppSettings(notificationSocketHost, notificationSocketPort);
+				settings = new AdminAppSettings(notificationSocketHost, notificationSocketPort, wantedServerHost);
 			});
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -80,12 +81,28 @@ public class Main {
 		buttonPanel.setMaximumSize(new Dimension(400, 400));
 
 		JButton terminalAdministrationButtton = getTerminalAdministrationButton();
+		JButton mediaDownloadButton = getMediaDownloadButton();
 
 		buttonPanel.add(terminalAdministrationButtton);
+		buttonPanel.add(mediaDownloadButton);
 
 		mainFrame.getContentPane().add(buttonPanel);
+	}
 
-		// TODO remove
-//		terminalAdministrationButtton.doClick();
+	private static JButton getMediaDownloadButton() {
+		JButton button = new JButton("Media Download");
+
+		button.addActionListener(e -> handleMediaDownloadButtonPress());
+
+		return button;
+	}
+
+	private static void handleMediaDownloadButtonPress() {
+		if (MediaDownloadFrame.frame == null) {
+			MediaDownloadFrame.setupTerminalFrame();
+		}
+
+		MediaDownloadFrame.frame.setVisible(true);
+		mainFrame.setVisible(false);
 	}
 }

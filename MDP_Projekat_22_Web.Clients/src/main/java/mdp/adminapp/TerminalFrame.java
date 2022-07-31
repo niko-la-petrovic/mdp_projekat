@@ -155,7 +155,7 @@ public class TerminalFrame {
 
 		Object[] passageIdOptions = passageIdList.toArray(new Object[passageIdList.size()]);
 		if (passageIdOptions.length == 0)
-			showErrorMessage("Terminal has no passages");
+			UiUtil.showErrorMessage(terminalFrame, "Terminal has no passages");
 
 		String selection = (String) JOptionPane.showInputDialog(terminalFrame, "Select the passage ID",
 				"Open Terminal Passages", JOptionPane.PLAIN_MESSAGE, null, passageIdOptions, passageIdOptions[0]);
@@ -163,7 +163,7 @@ public class TerminalFrame {
 		try {
 			BigInteger selectedId = new BigInteger(selection);
 		} catch (Exception e) {
-			showErrorMessage("Selecting passage ID", "Error Selecting Passage", e.getMessage());
+			UiUtil.showErrorMessage(terminalFrame, "Selecting passage ID", "Error Selecting Passage", e.getMessage());
 		}
 
 		handleSendOpenNotification(terminalId, terminalId);
@@ -181,11 +181,12 @@ public class TerminalFrame {
 				String result = (String) in.readObject();
 				JOptionPane.showMessageDialog(terminalFrame, result);
 			} catch (ClassNotFoundException e) {
-				showErrorMessage("Implementation error", "Failed to communicate with notification server socket",
-						e.getMessage());
+				UiUtil.showErrorMessage(terminalFrame, "Implementation error",
+						"Failed to communicate with notification server socket", e.getMessage());
 			}
 		} catch (IOException e) {
-			showErrorMessage("Sending open notification error", "Open Terminal Error", e.getMessage());
+			UiUtil.showErrorMessage(terminalFrame, "Sending open notification error", "Open Terminal Error",
+					e.getMessage());
 		}
 	}
 
@@ -196,10 +197,10 @@ public class TerminalFrame {
 			terminalRegisterClient.deleteTerminal(terminal.getId());
 			removeTerminalGui(terminal.getId(), row);
 		} catch (TerminalNotFoundException e) {
-			showErrorMessage("Terminal delete error", "Terminal Delete Error",
+			UiUtil.showErrorMessage(terminalFrame, "Terminal delete error", "Terminal Delete Error",
 					"Terminal with specified ID doesn't exist");
 		} catch (RemoteException e) {
-			showErrorMessage("Terminal delete error", "Terminal Delete Error", e.getMessage());
+			UiUtil.showErrorMessage(terminalFrame, "Terminal delete error", "Terminal Delete Error", e.getMessage());
 		}
 	}
 
@@ -240,25 +241,25 @@ public class TerminalFrame {
 			try {
 				dto = new UpdateTerminalDto(Integer.valueOf(setValue), exitPassageCount, terminalName, id);
 			} catch (NumberFormatException e) {
-				showErrorMessage("Invalid number format for entries count");
+				UiUtil.showErrorMessage(terminalFrame, "Invalid number format for entries count");
 			}
 			break;
 		case 3:
 			try {
 				dto = new UpdateTerminalDto(entryPassageCount, Integer.valueOf(setValue), terminalName, id);
 			} catch (NumberFormatException e) {
-				showErrorMessage("Invalid number format for exits count");
+				UiUtil.showErrorMessage(terminalFrame, "Invalid number format for exits count");
 			}
 			break;
 		default:
-			showErrorMessage("Unsupported column modified");
+			UiUtil.showErrorMessage(terminalFrame, "Unsupported column modified");
 			return;
 		}
 
 		try {
 			terminalRegisterClient.updateTerminal(dto);
 		} catch (RemoteException e) {
-			showErrorMessage("Update failed", "Update Error", e.getMessage());
+			UiUtil.showErrorMessage(terminalFrame, "Update failed", "Update Error", e.getMessage());
 		}
 	}
 
@@ -276,21 +277,6 @@ public class TerminalFrame {
 				.toArray(Object[][]::new);
 
 		setTableData(tableData);
-	}
-
-	private static void showErrorMessage(String operation, String title, String message) {
-		JOptionPane.showMessageDialog(terminalFrame, String.format("Operation: %s", message), title,
-				JOptionPane.ERROR_MESSAGE);
-	}
-
-	private static void showErrorMessage(String message) {
-		JOptionPane.showMessageDialog(terminalFrame, String.format("Error: %s", message), "Error",
-				JOptionPane.ERROR_MESSAGE);
-	}
-
-	private static void showCreationErrorDialog(Exception e) {
-		JOptionPane.showMessageDialog(terminalFrame, String.format("Failed to create terminal: %s", e.getMessage()),
-				"Create Terminal Error", JOptionPane.ERROR_MESSAGE);
 	}
 
 	static void addTerminalAction() {
@@ -314,7 +300,7 @@ public class TerminalFrame {
 					"Failed to create terminal", JOptionPane.ERROR_MESSAGE);
 			return;
 		} catch (Exception e) {
-			showCreationErrorDialog(e);
+			UiUtil.showCreationErrorDialog(terminalFrame, e);
 			return;
 		}
 
@@ -326,10 +312,9 @@ public class TerminalFrame {
 		try {
 			createTerminal(createTerminalDto);
 			clearTerminalDialog();
-			JOptionPane.showMessageDialog(terminalFrame, "Successfully created", "Terminal created",
-					JOptionPane.INFORMATION_MESSAGE);
+			UiUtil.showInfoMessage(terminalFrame, "Successfully created", "Terminal created");
 		} catch (Exception e) {
-			showCreationErrorDialog(e);
+			UiUtil.showCreationErrorDialog(terminalFrame, e);
 		}
 	}
 
