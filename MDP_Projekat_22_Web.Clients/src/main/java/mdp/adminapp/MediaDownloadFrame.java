@@ -20,8 +20,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import com.intellectualsites.http.HttpClient;
-
 import mdp.util.Util;
 import mdp.util.ui.UiUtil;
 
