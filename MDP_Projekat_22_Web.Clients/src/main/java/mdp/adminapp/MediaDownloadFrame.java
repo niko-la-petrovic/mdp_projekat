@@ -3,6 +3,8 @@ package mdp.adminapp;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -36,6 +38,12 @@ public class MediaDownloadFrame {
 		Container contentPane = frame.getContentPane();
 		frame.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
 
+		frame.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				Main.mainFrame.setVisible(true);
+			}
+		});
+
 		JButton downloadWantedLogsButton = getDownloadWantedLogsButton();
 
 		JButton downloadPersonDocumentsButton = getDownloadPersonDocumentsButton();
@@ -57,6 +65,8 @@ public class MediaDownloadFrame {
 
 		button.addActionListener(e -> {
 			String personId = JOptionPane.showInputDialog("Insert Person ID");
+			if (personId == null || personId.equals(""))
+				return;
 
 			File saveDirectoryFile = getSaveDirectory();
 			if (saveDirectoryFile == null)
