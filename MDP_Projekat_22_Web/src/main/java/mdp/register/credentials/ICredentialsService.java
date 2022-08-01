@@ -18,4 +18,6 @@ public interface ICredentialsService {
 
 	GetCredentialsDto[] getCredentials();
 
+	GetCredentialsDto[] getCredentialsStartingWith(String username);
+
 }

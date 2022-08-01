@@ -224,9 +224,6 @@ public class TerminalFrame {
 
 	protected static void handleTableCellUpdated(int row, int column) {
 		String setValue = table.getModel().getValueAt(row, column).toString();
-		// TODO Auto-generated method stub
-		// TODO send update message via client
-		// TODO refetch terminals
 		GetCustomsTerminalDto terminal = terminals[row];
 		int entryPassageCount = terminal.getEntries().length;
 		int exitPassageCount = terminal.getExits().length;

@@ -98,4 +98,13 @@ public class CredentialsService implements ICredentialsService {
 	private void setPassword(String username, String hash) {
 		jedis.hset(credentialsHash, username, hash);
 	}
+
+	@Override
+	public GetCredentialsDto[] getCredentialsStartingWith(String username) {
+		var credsMap = getAllCredentials();
+		var credentials = credsMap.keySet().stream().map(s -> new GetCredentialsDto(s))
+				.filter(c -> c.getUsername().startsWith(username)).toArray(GetCredentialsDto[]::new);
+
+		return credentials;
+	}
 }
