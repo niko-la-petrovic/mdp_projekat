@@ -139,7 +139,7 @@ public class MediaDownloadFrame {
 
 		connection.connect();
 		int responseCode = connection.getResponseCode();
-		if (!mdp.util.client.Util.isSuccessStatusCode(responseCode)) {
+		if (!mdp.util.client.HttpUtil.isSuccessStatusCode(responseCode)) {
 			String errorMessage = connection.getResponseMessage();
 			if (errorMessage == null || errorMessage.equals("null"))
 				if (responseCode == 404)

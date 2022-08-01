@@ -13,6 +13,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -48,6 +49,16 @@ public class CredentialsController {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getCredentials() {
 		var creds = credentialsService.getCredentials();
+
+		return Response.ok(creds).build();
+	}
+
+	@GET
+	@Path("/search")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response searchCredentials(@QueryParam("username") String username) {
+		var creds = credentialsService.getCredentialsStartingWith(username);
+		logger.log(Level.INFO, String.format("Searching for username '%s...'", username));
 
 		return Response.ok(creds).build();
 	}
@@ -99,6 +110,7 @@ public class CredentialsController {
 
 		try {
 			credentialsService.updateCredentials(dto);
+			logger.log(Level.INFO, String.format("Updated user with username '%s'", dto.getUsername()));
 			return Response.ok().build();
 		} catch (UsernameNotFoundException e) {
 			logger.log(Level.INFO, String.format("Username '%s' not found", dto.getUsername()));
@@ -107,13 +119,13 @@ public class CredentialsController {
 	}
 
 	@DELETE
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteCredentials(String username) {
+	public Response deleteCredentials(@QueryParam("username") String username) {
 		if (username == null)
 			return Response.status(Status.BAD_REQUEST).build();
 
 		try {
 			credentialsService.deleteCredentials(username);
+			logger.log(Level.INFO, String.format("Deleted user with username '%s'", username));
 			return Response.ok().build();
 		} catch (UsernameNotFoundException e) {
 			logger.log(Level.INFO, String.format("Username '%s' not found", username));

@@ -1,6 +1,5 @@
 package mdp.adminapp;
 
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -10,10 +9,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.rmi.RemoteException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.function.Function;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -31,8 +34,9 @@ import javax.swing.table.DefaultTableModel;
 
 import com.google.gson.Gson;
 
+import mdp.dtos.GetCredentialsDto;
 import mdp.dtos.PostCredentialsDto;
-import mdp.util.Util;
+import mdp.dtos.PutCredentialsDto;
 import mdp.util.ui.UiUtil;
 
 public class CredentialsFrame {
@@ -40,6 +44,7 @@ public class CredentialsFrame {
 	private static Gson gson = new Gson();
 	private static JTextField usernameSearchTextField;
 	private static JTable table;
+	private static GetCredentialsDto[] credentials;
 
 	public static void setupCredentialsFrame() {
 		frame = new JFrame("Credentials");
@@ -56,7 +61,7 @@ public class CredentialsFrame {
 
 		JPanel credentialsTopPanel = new JPanel();
 		JButton addButton = new JButton("Add");
-		addButton.addActionListener(e -> addCredentialsAction());
+		addButton.addActionListener(e -> handleCreateCredentialsAction());
 		credentialsTopPanel.add(addButton);
 
 		JLabel nameSearchLabel = new JLabel("Username");
@@ -66,7 +71,7 @@ public class CredentialsFrame {
 
 		JButton searchButton = new JButton("Search");
 		searchButton.addActionListener(e -> {
-			searchAction(usernameSearchTextField.getText());
+			handleSearchAction(usernameSearchTextField.getText());
 		});
 		credentialsTopPanel.add(searchButton);
 
@@ -86,31 +91,60 @@ public class CredentialsFrame {
 
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("GET");
-			connection.setRequestProperty("Content-Type", "application/json");
+			connection.setRequestProperty("Accept", "application/json");
 			connection.connect();
 
 			int responseCode = connection.getResponseCode();
-			if (!mdp.util.client.Util.isSuccessStatusCode(responseCode)) {
-// TODO show error				
+			if (!mdp.util.client.HttpUtil.isSuccessStatusCode(responseCode)) {
+				UiUtil.showErrorMessage(frame, "Fetching users", "Error Fetching Users", String.valueOf(responseCode));
 				return;
 			}
 
-			try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), "utf-8"))) {
-				StringBuilder response = new StringBuilder();
-				String responseLine = null;
-				while ((responseLine = br.readLine()) != null) {
-					response.append(responseLine.trim());
-				}
+			String json = getJson(connection);
 
-			}
-
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			credentials = gson.fromJson(json, GetCredentialsDto[].class);
+			setCredentialsToTableData();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			UiUtil.showErrorMessage(frame, "Fetching users", "Error Fetching Users", e.getMessage());
 		}
+	}
+
+	private static void setCredentialsToTableData() {
+		if (credentials == null || credentials.length == 0) {
+			clearTableData();
+			return;
+		}
+
+		Object[][] tableData = Arrays.asList(credentials).stream().map(extracted()).toArray(Object[][]::new);
+		setTableData(tableData);
+	}
+
+	private static Function<? super GetCredentialsDto, ? extends Object[]> extracted() {
+		return c -> new Object[] { c.getUsername() };
+	}
+
+	private static DefaultTableModel clearTableData() {
+		DefaultTableModel model = (DefaultTableModel) (table.getModel());
+		model.setRowCount(0);
+		return model;
+	}
+
+	private static void setTableData(Object[][] tableData) {
+		DefaultTableModel model = clearTableData();
+
+		for (Object[] object : tableData)
+			model.addRow(object);
+	}
+
+	private static String getJson(HttpURLConnection connection) throws IOException, UnsupportedEncodingException {
+		StringBuilder response = new StringBuilder();
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), "utf-8"))) {
+			String responseLine;
+			while ((responseLine = br.readLine()) != null) {
+				response.append(responseLine.trim());
+			}
+		}
+		return response.toString();
 	}
 
 	private static JTable initializeCredentialsTable() {
@@ -156,9 +190,6 @@ public class CredentialsFrame {
 	}
 
 	protected static void handleTableCellUpdated(int row, int column) {
-		if (column == 0) {
-
-		}
 	}
 
 	protected static void handlePopupTrigger(MouseEvent e) {
@@ -175,32 +206,115 @@ public class CredentialsFrame {
 		delete.addActionListener(evt -> handleDeleteAction(row));
 
 		JMenuItem setNewPassword = new JMenuItem("New Password");
-		setNewPassword.addActionListener(evt -> handleSetNewPasswordAction(row));
+		setNewPassword.addActionListener(evt -> handleUpdatePasswordAction(row));
 
 		popup.add(delete);
+		popup.add(setNewPassword);
 		popup.show(e.getComponent(), e.getX(), e.getY());
 	}
 
-	private static Object handleSetNewPasswordAction(int row) {
-		// TODO Auto-generated method stub
-		return null;
+	private static void handleUpdatePasswordAction(int row) {
+		GetCredentialsDto userCreds = credentials[row];
+
+		String password = inputPassword();
+		if (password == null)
+			return;
+
+		URL url;
+		try {
+			url = new URL(String.format("http://%s/api/credentials", Main.settings.getCredentialsServerHost()));
+
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection.setRequestProperty("Content-Type", "application/json");
+			connection.setRequestMethod("PUT");
+			connection.setDoOutput(true);
+			connection.connect();
+
+			PutCredentialsDto dto = new PutCredentialsDto(userCreds.getUsername(), password);
+			String json = gson.toJson(dto);
+			sendJson(connection, json);
+
+			int responseCode = connection.getResponseCode();
+			boolean successStatusCode = mdp.util.client.HttpUtil.isSuccessStatusCode(responseCode);
+			if (successStatusCode) {
+				UiUtil.showInfoMessage(frame,
+						String.format("Successfully updated password for user '%s'", dto.getUsername()), "Success");
+			} else if (responseCode == 404) {
+				UiUtil.showErrorMessage(frame, "Updating password", "Error Updating Password", "User doesn't exist");
+			}
+		} catch (IOException e) {
+			UiUtil.showErrorMessage(frame, "Updating user password", "Error Updating User Password", e.getMessage());
+		}
 	}
 
 	private static void handleDeleteAction(int row) {
-		// TODO Auto-generated method stub
+		GetCredentialsDto userCreds = credentials[row];
+		URL url;
+		try {
+			url = new URL(String.format("http://%s/api/credentials?username=%s",
+					Main.settings.getCredentialsServerHost(),
+					URLEncoder.encode(userCreds.getUsername(), java.nio.charset.StandardCharsets.UTF_8.toString())));
+
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection.setRequestMethod("DELETE");
+
+			connection.connect();
+			int responseCode = connection.getResponseCode();
+			if (responseCode == 404) {
+				UiUtil.showErrorMessage(frame, "Deleting user", "Error Deleting User", "User not found");
+				return;
+			} else if (!mdp.util.client.HttpUtil.isSuccessStatusCode(responseCode)) {
+				UiUtil.showErrorMessage(frame, "Deleting user", "Error Deleting User", String.valueOf(responseCode));
+				return;
+			}
+
+			UiUtil.showInfoMessage(frame, String.format("Successfully deleted user '%s'", userCreds.getUsername()),
+					"Delete User Success");
+			removeCredentialsFromGui(userCreds.getUsername(), row);
+		} catch (IOException e) {
+			UiUtil.showErrorMessage(frame, "Deleting user", "Error Deleting User", e.getMessage());
+		}
 	}
 
-	private static void searchAction(String text) {
-		// TODO Auto-generated method stub
-
+	private static void removeCredentialsFromGui(String username, int row) {
+		ArrayList<GetCredentialsDto> tempCredentials = new ArrayList<>(Arrays.asList(credentials));
+		tempCredentials.remove(row);
+		credentials = tempCredentials.toArray(new GetCredentialsDto[tempCredentials.size()]);
+		removeTableRow(row);
 	}
 
-	private static void addCredentialsAction() {
-		String username = JOptionPane.showInputDialog(frame, "Enter username", "Credentials Username",
-				JOptionPane.QUESTION_MESSAGE);
-		if (username == null || username.equals(""))
-			return;
+	private static void removeTableRow(int row) {
+		((DefaultTableModel) table.getModel()).removeRow(row);
+	}
 
+	private static void handleSearchAction(String text) {
+		URL url;
+		try {
+			url = new URL(String.format("http://%s/api/credentials/search?username=%s",
+					Main.settings.getCredentialsServerHost(),
+					URLEncoder.encode(text, java.nio.charset.StandardCharsets.UTF_8.toString())));
+
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+			connection.setRequestMethod("GET");
+			connection.setRequestProperty("Accept", "application/json");
+			connection.connect();
+
+			int responseCode = connection.getResponseCode();
+			if (!mdp.util.client.HttpUtil.isSuccessStatusCode(responseCode)) {
+				UiUtil.showErrorMessage(frame, "Fetching users", "Error Fetching Users", String.valueOf(responseCode));
+				return;
+			}
+
+			String json = getJson(connection);
+			credentials = gson.fromJson(json, GetCredentialsDto[].class);
+			setCredentialsToTableData();
+		} catch (IOException e) {
+			UiUtil.showErrorMessage(frame, "Fetching users", "Error Fetching Users", e.getMessage());
+		}
+	}
+
+	private static String inputPassword() {
 		JPanel panel = new JPanel();
 		JLabel label = new JLabel("Enter password");
 		JPasswordField pass = new JPasswordField(30);
@@ -210,9 +324,20 @@ public class CredentialsFrame {
 		int option = JOptionPane.showOptionDialog(frame, panel, "Credentials Password", JOptionPane.NO_OPTION,
 				JOptionPane.PLAIN_MESSAGE, null, options, options[1]);
 		if (option != 0)
+			return null;
+
+		return new String(pass.getPassword());
+	}
+
+	private static void handleCreateCredentialsAction() {
+		String username = JOptionPane.showInputDialog(frame, "Enter username", "Credentials Username",
+				JOptionPane.QUESTION_MESSAGE);
+		if (username == null || username.equals(""))
 			return;
 
-		String password = new String(pass.getPassword());
+		String password = inputPassword();
+		if (password == null)
+			return;
 		PostCredentialsDto dto = new PostCredentialsDto(username, password);
 
 		URL url;
@@ -220,24 +345,31 @@ public class CredentialsFrame {
 			url = new URL(String.format("http://%s/api/credentials", Main.settings.getCredentialsServerHost()));
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
+			connection.setRequestMethod("POST");
 			connection.addRequestProperty("Content-Type", "application/json");
 			connection.setDoOutput(true);
 
 			connection.connect();
-			try (OutputStream out = connection.getOutputStream();) {
-				String json = gson.toJson(dto);
-				byte[] jsonBytes = json.getBytes();
-				out.write(jsonBytes, 0, jsonBytes.length);
-			}
+			String json = gson.toJson(dto);
+			sendJson(connection, json);
 
 			int responseCode = connection.getResponseCode();
-			boolean successStatusCode = mdp.util.client.Util.isSuccessStatusCode(responseCode);
-			if (successStatusCode)
+			boolean successStatusCode = mdp.util.client.HttpUtil.isSuccessStatusCode(responseCode);
+			if (successStatusCode) {
 				UiUtil.showInfoMessage(frame, String.format("Successfully created user %s", username), "Success");
-			else if (responseCode == 409)
+				usernameSearchTextField.setText(username);
+				handleSearchAction(username);
+			} else if (responseCode == 409)
 				UiUtil.showErrorMessage(frame, "Creating user", "Error Creating User", "Username already in use");
 		} catch (IOException e) {
 			UiUtil.showErrorMessage(frame, "Creating user", "Failed to create user", e.getMessage());
+		}
+	}
+
+	private static void sendJson(HttpURLConnection connection, String json) throws IOException {
+		try (OutputStream out = connection.getOutputStream();) {
+			byte[] jsonBytes = json.getBytes();
+			out.write(jsonBytes, 0, jsonBytes.length);
 		}
 	}
 
