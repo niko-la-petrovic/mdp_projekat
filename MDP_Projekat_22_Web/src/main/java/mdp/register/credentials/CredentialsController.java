@@ -1,13 +1,11 @@
 package mdp.register.credentials;
 
-import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -26,6 +24,8 @@ import mdp.exceptions.UsernameNotFoundException;
 
 @Path("/credentials")
 public class CredentialsController {
+	private static final Logger logger = Logger.getLogger(CredentialsController.class.getName());
+
 	private ICredentialsService credentialsService;
 	private ValidatorFactory factory;
 	private Validator validator;
@@ -85,8 +85,8 @@ public class CredentialsController {
 			credentialsService.addCredentials(dto);
 			return Response.ok(dto).build();
 		} catch (UsernameExistsException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(Level.INFO,
+					String.format("Attempted to create user with existing username '%s'", dto.getUsername()));
 			return Response.status(Status.CONFLICT).build();
 		}
 	}
@@ -101,8 +101,7 @@ public class CredentialsController {
 			credentialsService.updateCredentials(dto);
 			return Response.ok().build();
 		} catch (UsernameNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(Level.INFO, String.format("Username '%s' not found", dto.getUsername()));
 			return Response.status(Status.NOT_FOUND).build();
 		}
 	}
@@ -117,7 +116,7 @@ public class CredentialsController {
 			credentialsService.deleteCredentials(username);
 			return Response.ok().build();
 		} catch (UsernameNotFoundException e) {
-			e.printStackTrace();
+			logger.log(Level.INFO, String.format("Username '%s' not found", username));
 			return Response.status(Status.NOT_FOUND).build();
 		}
 	}

@@ -9,6 +9,7 @@ import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -19,18 +20,24 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
+import com.google.gson.Gson;
+
+import mdp.dtos.PostCredentialsDto;
 import mdp.util.Util;
 import mdp.util.ui.UiUtil;
 
 public class CredentialsFrame {
 	static JFrame frame;
+	private static Gson gson = new Gson();
 	private static JTextField usernameSearchTextField;
 	private static JTable table;
 
@@ -94,7 +101,7 @@ public class CredentialsFrame {
 				while ((responseLine = br.readLine()) != null) {
 					response.append(responseLine.trim());
 				}
-				
+
 			}
 
 		} catch (MalformedURLException e) {
@@ -189,7 +196,49 @@ public class CredentialsFrame {
 	}
 
 	private static void addCredentialsAction() {
-		// TODO Auto-generated method stub
+		String username = JOptionPane.showInputDialog(frame, "Enter username", "Credentials Username",
+				JOptionPane.QUESTION_MESSAGE);
+		if (username == null || username.equals(""))
+			return;
+
+		JPanel panel = new JPanel();
+		JLabel label = new JLabel("Enter password");
+		JPasswordField pass = new JPasswordField(30);
+		panel.add(label);
+		panel.add(pass);
+		String[] options = new String[] { "OK", "Cancel" };
+		int option = JOptionPane.showOptionDialog(frame, panel, "Credentials Password", JOptionPane.NO_OPTION,
+				JOptionPane.PLAIN_MESSAGE, null, options, options[1]);
+		if (option != 0)
+			return;
+
+		String password = new String(pass.getPassword());
+		PostCredentialsDto dto = new PostCredentialsDto(username, password);
+
+		URL url;
+		try {
+			url = new URL(String.format("http://%s/api/credentials", Main.settings.getCredentialsServerHost()));
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+			connection.addRequestProperty("Content-Type", "application/json");
+			connection.setDoOutput(true);
+
+			connection.connect();
+			try (OutputStream out = connection.getOutputStream();) {
+				String json = gson.toJson(dto);
+				byte[] jsonBytes = json.getBytes();
+				out.write(jsonBytes, 0, jsonBytes.length);
+			}
+
+			int responseCode = connection.getResponseCode();
+			boolean successStatusCode = mdp.util.client.Util.isSuccessStatusCode(responseCode);
+			if (successStatusCode)
+				UiUtil.showInfoMessage(frame, String.format("Successfully created user %s", username), "Success");
+			else if (responseCode == 409)
+				UiUtil.showErrorMessage(frame, "Creating user", "Error Creating User", "Username already in use");
+		} catch (IOException e) {
+			UiUtil.showErrorMessage(frame, "Creating user", "Failed to create user", e.getMessage());
+		}
 	}
 
 }
