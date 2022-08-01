@@ -93,7 +93,7 @@ public class TerminalFrame {
 			@Override
 			public void fireTableCellUpdated(int row, int column) {
 				super.fireTableCellUpdated(row, column);
-				handleTableRowUpdated(row, column);
+				handleTableCellUpdated(row, column);
 			}
 		}) {
 
@@ -222,7 +222,7 @@ public class TerminalFrame {
 		return true;
 	}
 
-	protected static void handleTableRowUpdated(int row, int column) {
+	protected static void handleTableCellUpdated(int row, int column) {
 		String setValue = table.getModel().getValueAt(row, column).toString();
 		// TODO Auto-generated method stub
 		// TODO send update message via client

@@ -30,8 +30,10 @@ public class Main {
 				String notificationSocketHost = props.getProperty("notificationSocketHost");
 				int notificationSocketPort = Integer.valueOf(props.getProperty("notificationSocketPort"));
 				String wantedServerHost = props.getProperty("wantedServerHost");
+				String credentialsServerHost = props.getProperty("credentialsServerHost");
 
-				settings = new AdminAppSettings(notificationSocketHost, notificationSocketPort, wantedServerHost);
+				settings = new AdminAppSettings(notificationSocketHost, notificationSocketPort, wantedServerHost,
+						credentialsServerHost);
 			});
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -56,8 +58,8 @@ public class Main {
 				try {
 					TerminalFrame.setupTerminalFrame();
 				} catch (OperationNotSupportedException | IOException | ServiceException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					UiUtil.showErrorMessage(mainFrame, "Initialize terminal frame", "Error Initializing Terminal Frame",
+							e1.getMessage());
 				}
 			}
 
@@ -82,11 +84,30 @@ public class Main {
 
 		JButton terminalAdministrationButtton = getTerminalAdministrationButton();
 		JButton mediaDownloadButton = getMediaDownloadButton();
+		JButton credentialsAdminButton = getCredentialsAdminButton();
 
 		buttonPanel.add(terminalAdministrationButtton);
 		buttonPanel.add(mediaDownloadButton);
+		buttonPanel.add(credentialsAdminButton);
 
 		mainFrame.getContentPane().add(buttonPanel);
+	}
+
+	private static JButton getCredentialsAdminButton() {
+		JButton button = new JButton("Credentials");
+
+		button.addActionListener(e -> handleCredentialsAdminButtonPress());
+
+		return button;
+	}
+
+	private static void handleCredentialsAdminButtonPress() {
+		if (CredentialsFrame.frame == null) {
+			CredentialsFrame.setupCredentialsFrame();
+		}
+
+		CredentialsFrame.frame.setVisible(true);
+		mainFrame.setVisible(false);
 	}
 
 	private static JButton getMediaDownloadButton() {

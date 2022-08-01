@@ -8,12 +8,19 @@ public class AdminAppSettings implements Serializable {
 	private String notificationSocketHost;
 	private int notificationSocketPort;
 	private String wantedServerHost;
+	private String credentialsServerHost;
 
-	public AdminAppSettings(String notificationSocketHost, int notificationSocketPort, String wantedServerHost) {
+	public AdminAppSettings(String notificationSocketHost, int notificationSocketPort, String wantedServerHost,
+			String credentialsServerHost) {
 		super();
 		this.notificationSocketHost = notificationSocketHost;
 		this.notificationSocketPort = notificationSocketPort;
 		this.wantedServerHost = wantedServerHost;
+		this.credentialsServerHost = credentialsServerHost;
+	}
+
+	public String getCredentialsServerHost() {
+		return credentialsServerHost;
 	}
 
 	public String getNotificationSocketHost() {
@@ -26,6 +33,10 @@ public class AdminAppSettings implements Serializable {
 
 	public String getWantedServerHost() {
 		return wantedServerHost;
+	}
+
+	public void setCredentialsServerHost(String credentialsServerHost) {
+		this.credentialsServerHost = credentialsServerHost;
 	}
 
 	public void setNotificationSocketHost(String notificationSocketHost) {

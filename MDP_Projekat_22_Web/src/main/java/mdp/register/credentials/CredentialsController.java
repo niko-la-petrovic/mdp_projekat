@@ -39,8 +39,17 @@ public class CredentialsController {
 	@GET
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/ping")
 	public String getPing() {
 		return "pong";
+	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getCredentials() {
+		var creds = credentialsService.getCredentials();
+
+		return Response.ok(creds).build();
 	}
 
 	@POST

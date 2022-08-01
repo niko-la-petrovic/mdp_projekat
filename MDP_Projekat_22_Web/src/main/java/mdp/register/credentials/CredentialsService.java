@@ -1,6 +1,10 @@
 package mdp.register.credentials;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 import mdp.db.redis.JedisConnectionPool;
+import mdp.dtos.GetCredentialsDto;
 import mdp.dtos.PostCredentialsDto;
 import mdp.dtos.PutCredentialsDto;
 import mdp.exceptions.UsernameExistsException;
@@ -9,11 +13,7 @@ import mdp.util.PasswordUtil;
 import redis.clients.jedis.Jedis;
 
 public class CredentialsService implements ICredentialsService {
-	private static final String credentialsPrefix = "credentials:";
-
-	private static String getUsernameKey(String username) {
-		return credentialsPrefix + username;
-	}
+	private static final String credentialsHash = "credentials";
 
 	protected Jedis jedis;
 
@@ -26,12 +26,12 @@ public class CredentialsService implements ICredentialsService {
 		if (username == null)
 			throw new IllegalArgumentException();
 
-		var existingPasswordHash = jedis.get(getUsernameKey(username));
+		var existingPasswordHash = getUsernameHash(username);
 		if (existingPasswordHash != null)
 			throw new UsernameExistsException();
 
 		var hash = PasswordUtil.hashPassword(dto.getPassword());
-		jedis.set(getUsernameKey(username), hash);
+		setPassword(username, hash);
 	}
 
 	@Override
@@ -40,7 +40,7 @@ public class CredentialsService implements ICredentialsService {
 		if (username == null)
 			throw new IllegalArgumentException();
 
-		var existingPasswordHash = jedis.get(getUsernameKey(username));
+		var existingPasswordHash = getUsernameHash(username);
 		if (existingPasswordHash == null)
 			return false;
 
@@ -52,11 +52,19 @@ public class CredentialsService implements ICredentialsService {
 		if (username == null)
 			throw new IllegalArgumentException();
 
-		var existingPasswordHash = jedis.get(getUsernameKey(username));
+		var existingPasswordHash = getUsernameHash(username);
 		if (existingPasswordHash == null)
 			throw new UsernameNotFoundException();
 
-		jedis.del(getUsernameKey(username));
+		deleteUsernameEntry(username);
+	}
+
+	public GetCredentialsDto[] getCredentials() {
+		var credsMap = getAllCredentials();
+		var credentials = credsMap.keySet().stream().map(s -> new GetCredentialsDto(s))
+				.toArray(GetCredentialsDto[]::new);
+
+		return credentials;
 	}
 
 	@Override
@@ -65,12 +73,29 @@ public class CredentialsService implements ICredentialsService {
 		if (username == null)
 			throw new IllegalArgumentException();
 
-		var existingPasswordHash = jedis.get(getUsernameKey(username));
+		var existingPasswordHash = getUsernameHash(username);
 		if (existingPasswordHash == null)
 			throw new UsernameNotFoundException();
 
 		var hash = PasswordUtil.hashPassword(dto.getPassword());
 
-		jedis.set(getUsernameKey(username), hash);
+		setPassword(username, hash);
+	}
+
+	private void deleteUsernameEntry(String username) {
+		jedis.hdel(credentialsHash, username);
+	}
+
+	private Map<String, String> getAllCredentials() {
+		var credsMap = jedis.hgetAll(credentialsHash);
+		return credsMap;
+	}
+
+	private String getUsernameHash(String username) {
+		return jedis.hget(credentialsHash, username);
+	}
+
+	private void setPassword(String username, String hash) {
+		jedis.hset(credentialsHash, username, hash);
 	}
 }

@@ -139,7 +139,7 @@ public class MediaDownloadFrame {
 
 		connection.connect();
 		int responseCode = connection.getResponseCode();
-		if (!isSuccessStatusCode(responseCode)) {
+		if (!Util.isSuccessStatusCode(responseCode)) {
 			String errorMessage = connection.getResponseMessage();
 			if (errorMessage == null || errorMessage.equals("null"))
 				if (responseCode == 404)
@@ -182,10 +182,6 @@ public class MediaDownloadFrame {
 			return fileChooser.getSelectedFile();
 		else
 			return null;
-	}
-
-	private static boolean isSuccessStatusCode(int responseStatus) {
-		return responseStatus >= 200 && responseStatus < 300;
 	}
 
 }
