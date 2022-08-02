@@ -1,89 +1,232 @@
 package mdp.clientapp;
 
-import java.awt.Dimension;
-import java.io.FileNotFoundException;
+import java.awt.Color;
+import java.awt.GridBagLayout;
 import java.io.IOException;
+import java.math.BigInteger;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
+import javax.swing.text.StyledDocument;
+import javax.xml.rpc.ServiceException;
 
+import com.google.gson.Gson;
+
+import mdp.chat.client.ChatClientSettingsLoader;
+import mdp.chat.client.ChatClientSocketSettings;
+import mdp.chat.client.ClientThread;
+import mdp.dtos.PostCredentialsDto;
+import mdp.dtos.SearchTerminalDto;
+import mdp.exceptions.TerminalNotFoundException;
+import mdp.models.chat.ChatMessage;
+import mdp.models.chat.ChatMessageType;
+import mdp.register.terminals.TerminalRegisterService;
+import mdp.register.terminals.TerminalRegisterServiceServiceLocator;
+import mdp.register.terminals.dtos.GetCustomsTerminalDto;
+import mdp.util.client.HttpUtil;
 import mdp.util.client.SettingsLoader;
 import mdp.util.ui.UiUtil;
 
 public class Main {
-	private static ClientAppSettings settings;
+	private static final Logger logger = Logger.getLogger(Main.class.getName());
 
-	// TODO unnecessary throws declarations
-	public static void main(String[] args) throws Exception {
+	// TODO terminal register service with map of terminal id -> name
+	static ClientAppSettings settings;
+	static ChatClientSocketSettings chatSettings;
+	private static JFrame frame;
+	private static final Gson gson = new Gson();
+
+	private static String username;
+	private static ChatMessageType messageType;
+	private static GetCustomsTerminalDto terminal;
+	private static BigInteger passageId;
+	private static boolean isCustomsStep;
+
+	private static TerminalRegisterService terminalService;
+	private static JTextField messageTextField;
+	private static ClientThread thread;
+	private static SSLSocketFactory sf;
+
+	private static JTextPane textPane;
+
+	private static JTextField passageIdTextField;
+
+	private static JCheckBox customsOrPoliceCheckbox;
+
+	private static JComboBox<ChatMessageType> messageTypeComboBox;
+
+	public static void main(String[] args) {
 		loadSettings();
-		JFrame mainFrame = new JFrame("Client App");
-		setupMainFrame(mainFrame);
+		initializeSecurity();
+		try {
+			terminalService = new TerminalRegisterServiceServiceLocator().getTerminalRegisterService();
+		} catch (ServiceException e) {
+			UiUtil.showErrorMessage(frame, "Failed to communicate with remote terminal registry service");
+			return;
+		}
+
+		setupMainFrame();
 	}
 
-//	private static void searchTerminalAction(JTextField passageIdTextField, JCheckBox customsOrPoliceCheckbox,
-////			JTextField terminalNameTextField) throws ServiceException, TerminalNotFoundException {
-//		try {
-//			var passageId = new BigInteger(passageIdTextField.getText());
-//			var terminalName = terminalNameTextField.getText();
-//			var isCustomsPassage = customsOrPoliceCheckbox.isSelected();
-//
-//			var searchDto = new SearchTerminalDto();
-//			searchDto.setPassageId(passageId);
-//			searchDto.setTerminalName(terminalName);
-//			searchDto.setCustomsPassage(isCustomsPassage);
-//
-//			var terminalClient = new TerminalRegisterServiceServiceLocator().getTerminalRegisterService();
-//			var searchResult = terminalClient.searchTerminal(searchDto);
-//
-//			var clientConfig = new ClientConfig();
-//			var credentialsClient = ClientBuilder.newClient(clientConfig);
-//			var credentialsTarget = credentialsClient.target(settings.getApiHost()).path("api").path("credentials")
-//					.path("login");
-//
-//			var invocationBuilder = credentialsTarget.request(MediaType.APPLICATION_JSON);
-//			var response = invocationBuilder.method("POST", Entity.json(searchDto));
-//
-//			// TODO check if response is 2xx
-//			// var responseObject = response.readEntity();
-//			// if (response == null)
-//			// System.err.println();
-//
-//		} catch (NumberFormatException ex) {
-//			// TODO ex
-//			ex.printStackTrace();
-//			// TODO dialog error
-//		}
-//	}
+	private static void initializeSecurity() {
+		System.setProperty("javax.net.ssl.trustStore", chatSettings.getTrustStorePath());
+		System.setProperty("javax.net.ssl.trustStorePassword", chatSettings.getTrustStorePassword());
+	}
 
-	private static void setupMainFrame(JFrame mainFrame) {
-		UiUtil.setHalfScreenSize(mainFrame);
-		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	private static boolean searchTerminalAction(JTextField passageIdTextField, JCheckBox customsOrPoliceCheckbox,
+			JTextField terminalNameTextField) {
+		try {
+			BigInteger passageId = new BigInteger(passageIdTextField.getText());
+			String terminalName = terminalNameTextField.getText();
+			boolean isCustomsPassage = customsOrPoliceCheckbox.isSelected();
+
+			SearchTerminalDto searchDto = new SearchTerminalDto(isCustomsPassage, passageId, terminalName);
+
+			terminal = terminalService.searchTerminal(searchDto);
+			if (terminal == null) {
+				UiUtil.showErrorMessage(frame, "Specified passage and customs/police step not found");
+				return false;
+			}
+
+			UiUtil.showInfoMessage(frame, String.format("Terminal '%s' Found", terminalName), "Terminal found");
+			return true;
+		} catch (NumberFormatException ex) {
+			UiUtil.showErrorMessage(frame, "Parsing terminal parameters", "Error In Terminal Parameters",
+					"Invalid number format");
+		} catch (TerminalNotFoundException e) {
+			UiUtil.showErrorMessage(frame, "Couldn't find terminal with specified parameters");
+		} catch (RemoteException e) {
+			UiUtil.showErrorMessage(frame, "Error occurred during remote communication");
+		}
+		return false;
+	}
+
+	private static void setupMainFrame() {
+		frame = new JFrame("Client App");
+		UiUtil.setHalfScreenSize(frame);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
 
 		JPanel terminalPanel = setupTerminalPanel();
-		mainFrame.add(terminalPanel);
-		mainFrame.setVisible(true);
+		JScrollPane messageLogsPanel = setupMessageLogsPanel();
+		JPanel messageInputPanel = setupMessageInputPanel();
+
+		frame.add(terminalPanel);
+		frame.add(messageLogsPanel);
+		frame.add(messageInputPanel);
+		frame.setVisible(true);
+	}
+
+	private static JPanel setupMessageInputPanel() {
+		JPanel panel = new JPanel();
+		panel.setBorder(BorderFactory.createTitledBorder("Message Input"));
+
+		JLabel messageLabel = new JLabel("Message");
+		messageTextField = new JTextField(40);
+		JButton submitMessageButton = new JButton("Send");
+		submitMessageButton.addActionListener(e -> handleSendMessage());
+
+		List<ChatMessageType> messageTypesList = new ArrayList<ChatMessageType>(Arrays.asList(ChatMessageType.values()))
+				.stream().filter(t -> !t.equals(ChatMessageType.INFO)).collect(Collectors.toList());
+		ChatMessageType[] messageTypes = messageTypesList.toArray(new ChatMessageType[messageTypesList.size()]);
+		messageTypeComboBox = new JComboBox<>(messageTypes);
+		messageTypeComboBox
+				.addActionListener(e -> messageType = (ChatMessageType) messageTypeComboBox.getSelectedItem());
+
+		panel.add(messageLabel);
+		panel.add(messageTextField);
+		panel.add(messageTypeComboBox);
+		panel.add(submitMessageButton);
+
+		return panel;
+	}
+
+	private static void handleSendMessage() {
+		String messageText = messageTextField.getText();
+		if (messageText == null || messageText.equals(""))
+			return;
+
+		passageId = new BigInteger(passageIdTextField.getText());
+		isCustomsStep = customsOrPoliceCheckbox.isSelected();
+		messageType = (ChatMessageType) messageTypeComboBox.getSelectedItem();
+
+		ChatMessage chatMessage = new ChatMessage(messageText, username, terminal.getId(), passageId, isCustomsStep,
+				messageType);
+		thread.sendMessage(chatMessage);
+		messageTextField.setText("");
+	}
+
+	private synchronized static void addChatMessageToLogs(ChatMessage message) {
+		appendToPane(textPane, String.format("[%s] ", message.getTerminalId()), Color.RED);
+		appendToPane(textPane, String.format("[%s] ", message.getPassageId()), Color.GREEN);
+		appendToPane(textPane, String.format("(%s) ", message.getType()), Color.BLUE);
+		appendToPane(textPane, String.format("%s\n", message.getText()), Color.BLACK);
+	}
+
+	private static void appendToPane(JTextPane tp, String msg, Color c) {
+		StyleContext sc = StyleContext.getDefaultStyleContext();
+		AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, c);
+
+		StyledDocument doc = textPane.getStyledDocument();
+		try {
+			doc.insertString(doc.getEndPosition().getOffset(), msg, aset);
+		} catch (BadLocationException e) {
+			UiUtil.showErrorMessage(frame, String.format("Failed to show message:", e.getMessage()));
+		}
+	}
+
+	private static JScrollPane setupMessageLogsPanel() {
+
+		textPane = new JTextPane();
+		textPane.setEditable(false);
+
+		JScrollPane scrollPane = new JScrollPane(textPane);
+		scrollPane.setBorder(BorderFactory.createTitledBorder("Message Logs"));
+
+		return scrollPane;
 	}
 
 	private static JPanel setupTerminalPanel() {
 		JPanel terminalPanel = new JPanel();
 		terminalPanel.setBorder(BorderFactory.createTitledBorder("Terminal"));
-		terminalPanel.setMaximumSize(new Dimension(400, 400));
 
 		JPanel passageIdPanel = new JPanel();
 		JLabel passageIdLabel = new JLabel("Terminal Passage Id");
-		JTextField passageIdTextField = new JTextField(20);
+		passageIdTextField = new JTextField(20);
 		passageIdPanel.add(passageIdLabel);
 		passageIdPanel.add(passageIdTextField);
 
 		JPanel customsOrPolicePanel = new JPanel();
 		JLabel customsOrPoliceLabel = new JLabel("Customs/Police step");
-		JCheckBox customsOrPoliceCheckbox = new JCheckBox();
+		customsOrPoliceCheckbox = new JCheckBox();
 		customsOrPolicePanel.add(customsOrPoliceLabel);
 		customsOrPolicePanel.add(customsOrPoliceCheckbox);
 
@@ -95,7 +238,37 @@ public class Main {
 
 		JButton terminalSubmitButton = new JButton("Submit");
 		terminalSubmitButton.addActionListener(e -> {
-//				searchTerminalAction(passageIdTextField, customsOrPoliceCheckbox, terminalNameTextField);
+			boolean foundTerminal = searchTerminalAction(passageIdTextField, customsOrPoliceCheckbox,
+					terminalNameTextField);
+
+			if (!foundTerminal) {
+				return;
+			}
+
+			if (!attemptLoginAction())
+				return;
+
+			// TODO set username in disabled textfield
+			// TODO set marker - connected to server
+			// TODO show panel below with the messages
+			// TODO create selector for message type
+			// TODO chat client
+
+			try {
+				// TODO initialize above
+				sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
+				SSLSocket sockets = (SSLSocket) sf.createSocket(chatSettings.getHost(), chatSettings.getPort());
+				thread = new ClientThread(terminal.getId(), new BigInteger(passageIdTextField.getText()),
+						customsOrPoliceCheckbox.isSelected(), chatSettings, sockets, m -> addChatMessageToLogs(m));
+				thread.setOnDisconnect(() -> {
+					UiUtil.showInfoMessage(frame, "Chat Server disconnected", "Chat Server Disconnected");
+				});
+				thread.start();
+				logger.log(Level.INFO, "Initialized ClientThread");
+				UiUtil.showInfoMessage(frame, "Connected to chat server", "Chat Server Connection");
+			} catch (IOException e1) {
+				UiUtil.showErrorMessage(frame, String.format("Failed to initialize ClientThread: %s", e1.getMessage()));
+			}
 		});
 
 		terminalPanel.add(passageIdPanel);
@@ -105,15 +278,65 @@ public class Main {
 		return terminalPanel;
 	}
 
-	private static void loadSettings() throws IOException, FileNotFoundException {
-		Properties props = SettingsLoader.getLoadedProperties("clientApp");
-		String apiHost = props.getProperty("apiHost");
-		Integer rmiPort = Integer.valueOf(props.getProperty("rmiPort"));
-		String rmiHost = props.getProperty("rmiHost");
-		String policeCheckStepServiceBindingName = props.getProperty("policeCheckStepServiceBindingName");
-		String personIdentifyingDocumentsServiceBindingName = props
-				.getProperty("personIdentifyingDocumentsServiceBindingName");
-		settings = new ClientAppSettings(apiHost, rmiPort, rmiHost, policeCheckStepServiceBindingName,
-				personIdentifyingDocumentsServiceBindingName);
+	private static boolean attemptLoginAction() {
+		String username = UiUtil.getUsername(frame);
+		if (username == null || username.length() == 0)
+			return false;
+
+		String password = UiUtil.getPassword(frame);
+		if (password == null)
+			return false;
+		PostCredentialsDto dto = new PostCredentialsDto(username, password);
+
+		URL url;
+		try {
+			url = new URL(String.format("http://%s/api/credentials/login", settings.getApiHost()));
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+			connection.setRequestMethod("POST");
+			connection.setRequestProperty("Content-Type", "application/json");
+			connection.setDoOutput(true);
+			connection.connect();
+
+			String json = gson.toJson(dto);
+			HttpUtil.sendJson(connection, json);
+
+			int responseCode = connection.getResponseCode();
+			if (responseCode == 200) {
+				UiUtil.showInfoMessage(frame, "Login successful", "Success");
+				Main.username = dto.getUsername();
+				return true;
+			} else if (responseCode == 401) {
+				UiUtil.showErrorMessage(frame, "Invalid credentials");
+				return false;
+			}
+		} catch (MalformedURLException e) {
+			UiUtil.showErrorMessage(frame, "Invalid URL");
+		} catch (IOException e) {
+			UiUtil.showErrorMessage(frame, String.format("Error: %s", e.getMessage()));
+		}
+
+		return false;
+	}
+
+	private static void loadSettings() {
+		Properties props;
+		try {
+			props = SettingsLoader.getLoadedProperties("clientApp");
+			String apiHost = props.getProperty("apiHost");
+			Integer rmiPort = Integer.valueOf(props.getProperty("rmiPort"));
+			String rmiHost = props.getProperty("rmiHost");
+			String policeCheckStepServiceBindingName = props.getProperty("policeCheckStepServiceBindingName");
+			String personIdentifyingDocumentsServiceBindingName = props
+					.getProperty("personIdentifyingDocumentsServiceBindingName");
+
+			settings = new ClientAppSettings(apiHost, rmiPort, rmiHost, policeCheckStepServiceBindingName,
+					personIdentifyingDocumentsServiceBindingName);
+
+			chatSettings = ChatClientSettingsLoader.getSettings();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
 	}
 }

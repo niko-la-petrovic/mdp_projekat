@@ -37,6 +37,7 @@ import com.google.gson.Gson;
 import mdp.dtos.GetCredentialsDto;
 import mdp.dtos.PostCredentialsDto;
 import mdp.dtos.PutCredentialsDto;
+import mdp.util.client.HttpUtil;
 import mdp.util.ui.UiUtil;
 
 public class CredentialsFrame {
@@ -100,7 +101,7 @@ public class CredentialsFrame {
 				return;
 			}
 
-			String json = getJson(connection);
+			String json = HttpUtil.getJson(connection);
 
 			credentials = gson.fromJson(json, GetCredentialsDto[].class);
 			setCredentialsToTableData();
@@ -134,17 +135,6 @@ public class CredentialsFrame {
 
 		for (Object[] object : tableData)
 			model.addRow(object);
-	}
-
-	private static String getJson(HttpURLConnection connection) throws IOException, UnsupportedEncodingException {
-		StringBuilder response = new StringBuilder();
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), "utf-8"))) {
-			String responseLine;
-			while ((responseLine = br.readLine()) != null) {
-				response.append(responseLine.trim());
-			}
-		}
-		return response.toString();
 	}
 
 	private static JTable initializeCredentialsTable() {
@@ -216,7 +206,7 @@ public class CredentialsFrame {
 	private static void handleUpdatePasswordAction(int row) {
 		GetCredentialsDto userCreds = credentials[row];
 
-		String password = inputPassword();
+		String password = UiUtil.getPassword(frame);
 		if (password == null)
 			return;
 
@@ -232,7 +222,7 @@ public class CredentialsFrame {
 
 			PutCredentialsDto dto = new PutCredentialsDto(userCreds.getUsername(), password);
 			String json = gson.toJson(dto);
-			sendJson(connection, json);
+			HttpUtil.sendJson(connection, json);
 
 			int responseCode = connection.getResponseCode();
 			boolean successStatusCode = mdp.util.client.HttpUtil.isSuccessStatusCode(responseCode);
@@ -306,7 +296,7 @@ public class CredentialsFrame {
 				return;
 			}
 
-			String json = getJson(connection);
+			String json = HttpUtil.getJson(connection);
 			credentials = gson.fromJson(json, GetCredentialsDto[].class);
 			setCredentialsToTableData();
 		} catch (IOException e) {
@@ -314,28 +304,12 @@ public class CredentialsFrame {
 		}
 	}
 
-	private static String inputPassword() {
-		JPanel panel = new JPanel();
-		JLabel label = new JLabel("Enter password");
-		JPasswordField pass = new JPasswordField(30);
-		panel.add(label);
-		panel.add(pass);
-		String[] options = new String[] { "OK", "Cancel" };
-		int option = JOptionPane.showOptionDialog(frame, panel, "Credentials Password", JOptionPane.NO_OPTION,
-				JOptionPane.PLAIN_MESSAGE, null, options, options[1]);
-		if (option != 0)
-			return null;
-
-		return new String(pass.getPassword());
-	}
-
 	private static void handleCreateCredentialsAction() {
-		String username = JOptionPane.showInputDialog(frame, "Enter username", "Credentials Username",
-				JOptionPane.QUESTION_MESSAGE);
+		String username = UiUtil.getUsername(frame);
 		if (username == null || username.equals(""))
 			return;
 
-		String password = inputPassword();
+		String password = UiUtil.getPassword(frame);
 		if (password == null)
 			return;
 		PostCredentialsDto dto = new PostCredentialsDto(username, password);
@@ -351,7 +325,7 @@ public class CredentialsFrame {
 
 			connection.connect();
 			String json = gson.toJson(dto);
-			sendJson(connection, json);
+			HttpUtil.sendJson(connection, json);
 
 			int responseCode = connection.getResponseCode();
 			boolean successStatusCode = mdp.util.client.HttpUtil.isSuccessStatusCode(responseCode);
@@ -363,13 +337,6 @@ public class CredentialsFrame {
 				UiUtil.showErrorMessage(frame, "Creating user", "Error Creating User", "Username already in use");
 		} catch (IOException e) {
 			UiUtil.showErrorMessage(frame, "Creating user", "Failed to create user", e.getMessage());
-		}
-	}
-
-	private static void sendJson(HttpURLConnection connection, String json) throws IOException {
-		try (OutputStream out = connection.getOutputStream();) {
-			byte[] jsonBytes = json.getBytes();
-			out.write(jsonBytes, 0, jsonBytes.length);
 		}
 	}
 

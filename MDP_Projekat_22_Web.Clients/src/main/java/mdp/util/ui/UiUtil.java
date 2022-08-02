@@ -3,7 +3,10 @@ package mdp.util.ui;
 import java.awt.Toolkit;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 
 import mdp.adminapp.Main;
 
@@ -32,5 +35,26 @@ public class UiUtil {
 
 	public static void showInfoMessage(JFrame frame, String message, String title) {
 		JOptionPane.showMessageDialog(frame, message, title, JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	public static String getUsername(JFrame frame) {
+		String username = JOptionPane.showInputDialog(frame, "Enter username", "Credentials Username",
+				JOptionPane.QUESTION_MESSAGE);
+		return username;
+	}
+
+	public static String getPassword(JFrame frame) {
+		JPanel panel = new JPanel();
+		JLabel label = new JLabel("Enter password");
+		JPasswordField pass = new JPasswordField(30);
+		panel.add(label);
+		panel.add(pass);
+		String[] options = new String[] { "OK", "Cancel" };
+		int option = JOptionPane.showOptionDialog(frame, panel, "Credentials Password", JOptionPane.NO_OPTION,
+				JOptionPane.PLAIN_MESSAGE, null, options, options[1]);
+		if (option != 0)
+			return null;
+
+		return new String(pass.getPassword());
 	}
 }

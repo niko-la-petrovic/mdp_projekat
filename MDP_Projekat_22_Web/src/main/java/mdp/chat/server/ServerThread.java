@@ -7,9 +7,12 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.google.gson.Gson;
 import com.rabbitmq.client.Channel;
@@ -25,6 +28,7 @@ import mdp.models.chat.ChatMessage;
 import mdp.mq.rabbitmq.Constants;
 
 public class ServerThread extends Thread {
+	private static final Logger logger = Logger.getLogger(ServerThread.class.getName());
 
 	private static final Gson gson = new Gson();
 	static Channel channel;
@@ -57,11 +61,16 @@ public class ServerThread extends Thread {
 
 	@Override
 	public void run() {
-		System.out.println("Client connected");
 		try {
 			while (!isShouldTerminate())
 				try {
 					communicate();
+				}
+
+				catch (SocketException e) {
+					{
+						handleTerminate();
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -70,8 +79,7 @@ public class ServerThread extends Thread {
 			out.close();
 			socket.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(Level.SEVERE, String.format("Error while stopping client communication: %s", e.getMessage()));
 		}
 	}
 
@@ -149,14 +157,12 @@ public class ServerThread extends Thread {
 
 	private void communicate() throws IOException {
 		String jsonLine = null;
-		System.out.println("Reading next line..");
 		try {
 			jsonLine = in.readLine();
 			if (jsonLine == null)
 				setShouldTerminate(true);
 		} catch (IOException e) {
-			// TODO log
-			e.printStackTrace();
+			logger.log(Level.SEVERE, String.format("Error while communicating with client: %s", e.getMessage()));
 			setShouldTerminate(true);
 		}
 
@@ -240,8 +246,6 @@ public class ServerThread extends Thread {
 						var message = messageQueue.take();
 						sendMessage(new SocketMessage(SocketMessageType.TRANSFER_MESSAGE, message, null, null));
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-//						e.printStackTrace();
 					}
 				}
 			}
@@ -254,6 +258,7 @@ public class ServerThread extends Thread {
 		setShouldTerminate(true);
 		unbindConsumer();
 		transferMessageThread.interrupt();
+		logger.log(Level.INFO, String.format("Terminating client '%s'", socket.getInetAddress()));
 	}
 
 	private synchronized void sendMessage(SocketMessage message) {
@@ -276,6 +281,10 @@ public class ServerThread extends Thread {
 
 		channel.basicCancel(consumerTag);
 		routingKeyConsumerMap.remove(routingKey);
+		ConcurrentSet<ServerThread> subscribers = routingKeySubscriberMap.get(routingKey);
+		synchronized (subscribers) {
+			subscribers.remove(this);
+		}
 		consumerTagMap.remove(consumer);
 		threadRoutingKey.remove();
 	}
