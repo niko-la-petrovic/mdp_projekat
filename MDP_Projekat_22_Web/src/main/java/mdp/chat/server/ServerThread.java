@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.google.gson.Gson;
+import com.rabbitmq.client.AlreadyClosedException;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.Consumer;
@@ -114,11 +115,15 @@ public class ServerThread extends Thread {
 		if (consumer != null)
 			return consumer;
 
-		var declareQueueResult = channel.queueDeclare(routingKey, true, false, false, null);
-		var bindBroadcastExchangeResult = channel.queueBind(routingKey, Constants.BROADCAST_EXCHANGE_NAME, "");
-		var bindMulticastExchangeResult = channel.queueBind(routingKey, Constants.TOPIC_EXCHANGE_NAME,
-				Constants.getTerminalBindingKey(terminalId.toString()));
-		var bindDirectExchangeResult = channel.queueBind(routingKey, Constants.DIRECT_EXCHANGE_NAME, routingKey);
+		try {
+			var declareQueueResult = channel.queueDeclare(routingKey, true, false, false, null);
+			var bindBroadcastExchangeResult = channel.queueBind(routingKey, Constants.BROADCAST_EXCHANGE_NAME, "");
+			var bindMulticastExchangeResult = channel.queueBind(routingKey, Constants.TOPIC_EXCHANGE_NAME,
+					Constants.getTerminalBindingKey(terminalId.toString()));
+			var bindDirectExchangeResult = channel.queueBind(routingKey, Constants.DIRECT_EXCHANGE_NAME, routingKey);
+		} catch (AlreadyClosedException e) {
+			logger.log(Level.WARNING, String.format("Channel already closed: %s", e.getMessage()));
+		}
 
 		if (!routingKeyChatMessageMap.contains(routingKey))
 			routingKeyChatMessageMap.put(routingKey, new ConcurrentLinkedDeque<>());

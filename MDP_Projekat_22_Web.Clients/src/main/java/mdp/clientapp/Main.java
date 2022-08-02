@@ -50,10 +50,13 @@ import mdp.chat.client.ChatClientSettingsLoader;
 import mdp.chat.client.ChatClientSocketSettings;
 import mdp.chat.client.ClientThread;
 import mdp.dtos.PostCredentialsDto;
+import mdp.dtos.PutCredentialsDto;
 import mdp.dtos.SearchTerminalDto;
 import mdp.exceptions.TerminalNotFoundException;
+import mdp.exceptions.UsernameNotFoundException;
 import mdp.models.chat.ChatMessage;
 import mdp.models.chat.ChatMessageType;
+import mdp.register.credentials.CredentialsService;
 import mdp.register.terminals.TerminalRegisterService;
 import mdp.register.terminals.TerminalRegisterServiceServiceLocator;
 import mdp.register.terminals.dtos.GetCustomsTerminalDto;
@@ -77,6 +80,7 @@ public class Main {
 	private static boolean isCustomsStep;
 
 	private static TerminalRegisterService terminalService;
+	private static CredentialsService credentialsService;
 	private static JTextField messageTextField;
 	private static ClientThread thread;
 	private static SSLSocketFactory sf;
@@ -99,6 +103,12 @@ public class Main {
 			return;
 		}
 
+		try {
+			credentialsService = new CredentialsService();
+		} catch (Exception e1) {
+			UiUtil.showErrorMessage(frame, "Failed to initialize credentials service");
+			return;
+		}
 		setupMainFrame();
 	}
 
@@ -218,6 +228,25 @@ public class Main {
 	}
 
 	private static void handleChangePassword() {
+		if (username == null || username.equals("")) {
+			UiUtil.showErrorMessage(frame, "You must be logged in first");
+			return;
+		}
+
+		String password = UiUtil.getPassword(frame);
+		if (password == null || password.equals("")) {
+			UiUtil.showErrorMessage(frame, "Invalid password provided");
+			return;
+		}
+
+		PutCredentialsDto dto = new PutCredentialsDto(username, password);
+		try {
+			credentialsService.updateCredentials(dto);
+			UiUtil.showInfoMessage(frame, "Successfully changed password", "Password Change");
+		} catch (UsernameNotFoundException e) {
+
+			UiUtil.showErrorMessage(frame, String.format("Username '%s' not found", username));
+		}
 	}
 
 	private static void handleExitPressed() {
