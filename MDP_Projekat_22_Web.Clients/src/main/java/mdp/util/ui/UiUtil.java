@@ -1,7 +1,9 @@
 package mdp.util.ui;
 
 import java.awt.Toolkit;
+import java.io.File;
 
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -56,5 +58,18 @@ public class UiUtil {
 			return null;
 
 		return new String(pass.getPassword());
+	}
+
+	public static File getSaveDirectory(JFrame frame) {
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+		fileChooser.setDialogTitle("Select save directory");
+		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+		fileChooser.setAcceptAllFileFilterUsed(false);
+		if (fileChooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION)
+			return fileChooser.getSelectedFile();
+		else
+			return null;
 	}
 }

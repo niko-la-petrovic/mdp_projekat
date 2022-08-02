@@ -35,13 +35,8 @@ public class Main {
 				settings = new AdminAppSettings(notificationSocketHost, notificationSocketPort, wantedServerHost,
 						credentialsServerHost);
 			});
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			UiUtil.showErrorMessage(mainFrame, String.format("Failed to load settings: %s", e.getMessage()));
 			return;
 		}
 
@@ -120,7 +115,7 @@ public class Main {
 
 	private static void handleMediaDownloadButtonPress() {
 		if (MediaDownloadFrame.frame == null) {
-			MediaDownloadFrame.setupTerminalFrame();
+			MediaDownloadFrame.setupFrame();
 		}
 
 		MediaDownloadFrame.frame.setVisible(true);

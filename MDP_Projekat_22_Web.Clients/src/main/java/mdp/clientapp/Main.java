@@ -1,12 +1,16 @@
 package mdp.clientapp;
 
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.GridBagLayout;
+import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -225,6 +229,23 @@ public class Main {
 	}
 
 	private static void handleShowPassageLogs() {
+		File saveDirectory = UiUtil.getSaveDirectory(frame);
+		if (saveDirectory == null)
+			return;
+
+		String fileName = "personLogs.txt";
+		Path filePath = Paths.get(saveDirectory.toString(), fileName);
+		File file = filePath.toFile();
+
+		URL url;
+		try {
+			url = new URL(String.format("http://%s/api/persons", Main.settings.getApiHost()));
+
+			HttpUtil.downloadToFileFromUrl(frame, saveDirectory, file, url);
+			Desktop.getDesktop().open(file);
+		} catch (IOException e) {
+			UiUtil.showErrorMessage(frame, String.format("Failed to download persons logs: %s", e.getMessage()));
+		}
 	}
 
 	private static void handleChangePassword() {

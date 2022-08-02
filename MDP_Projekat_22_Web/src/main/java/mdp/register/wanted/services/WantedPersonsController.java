@@ -2,6 +2,7 @@ package mdp.register.wanted.services;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -12,6 +13,7 @@ import javax.ws.rs.core.Response.Status;
 
 @Path("/wanted")
 public class WantedPersonsController {
+	private static final Logger logger = Logger.getLogger(WantedPersonsController.class.getName());
 
 	private IWantedPersonsService wantedPerosnsService;
 
