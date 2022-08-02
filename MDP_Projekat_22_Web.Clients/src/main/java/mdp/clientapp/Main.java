@@ -26,10 +26,16 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
@@ -133,16 +139,91 @@ public class Main {
 		frame = new JFrame("Client App");
 		UiUtil.setHalfScreenSize(frame);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
 		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
 
 		JPanel terminalPanel = setupTerminalPanel();
 		JScrollPane messageLogsPanel = setupMessageLogsPanel();
 		JPanel messageInputPanel = setupMessageInputPanel();
 
+		JMenuBar menuBar = setupMenuBar();
+		frame.setJMenuBar(menuBar);
 		frame.add(terminalPanel);
 		frame.add(messageLogsPanel);
 		frame.add(messageInputPanel);
 		frame.setVisible(true);
+	}
+
+	private static JMenuBar setupMenuBar() {
+		JMenuBar menuBar = new JMenuBar();
+
+		JMenu exit = new JMenu("Exit");
+		exit.addMenuListener(new MenuListener() {
+			@Override
+			public void menuSelected(MenuEvent e) {
+				handleExitPressed();
+			}
+
+			@Override
+			public void menuDeselected(MenuEvent e) {
+			}
+
+			@Override
+			public void menuCanceled(MenuEvent e) {
+			}
+		});
+
+		JMenu changePassword = new JMenu("Change Password");
+		changePassword.addMenuListener(new MenuListener() {
+
+			@Override
+			public void menuSelected(MenuEvent e) {
+				handleChangePassword();
+			}
+
+			@Override
+			public void menuDeselected(MenuEvent e) {
+			}
+
+			@Override
+			public void menuCanceled(MenuEvent e) {
+			}
+		});
+
+		JMenu showPassageLogs = new JMenu("Passage Logs");
+		showPassageLogs.addMenuListener(new MenuListener() {
+
+			@Override
+			public void menuSelected(MenuEvent e) {
+				handleShowPassageLogs();
+			}
+
+			@Override
+			public void menuDeselected(MenuEvent e) {
+			}
+
+			@Override
+			public void menuCanceled(MenuEvent e) {
+			}
+		});
+
+		menuBar.add(exit);
+		menuBar.add(changePassword);
+		menuBar.add(showPassageLogs);
+
+		return menuBar;
+	}
+
+	private static void handleShowPassageLogs() {
+	}
+
+	private static void handleChangePassword() {
+	}
+
+	private static void handleExitPressed() {
+		int result = JOptionPane.showConfirmDialog(frame, "Do you wish to close the app?");
+		if (result == 0)
+			System.exit(0);
 	}
 
 	private static JPanel setupMessageInputPanel() {
