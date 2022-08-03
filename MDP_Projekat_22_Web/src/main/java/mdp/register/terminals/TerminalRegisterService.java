@@ -202,6 +202,35 @@ public class TerminalRegisterService
 		return getTerminal(dto.getPassageId(), dto.isCustomsPassage(), dto.getTerminalName());
 	}
 
+	public GetCustomsTerminalDto searchTerminalSimulation(String terminalName, BigInteger passageId, boolean isEntry){
+		return getTerminalSimulation(terminalName, passageId, isEntry);
+	}
+
+	private GetCustomsTerminalDto getTerminalSimulation(String terminalName, BigInteger passageId, boolean isEntry) {
+		var terminals = terminalIdToTerminalMap.values();
+
+		CustomsTerminal terminal = null;
+		for (CustomsTerminal customsTerminal : terminals) {
+			var terminalPassages = Arrays.asList(customsTerminal.getPassages());
+			boolean foundTerminal = customsTerminal.getName().equals(terminalName);
+			boolean foundPassage = false;
+			for (CustomsPassage passage : terminalPassages) {
+				if (passage.getId().equals(passageId) && passage.isEntry() == isEntry) {
+					foundPassage = true;
+					break;
+				}
+			}
+
+			if (foundTerminal && foundPassage)
+				terminal = customsTerminal;
+		}
+
+		if (terminal == null)
+			return null;
+
+		return mapTerminalToGetDto(terminal);
+	}
+
 	//
 ////	@Override
 	public GetCustomsTerminalDto updateTerminal(UpdateTerminalDto dto) throws IOException, Exception {

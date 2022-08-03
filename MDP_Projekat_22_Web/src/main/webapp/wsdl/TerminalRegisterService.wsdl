@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<wsdl:definitions targetNamespace="http://terminals.register.mdp" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://terminals.register.mdp" xmlns:intf="http://terminals.register.mdp" xmlns:tns1="http://dtos.terminals.register.mdp" xmlns:tns2="http://exceptions.mdp" xmlns:tns3="http://dtos.mdp" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<wsdl:definitions targetNamespace="http://terminals.register.mdp" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://terminals.register.mdp" xmlns:intf="http://terminals.register.mdp" xmlns:tns1="http://dtos.terminals.register.mdp" xmlns:tns2="http://dtos.mdp" xmlns:tns3="http://exceptions.mdp" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 <!--WSDL created by Apache Axis version: 1.4
 Built on Apr 22, 2006 (06:55:48 PDT)-->
  <wsdl:types>
@@ -31,6 +31,22 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      <element maxOccurs="unbounded" minOccurs="0" name="item" type="tns1:GetCustomsPassageDto"/>
     </sequence>
    </complexType>
+   <element name="searchTerminalSimulation">
+    <complexType>
+     <sequence>
+      <element name="terminalName" type="xsd:string"/>
+      <element name="passageId" type="xsd:integer"/>
+      <element name="isEntry" type="xsd:boolean"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="searchTerminalSimulationResponse">
+    <complexType>
+     <sequence>
+      <element name="searchTerminalSimulationReturn" type="tns1:GetCustomsTerminalDto"/>
+     </sequence>
+    </complexType>
+   </element>
    <element name="createTerminal">
     <complexType>
      <sequence>
@@ -55,6 +71,21 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      </sequence>
     </complexType>
    </element>
+   <element name="searchTerminal">
+    <complexType>
+     <sequence>
+      <element name="dto" type="tns2:SearchTerminalDto"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="searchTerminalResponse">
+    <complexType>
+     <sequence>
+      <element name="searchTerminalReturn" type="tns1:GetCustomsTerminalDto"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="fault" type="tns3:TerminalNotFoundException"/>
    <element name="deleteTerminal">
     <complexType>
      <sequence>
@@ -65,7 +96,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
    <element name="deleteTerminalResponse">
     <complexType/>
    </element>
-   <element name="fault" type="tns2:TerminalNotFoundException"/>
    <element name="getTerminal">
     <complexType>
      <sequence>
@@ -79,20 +109,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
     <complexType>
      <sequence>
       <element name="getTerminalReturn" type="tns1:GetCustomsTerminalDto"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="searchTerminal">
-    <complexType>
-     <sequence>
-      <element name="dto" type="tns3:SearchTerminalDto"/>
-     </sequence>
-    </complexType>
-   </element>
-   <element name="searchTerminalResponse">
-    <complexType>
-     <sequence>
-      <element name="searchTerminalReturn" type="tns1:GetCustomsTerminalDto"/>
      </sequence>
     </complexType>
    </element>
@@ -152,14 +168,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
     </sequence>
    </complexType>
   </schema>
-  <schema elementFormDefault="qualified" targetNamespace="http://exceptions.mdp" xmlns="http://www.w3.org/2001/XMLSchema">
-   <import namespace="http://dtos.terminals.register.mdp"/>
-   <import namespace="http://terminals.register.mdp"/>
-   <import namespace="http://dtos.mdp"/>
-   <complexType name="TerminalNotFoundException">
-    <sequence/>
-   </complexType>
-  </schema>
   <schema elementFormDefault="qualified" targetNamespace="http://dtos.mdp" xmlns="http://www.w3.org/2001/XMLSchema">
    <import namespace="http://dtos.terminals.register.mdp"/>
    <import namespace="http://terminals.register.mdp"/>
@@ -170,6 +178,14 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
      <element name="passageId" nillable="true" type="xsd:integer"/>
      <element name="terminalName" nillable="true" type="xsd:string"/>
     </sequence>
+   </complexType>
+  </schema>
+  <schema elementFormDefault="qualified" targetNamespace="http://exceptions.mdp" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://dtos.terminals.register.mdp"/>
+   <import namespace="http://terminals.register.mdp"/>
+   <import namespace="http://dtos.mdp"/>
+   <complexType name="TerminalNotFoundException">
+    <sequence/>
    </complexType>
   </schema>
  </wsdl:types>
@@ -185,6 +201,14 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
    <wsdl:message name="getTerminalsStartingWithNameRequest">
 
       <wsdl:part element="impl:getTerminalsStartingWithName" name="parameters">
+
+      </wsdl:part>
+
+   </wsdl:message>
+
+   <wsdl:message name="searchTerminalSimulationRequest">
+
+      <wsdl:part element="impl:searchTerminalSimulation" name="parameters">
 
       </wsdl:part>
 
@@ -233,6 +257,14 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
    <wsdl:message name="getTerminalsResponse">
 
       <wsdl:part element="impl:getTerminalsResponse" name="parameters">
+
+      </wsdl:part>
+
+   </wsdl:message>
+
+   <wsdl:message name="searchTerminalSimulationResponse">
+
+      <wsdl:part element="impl:searchTerminalSimulationResponse" name="parameters">
 
       </wsdl:part>
 
@@ -308,6 +340,18 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
+      <wsdl:operation name="searchTerminalSimulation">
+
+         <wsdl:input message="impl:searchTerminalSimulationRequest" name="searchTerminalSimulationRequest">
+
+       </wsdl:input>
+
+         <wsdl:output message="impl:searchTerminalSimulationResponse" name="searchTerminalSimulationResponse">
+
+       </wsdl:output>
+
+      </wsdl:operation>
+
       <wsdl:operation name="createTerminal">
 
          <wsdl:input message="impl:createTerminalRequest" name="createTerminalRequest">
@@ -329,6 +373,22 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
          <wsdl:output message="impl:getTerminalsResponse" name="getTerminalsResponse">
 
        </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="searchTerminal">
+
+         <wsdl:input message="impl:searchTerminalRequest" name="searchTerminalRequest">
+
+       </wsdl:input>
+
+         <wsdl:output message="impl:searchTerminalResponse" name="searchTerminalResponse">
+
+       </wsdl:output>
+
+         <wsdl:fault message="impl:TerminalNotFoundException" name="TerminalNotFoundException">
+
+       </wsdl:fault>
 
       </wsdl:operation>
 
@@ -355,22 +415,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
        </wsdl:input>
 
          <wsdl:output message="impl:getTerminalResponse" name="getTerminalResponse">
-
-       </wsdl:output>
-
-         <wsdl:fault message="impl:TerminalNotFoundException" name="TerminalNotFoundException">
-
-       </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="searchTerminal">
-
-         <wsdl:input message="impl:searchTerminalRequest" name="searchTerminalRequest">
-
-       </wsdl:input>
-
-         <wsdl:output message="impl:searchTerminalResponse" name="searchTerminalResponse">
 
        </wsdl:output>
 
@@ -416,6 +460,24 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
 
       </wsdl:operation>
 
+      <wsdl:operation name="searchTerminalSimulation">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="searchTerminalSimulationRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="searchTerminalSimulationResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
       <wsdl:operation name="createTerminal">
 
          <wsdlsoap:operation soapAction=""/>
@@ -449,6 +511,30 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
             <wsdlsoap:body use="literal"/>
 
          </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="searchTerminal">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="searchTerminalRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="searchTerminalResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="TerminalNotFoundException">
+
+            <wsdlsoap:fault name="TerminalNotFoundException" use="literal"/>
+
+         </wsdl:fault>
 
       </wsdl:operation>
 
@@ -487,30 +573,6 @@ Built on Apr 22, 2006 (06:55:48 PDT)-->
          </wsdl:input>
 
          <wsdl:output name="getTerminalResponse">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:output>
-
-         <wsdl:fault name="TerminalNotFoundException">
-
-            <wsdlsoap:fault name="TerminalNotFoundException" use="literal"/>
-
-         </wsdl:fault>
-
-      </wsdl:operation>
-
-      <wsdl:operation name="searchTerminal">
-
-         <wsdlsoap:operation soapAction=""/>
-
-         <wsdl:input name="searchTerminalRequest">
-
-            <wsdlsoap:body use="literal"/>
-
-         </wsdl:input>
-
-         <wsdl:output name="searchTerminalResponse">
 
             <wsdlsoap:body use="literal"/>
 

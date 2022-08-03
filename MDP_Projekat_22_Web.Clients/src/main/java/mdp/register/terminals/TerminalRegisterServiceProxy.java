@@ -50,6 +50,12 @@ public class TerminalRegisterServiceProxy implements mdp.register.terminals.Term
     return terminalRegisterService.getTerminalsStartingWithName(namePrefix);
   }
   
+  public mdp.register.terminals.dtos.GetCustomsTerminalDto searchTerminalSimulation(java.lang.String terminalName, java.math.BigInteger passageId, boolean isEntry) throws java.rmi.RemoteException{
+    if (terminalRegisterService == null)
+      _initTerminalRegisterServiceProxy();
+    return terminalRegisterService.searchTerminalSimulation(terminalName, passageId, isEntry);
+  }
+  
   public mdp.register.terminals.dtos.GetCustomsTerminalDto createTerminal(mdp.register.terminals.dtos.CreateTerminalDto dto) throws java.rmi.RemoteException{
     if (terminalRegisterService == null)
       _initTerminalRegisterServiceProxy();
@@ -62,6 +68,12 @@ public class TerminalRegisterServiceProxy implements mdp.register.terminals.Term
     return terminalRegisterService.getTerminals();
   }
   
+  public mdp.register.terminals.dtos.GetCustomsTerminalDto searchTerminal(mdp.dtos.SearchTerminalDto dto) throws java.rmi.RemoteException, mdp.exceptions.TerminalNotFoundException{
+    if (terminalRegisterService == null)
+      _initTerminalRegisterServiceProxy();
+    return terminalRegisterService.searchTerminal(dto);
+  }
+  
   public void deleteTerminal(java.math.BigInteger id) throws java.rmi.RemoteException, mdp.exceptions.TerminalNotFoundException{
     if (terminalRegisterService == null)
       _initTerminalRegisterServiceProxy();
@@ -72,12 +84,6 @@ public class TerminalRegisterServiceProxy implements mdp.register.terminals.Term
     if (terminalRegisterService == null)
       _initTerminalRegisterServiceProxy();
     return terminalRegisterService.getTerminal(passageId, isCustomsStep, terminalName);
-  }
-  
-  public mdp.register.terminals.dtos.GetCustomsTerminalDto searchTerminal(mdp.dtos.SearchTerminalDto dto) throws java.rmi.RemoteException, mdp.exceptions.TerminalNotFoundException{
-    if (terminalRegisterService == null)
-      _initTerminalRegisterServiceProxy();
-    return terminalRegisterService.searchTerminal(dto);
   }
   
   public mdp.register.terminals.dtos.GetCustomsTerminalDto updateTerminal(mdp.register.terminals.dtos.UpdateTerminalDto dto) throws java.rmi.RemoteException{

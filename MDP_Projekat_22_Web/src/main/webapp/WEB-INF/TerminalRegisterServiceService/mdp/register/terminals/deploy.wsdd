@@ -13,10 +13,19 @@
       <operation xmlns:operNS="http://terminals.register.mdp" xmlns:retNS="http://terminals.register.mdp" xmlns:rtns="http://dtos.terminals.register.mdp" name="getTerminalsStartingWithName" qname="operNS:getTerminalsStartingWithName" returnQName="retNS:getTerminalsStartingWithNameReturn" returnType="rtns:GetCustomsTerminalDto" soapAction="">
         <parameter xmlns:pns="http://terminals.register.mdp" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:namePrefix" type="tns:string"/>
       </operation>
+      <operation xmlns:operNS="http://terminals.register.mdp" xmlns:retNS="http://terminals.register.mdp" xmlns:rtns="http://dtos.terminals.register.mdp" name="searchTerminalSimulation" qname="operNS:searchTerminalSimulation" returnQName="retNS:searchTerminalSimulationReturn" returnType="rtns:GetCustomsTerminalDto" soapAction="">
+        <parameter xmlns:pns="http://terminals.register.mdp" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:terminalName" type="tns:string"/>
+        <parameter xmlns:pns="http://terminals.register.mdp" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:passageId" type="tns:integer"/>
+        <parameter xmlns:pns="http://terminals.register.mdp" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:isEntry" type="tns:boolean"/>
+      </operation>
       <operation xmlns:operNS="http://terminals.register.mdp" xmlns:retNS="http://terminals.register.mdp" xmlns:rtns="http://dtos.terminals.register.mdp" name="createTerminal" qname="operNS:createTerminal" returnQName="retNS:createTerminalReturn" returnType="rtns:GetCustomsTerminalDto" soapAction="">
         <parameter xmlns:pns="http://terminals.register.mdp" xmlns:tns="http://dtos.terminals.register.mdp" qname="pns:dto" type="tns:CreateTerminalDto"/>
       </operation>
       <operation xmlns:operNS="http://terminals.register.mdp" xmlns:retNS="http://terminals.register.mdp" xmlns:rtns="http://dtos.terminals.register.mdp" name="getTerminals" qname="operNS:getTerminals" returnQName="retNS:getTerminalsReturn" returnType="rtns:GetCustomsTerminalDto" soapAction="">
+      </operation>
+      <operation xmlns:operNS="http://terminals.register.mdp" xmlns:retNS="http://terminals.register.mdp" xmlns:rtns="http://dtos.terminals.register.mdp" name="searchTerminal" qname="operNS:searchTerminal" returnQName="retNS:searchTerminalReturn" returnType="rtns:GetCustomsTerminalDto" soapAction="">
+        <parameter xmlns:pns="http://terminals.register.mdp" xmlns:tns="http://dtos.mdp" qname="pns:dto" type="tns:SearchTerminalDto"/>
+        <fault xmlns:fns="http://terminals.register.mdp" xmlns:tns="http://exceptions.mdp" name="TerminalNotFoundException" qname="fns:fault" class="mdp.exceptions.TerminalNotFoundException" type="tns:TerminalNotFoundException"/>
       </operation>
       <operation xmlns:operNS="http://terminals.register.mdp" name="deleteTerminal" qname="operNS:deleteTerminal" soapAction="">
         <parameter xmlns:pns="http://terminals.register.mdp" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:id" type="tns:integer"/>
@@ -28,14 +37,10 @@
         <parameter xmlns:pns="http://terminals.register.mdp" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:terminalName" type="tns:string"/>
         <fault xmlns:fns="http://terminals.register.mdp" xmlns:tns="http://exceptions.mdp" name="TerminalNotFoundException" qname="fns:fault" class="mdp.exceptions.TerminalNotFoundException" type="tns:TerminalNotFoundException"/>
       </operation>
-      <operation xmlns:operNS="http://terminals.register.mdp" xmlns:retNS="http://terminals.register.mdp" xmlns:rtns="http://dtos.terminals.register.mdp" name="searchTerminal" qname="operNS:searchTerminal" returnQName="retNS:searchTerminalReturn" returnType="rtns:GetCustomsTerminalDto" soapAction="">
-        <parameter xmlns:pns="http://terminals.register.mdp" xmlns:tns="http://dtos.mdp" qname="pns:dto" type="tns:SearchTerminalDto"/>
-        <fault xmlns:fns="http://terminals.register.mdp" xmlns:tns="http://exceptions.mdp" name="TerminalNotFoundException" qname="fns:fault" class="mdp.exceptions.TerminalNotFoundException" type="tns:TerminalNotFoundException"/>
-      </operation>
       <operation xmlns:operNS="http://terminals.register.mdp" xmlns:retNS="http://terminals.register.mdp" xmlns:rtns="http://dtos.terminals.register.mdp" name="updateTerminal" qname="operNS:updateTerminal" returnQName="retNS:updateTerminalReturn" returnType="rtns:GetCustomsTerminalDto" soapAction="">
         <parameter xmlns:pns="http://terminals.register.mdp" xmlns:tns="http://dtos.terminals.register.mdp" qname="pns:dto" type="tns:UpdateTerminalDto"/>
       </operation>
-      <parameter name="allowedMethods" value="updateTerminal getTerminal searchTerminal getTerminals getTerminalsStartingWithName createTerminal deleteTerminal"/>
+      <parameter name="allowedMethods" value="updateTerminal getTerminal searchTerminal getTerminals searchTerminalSimulation getTerminalsStartingWithName createTerminal deleteTerminal"/>
 
       <typeMapping xmlns:ns="http://dtos.terminals.register.mdp" qname="ns:UpdateTerminalDto" type="java:mdp.register.terminals.dtos.UpdateTerminalDto" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle=""/>
       <typeMapping xmlns:ns="http://dtos.terminals.register.mdp" qname="ns:GetCustomsPassageStepDto" type="java:mdp.register.terminals.dtos.GetCustomsPassageStepDto" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle=""/>

@@ -16,7 +16,7 @@ public class TerminalRegisterServiceSoapBindingStub extends org.apache.axis.clie
     static org.apache.axis.description.OperationDesc [] _operations;
 
     static {
-        _operations = new org.apache.axis.description.OperationDesc[7];
+        _operations = new org.apache.axis.description.OperationDesc[8];
         _initOperationDesc1();
     }
 
@@ -35,6 +35,21 @@ public class TerminalRegisterServiceSoapBindingStub extends org.apache.axis.clie
         _operations[0] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
+        oper.setName("searchTerminalSimulation");
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://terminals.register.mdp", "terminalName"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://terminals.register.mdp", "passageId"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "integer"), java.math.BigInteger.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://terminals.register.mdp", "isEntry"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"), boolean.class, false, false);
+        oper.addParameter(param);
+        oper.setReturnType(new javax.xml.namespace.QName("http://dtos.terminals.register.mdp", "GetCustomsTerminalDto"));
+        oper.setReturnClass(mdp.register.terminals.dtos.GetCustomsTerminalDto.class);
+        oper.setReturnQName(new javax.xml.namespace.QName("http://terminals.register.mdp", "searchTerminalSimulationReturn"));
+        oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
+        oper.setUse(org.apache.axis.constants.Use.LITERAL);
+        _operations[1] = oper;
+
+        oper = new org.apache.axis.description.OperationDesc();
         oper.setName("createTerminal");
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://terminals.register.mdp", "dto"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://dtos.terminals.register.mdp", "CreateTerminalDto"), mdp.register.terminals.dtos.CreateTerminalDto.class, false, false);
         oper.addParameter(param);
@@ -43,7 +58,7 @@ public class TerminalRegisterServiceSoapBindingStub extends org.apache.axis.clie
         oper.setReturnQName(new javax.xml.namespace.QName("http://terminals.register.mdp", "createTerminalReturn"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
-        _operations[1] = oper;
+        _operations[2] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("getTerminals");
@@ -52,7 +67,24 @@ public class TerminalRegisterServiceSoapBindingStub extends org.apache.axis.clie
         oper.setReturnQName(new javax.xml.namespace.QName("http://terminals.register.mdp", "getTerminalsReturn"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
-        _operations[2] = oper;
+        _operations[3] = oper;
+
+        oper = new org.apache.axis.description.OperationDesc();
+        oper.setName("searchTerminal");
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://terminals.register.mdp", "dto"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://dtos.mdp", "SearchTerminalDto"), mdp.dtos.SearchTerminalDto.class, false, false);
+        oper.addParameter(param);
+        oper.setReturnType(new javax.xml.namespace.QName("http://dtos.terminals.register.mdp", "GetCustomsTerminalDto"));
+        oper.setReturnClass(mdp.register.terminals.dtos.GetCustomsTerminalDto.class);
+        oper.setReturnQName(new javax.xml.namespace.QName("http://terminals.register.mdp", "searchTerminalReturn"));
+        oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
+        oper.setUse(org.apache.axis.constants.Use.LITERAL);
+        oper.addFault(new org.apache.axis.description.FaultDesc(
+                      new javax.xml.namespace.QName("http://terminals.register.mdp", "fault"),
+                      "mdp.exceptions.TerminalNotFoundException",
+                      new javax.xml.namespace.QName("http://exceptions.mdp", "TerminalNotFoundException"), 
+                      true
+                     ));
+        _operations[4] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("deleteTerminal");
@@ -67,7 +99,7 @@ public class TerminalRegisterServiceSoapBindingStub extends org.apache.axis.clie
                       new javax.xml.namespace.QName("http://exceptions.mdp", "TerminalNotFoundException"), 
                       true
                      ));
-        _operations[3] = oper;
+        _operations[5] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("getTerminal");
@@ -88,24 +120,7 @@ public class TerminalRegisterServiceSoapBindingStub extends org.apache.axis.clie
                       new javax.xml.namespace.QName("http://exceptions.mdp", "TerminalNotFoundException"), 
                       true
                      ));
-        _operations[4] = oper;
-
-        oper = new org.apache.axis.description.OperationDesc();
-        oper.setName("searchTerminal");
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://terminals.register.mdp", "dto"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://dtos.mdp", "SearchTerminalDto"), mdp.dtos.SearchTerminalDto.class, false, false);
-        oper.addParameter(param);
-        oper.setReturnType(new javax.xml.namespace.QName("http://dtos.terminals.register.mdp", "GetCustomsTerminalDto"));
-        oper.setReturnClass(mdp.register.terminals.dtos.GetCustomsTerminalDto.class);
-        oper.setReturnQName(new javax.xml.namespace.QName("http://terminals.register.mdp", "searchTerminalReturn"));
-        oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
-        oper.setUse(org.apache.axis.constants.Use.LITERAL);
-        oper.addFault(new org.apache.axis.description.FaultDesc(
-                      new javax.xml.namespace.QName("http://terminals.register.mdp", "fault"),
-                      "mdp.exceptions.TerminalNotFoundException",
-                      new javax.xml.namespace.QName("http://exceptions.mdp", "TerminalNotFoundException"), 
-                      true
-                     ));
-        _operations[5] = oper;
+        _operations[6] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("updateTerminal");
@@ -116,7 +131,7 @@ public class TerminalRegisterServiceSoapBindingStub extends org.apache.axis.clie
         oper.setReturnQName(new javax.xml.namespace.QName("http://terminals.register.mdp", "updateTerminalReturn"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
-        _operations[6] = oper;
+        _operations[7] = oper;
 
     }
 
@@ -316,12 +331,46 @@ public class TerminalRegisterServiceSoapBindingStub extends org.apache.axis.clie
 }
     }
 
-    public mdp.register.terminals.dtos.GetCustomsTerminalDto createTerminal(mdp.register.terminals.dtos.CreateTerminalDto dto) throws java.rmi.RemoteException {
+    public mdp.register.terminals.dtos.GetCustomsTerminalDto searchTerminalSimulation(java.lang.String terminalName, java.math.BigInteger passageId, boolean isEntry) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
         _call.setOperation(_operations[1]);
+        _call.setUseSOAPAction(true);
+        _call.setSOAPActionURI("");
+        _call.setEncodingStyle(null);
+        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
+        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+        _call.setOperationName(new javax.xml.namespace.QName("http://terminals.register.mdp", "searchTerminalSimulation"));
+
+        setRequestHeaders(_call);
+        setAttachments(_call);
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {terminalName, passageId, new java.lang.Boolean(isEntry)});
+
+        if (_resp instanceof java.rmi.RemoteException) {
+            throw (java.rmi.RemoteException)_resp;
+        }
+        else {
+            extractAttachments(_call);
+            try {
+                return (mdp.register.terminals.dtos.GetCustomsTerminalDto) _resp;
+            } catch (java.lang.Exception _exception) {
+                return (mdp.register.terminals.dtos.GetCustomsTerminalDto) org.apache.axis.utils.JavaUtils.convert(_resp, mdp.register.terminals.dtos.GetCustomsTerminalDto.class);
+            }
+        }
+  } catch (org.apache.axis.AxisFault axisFaultException) {
+  throw axisFaultException;
+}
+    }
+
+    public mdp.register.terminals.dtos.GetCustomsTerminalDto createTerminal(mdp.register.terminals.dtos.CreateTerminalDto dto) throws java.rmi.RemoteException {
+        if (super.cachedEndpoint == null) {
+            throw new org.apache.axis.NoEndPointException();
+        }
+        org.apache.axis.client.Call _call = createCall();
+        _call.setOperation(_operations[2]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("");
         _call.setEncodingStyle(null);
@@ -355,7 +404,7 @@ public class TerminalRegisterServiceSoapBindingStub extends org.apache.axis.clie
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[2]);
+        _call.setOperation(_operations[3]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("");
         _call.setEncodingStyle(null);
@@ -384,89 +433,12 @@ public class TerminalRegisterServiceSoapBindingStub extends org.apache.axis.clie
 }
     }
 
-    public void deleteTerminal(java.math.BigInteger id) throws java.rmi.RemoteException, mdp.exceptions.TerminalNotFoundException {
-        if (super.cachedEndpoint == null) {
-            throw new org.apache.axis.NoEndPointException();
-        }
-        org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[3]);
-        _call.setUseSOAPAction(true);
-        _call.setSOAPActionURI("");
-        _call.setEncodingStyle(null);
-        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
-        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
-        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
-        _call.setOperationName(new javax.xml.namespace.QName("http://terminals.register.mdp", "deleteTerminal"));
-
-        setRequestHeaders(_call);
-        setAttachments(_call);
- try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {id});
-
-        if (_resp instanceof java.rmi.RemoteException) {
-            throw (java.rmi.RemoteException)_resp;
-        }
-        extractAttachments(_call);
-  } catch (org.apache.axis.AxisFault axisFaultException) {
-    if (axisFaultException.detail != null) {
-        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
-              throw (java.rmi.RemoteException) axisFaultException.detail;
-         }
-        if (axisFaultException.detail instanceof mdp.exceptions.TerminalNotFoundException) {
-              throw (mdp.exceptions.TerminalNotFoundException) axisFaultException.detail;
-         }
-   }
-  throw axisFaultException;
-}
-    }
-
-    public mdp.register.terminals.dtos.GetCustomsTerminalDto getTerminal(java.math.BigInteger passageId, boolean isCustomsStep, java.lang.String terminalName) throws java.rmi.RemoteException, mdp.exceptions.TerminalNotFoundException {
-        if (super.cachedEndpoint == null) {
-            throw new org.apache.axis.NoEndPointException();
-        }
-        org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[4]);
-        _call.setUseSOAPAction(true);
-        _call.setSOAPActionURI("");
-        _call.setEncodingStyle(null);
-        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
-        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
-        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
-        _call.setOperationName(new javax.xml.namespace.QName("http://terminals.register.mdp", "getTerminal"));
-
-        setRequestHeaders(_call);
-        setAttachments(_call);
- try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {passageId, new java.lang.Boolean(isCustomsStep), terminalName});
-
-        if (_resp instanceof java.rmi.RemoteException) {
-            throw (java.rmi.RemoteException)_resp;
-        }
-        else {
-            extractAttachments(_call);
-            try {
-                return (mdp.register.terminals.dtos.GetCustomsTerminalDto) _resp;
-            } catch (java.lang.Exception _exception) {
-                return (mdp.register.terminals.dtos.GetCustomsTerminalDto) org.apache.axis.utils.JavaUtils.convert(_resp, mdp.register.terminals.dtos.GetCustomsTerminalDto.class);
-            }
-        }
-  } catch (org.apache.axis.AxisFault axisFaultException) {
-    if (axisFaultException.detail != null) {
-        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
-              throw (java.rmi.RemoteException) axisFaultException.detail;
-         }
-        if (axisFaultException.detail instanceof mdp.exceptions.TerminalNotFoundException) {
-              throw (mdp.exceptions.TerminalNotFoundException) axisFaultException.detail;
-         }
-   }
-  throw axisFaultException;
-}
-    }
-
     public mdp.register.terminals.dtos.GetCustomsTerminalDto searchTerminal(mdp.dtos.SearchTerminalDto dto) throws java.rmi.RemoteException, mdp.exceptions.TerminalNotFoundException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[5]);
+        _call.setOperation(_operations[4]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("");
         _call.setEncodingStyle(null);
@@ -503,12 +475,89 @@ public class TerminalRegisterServiceSoapBindingStub extends org.apache.axis.clie
 }
     }
 
-    public mdp.register.terminals.dtos.GetCustomsTerminalDto updateTerminal(mdp.register.terminals.dtos.UpdateTerminalDto dto) throws java.rmi.RemoteException {
+    public void deleteTerminal(java.math.BigInteger id) throws java.rmi.RemoteException, mdp.exceptions.TerminalNotFoundException {
+        if (super.cachedEndpoint == null) {
+            throw new org.apache.axis.NoEndPointException();
+        }
+        org.apache.axis.client.Call _call = createCall();
+        _call.setOperation(_operations[5]);
+        _call.setUseSOAPAction(true);
+        _call.setSOAPActionURI("");
+        _call.setEncodingStyle(null);
+        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
+        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+        _call.setOperationName(new javax.xml.namespace.QName("http://terminals.register.mdp", "deleteTerminal"));
+
+        setRequestHeaders(_call);
+        setAttachments(_call);
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {id});
+
+        if (_resp instanceof java.rmi.RemoteException) {
+            throw (java.rmi.RemoteException)_resp;
+        }
+        extractAttachments(_call);
+  } catch (org.apache.axis.AxisFault axisFaultException) {
+    if (axisFaultException.detail != null) {
+        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
+              throw (java.rmi.RemoteException) axisFaultException.detail;
+         }
+        if (axisFaultException.detail instanceof mdp.exceptions.TerminalNotFoundException) {
+              throw (mdp.exceptions.TerminalNotFoundException) axisFaultException.detail;
+         }
+   }
+  throw axisFaultException;
+}
+    }
+
+    public mdp.register.terminals.dtos.GetCustomsTerminalDto getTerminal(java.math.BigInteger passageId, boolean isCustomsStep, java.lang.String terminalName) throws java.rmi.RemoteException, mdp.exceptions.TerminalNotFoundException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
         _call.setOperation(_operations[6]);
+        _call.setUseSOAPAction(true);
+        _call.setSOAPActionURI("");
+        _call.setEncodingStyle(null);
+        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
+        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+        _call.setOperationName(new javax.xml.namespace.QName("http://terminals.register.mdp", "getTerminal"));
+
+        setRequestHeaders(_call);
+        setAttachments(_call);
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {passageId, new java.lang.Boolean(isCustomsStep), terminalName});
+
+        if (_resp instanceof java.rmi.RemoteException) {
+            throw (java.rmi.RemoteException)_resp;
+        }
+        else {
+            extractAttachments(_call);
+            try {
+                return (mdp.register.terminals.dtos.GetCustomsTerminalDto) _resp;
+            } catch (java.lang.Exception _exception) {
+                return (mdp.register.terminals.dtos.GetCustomsTerminalDto) org.apache.axis.utils.JavaUtils.convert(_resp, mdp.register.terminals.dtos.GetCustomsTerminalDto.class);
+            }
+        }
+  } catch (org.apache.axis.AxisFault axisFaultException) {
+    if (axisFaultException.detail != null) {
+        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
+              throw (java.rmi.RemoteException) axisFaultException.detail;
+         }
+        if (axisFaultException.detail instanceof mdp.exceptions.TerminalNotFoundException) {
+              throw (mdp.exceptions.TerminalNotFoundException) axisFaultException.detail;
+         }
+   }
+  throw axisFaultException;
+}
+    }
+
+    public mdp.register.terminals.dtos.GetCustomsTerminalDto updateTerminal(mdp.register.terminals.dtos.UpdateTerminalDto dto) throws java.rmi.RemoteException {
+        if (super.cachedEndpoint == null) {
+            throw new org.apache.axis.NoEndPointException();
+        }
+        org.apache.axis.client.Call _call = createCall();
+        _call.setOperation(_operations[7]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("");
         _call.setEncodingStyle(null);

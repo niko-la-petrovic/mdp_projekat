@@ -46,6 +46,8 @@ public class PoliceCheckStepService implements IPoliceCheckStepService {
 		loadWantedPersonsService();
 	}
 
+	// TODO exception if terminal is null
+	
 	public synchronized boolean isOpenTerminalPassage(BigInteger terminalId, boolean isEntry, BigInteger passageId)
 			throws TerminalNotFoundException, PassageNotFoundException {
 		var terminal = getTerminal(terminalId);

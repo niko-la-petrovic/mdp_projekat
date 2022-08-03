@@ -1,9 +1,11 @@
 package mdp.simulation;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.file.Files;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -12,12 +14,14 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Properties;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -41,6 +45,7 @@ import mdp.register.terminals.TerminalRegisterServiceServiceLocator;
 import mdp.register.terminals.dtos.GetCustomsTerminalDto;
 import mdp.register.wanted.services.IPersonIdentifyingDocumentsService;
 import mdp.register.wanted.services.IPoliceCheckStepService;
+import mdp.util.Util;
 import mdp.util.client.HttpUtil;
 import mdp.util.client.SettingsLoader;
 import mdp.util.ui.UiUtil;
@@ -67,6 +72,8 @@ public class Main {
 	private static IPoliceCheckStepService policeCheckStepService;
 
 	private static boolean isOpen;
+
+	private static IPersonIdentifyingDocumentsService documentsService;
 
 	public static void main(String[] args) {
 		loadSettings();
@@ -96,7 +103,7 @@ public class Main {
 
 	private static void loadFileServerService() throws RemoteException, NotBoundException {
 		Registry registry = loadFileServerRegistry();
-		IPersonIdentifyingDocumentsService documentsService = (IPersonIdentifyingDocumentsService) registry
+		documentsService = (IPersonIdentifyingDocumentsService) registry
 				.lookup(settings.getPersonIdentifyingDocumentsServiceBindingName());
 	}
 
@@ -201,6 +208,7 @@ public class Main {
 
 				try {
 					boolean isWanted = policeCheckStepService.isWanted(dto.getPersonId(), terminal.getId(), passageId);
+					Main.isWanted = isWanted;
 				} catch (IOException e1) {
 					UiUtil.showErrorMessage(frame,
 							String.format("Failed to check if person is wanted: %s", e1.getMessage()));
@@ -209,11 +217,13 @@ public class Main {
 
 				if (isWanted) {
 					Main.isWanted = true;
+					UiUtil.showInfoMessage(frame, "You were detected as a wanted person.", "Wanted Person Detected");
 				}
 			}
 
 			try {
-				isOpen = policeCheckStepService.isOpenTerminalPassage(terminal.getId(), isEntry, passageId);
+				boolean isOpen = policeCheckStepService.isOpenTerminalPassage(terminal.getId(), isEntry, passageId);
+				Main.isOpen = isOpen;
 			} catch (TerminalNotFoundException e1) {
 				UiUtil.showErrorMessage(frame, "Specified terminal was not found");
 				return;
@@ -232,8 +242,27 @@ public class Main {
 				return;
 			}
 
-			
-			// TODO if open, communicate with customs file server
+			JFileChooser chooser = new JFileChooser();
+			chooser.setMultiSelectionEnabled(true);
+			chooser.showOpenDialog(frame);
+			File[] files = chooser.getSelectedFiles();
+
+			HashMap<String, byte[]> fileMap = new HashMap<>();
+			for (File file : files) {
+				try {
+					byte[] deflatedBytes = Util.getDeflatedBytes(file);
+					fileMap.put(file.getName(), deflatedBytes);
+				} catch (IOException e1) {
+					UiUtil.showErrorMessage(frame,
+							String.format("Failed to read file '%s': %s", file.toPath(), e1.getMessage()));
+				}
+			}
+			try {
+				documentsService.addPersonDocuments(dto.getPersonId(), fileMap);
+				UiUtil.showInfoMessage(frame, "You have passed the border", "Success");
+			} catch (IOException e1) {
+				UiUtil.showErrorMessage(frame, String.format("Failed to upload files: %s", e1.getMessage()));
+			}
 		});
 
 		terminalPanel.add(passageIdPanel);
@@ -374,12 +403,10 @@ public class Main {
 			String terminalName = terminalNameTextField.getText();
 			boolean isEntry = isEntryCheckBox.isSelected();
 
-			// TODO - add new method that accepts boolean which indicates where entry or
-			// exit, rather than customs/police passage
-			SearchTerminalDto searchDto = new SearchTerminalDto(isEntry, passageId, terminalName);
+			Main.passageId = passageId;
+			Main.isEntry = isEntry;
 
-//			terminalService.getter
-			terminal = terminalService.searchTerminal(searchDto);
+			terminal = terminalService.searchTerminalSimulation(terminalName, passageId, isEntry);
 			if (terminal == null) {
 				UiUtil.showErrorMessage(frame, "Specified passage and customs/police step not found");
 				return false;
