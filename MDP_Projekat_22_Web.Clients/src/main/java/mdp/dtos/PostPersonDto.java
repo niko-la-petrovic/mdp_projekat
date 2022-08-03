@@ -11,10 +11,10 @@ public class PostPersonDto implements Serializable {
 	private String name;
 	private String lastName;
 	private String ssn;
-	private LocalDate birthDate;
+	private String birthDate;
 	private boolean isMale;
 
-	public PostPersonDto(BigInteger personId, String name, String lastName, String ssn, LocalDate birthDate,
+	public PostPersonDto(BigInteger personId, String name, String lastName, String ssn, String birthDate,
 			boolean isMale) {
 		super();
 		this.personId = personId;
@@ -25,7 +25,7 @@ public class PostPersonDto implements Serializable {
 		this.isMale = isMale;
 	}
 
-	public LocalDate getBirthDate() {
+	public String getBirthDate() {
 		return birthDate;
 	}
 
@@ -49,7 +49,7 @@ public class PostPersonDto implements Serializable {
 		return isMale;
 	}
 
-	public void setBirthDate(LocalDate birthDate) {
+	public void setBirthDate(String birthDate) {
 		this.birthDate = birthDate;
 	}
 
@@ -72,4 +72,5 @@ public class PostPersonDto implements Serializable {
 	public void setSsn(String ssn) {
 		this.ssn = ssn;
 	}
+
 }

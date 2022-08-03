@@ -32,11 +32,11 @@ public class Main {
 		}
 
 		SettingsLoader.loadSettings("wantedRegisterServer", props -> {
+			var rmiHost = props.getProperty("rmiHost");
 			var rmiPort = Integer.valueOf(props.getProperty("rmiPort"));
 			var policeCheckStepServiceBindingName = props.getProperty("policeCheckStepServiceBindingName");
 			var shouldCreateRegistry = Boolean.valueOf(props.getProperty("shouldCreateRegistry"));
-
-			settings = new WantedRegisterServerSettings(rmiPort, policeCheckStepServiceBindingName,
+			settings = new WantedRegisterServerSettings(rmiHost, rmiPort, policeCheckStepServiceBindingName,
 					shouldCreateRegistry);
 		});
 
@@ -46,7 +46,7 @@ public class Main {
 		try {
 			if (settings.isShouldCreateRegistry())
 				LocateRegistry.createRegistry(settings.getRmiPort());
-			var registry = LocateRegistry.getRegistry();
+			var registry = LocateRegistry.getRegistry(settings.getRmiHost(), settings.getRmiPort());
 
 			registry.rebind(settings.getPoliceCheckStepServiceBindingName(), policeServiceStub);
 		} catch (AccessException e) {

@@ -30,15 +30,15 @@ public class PersonsService implements IPersonsService {
 		logsFile = new File(settings.getPersonsLogsFilePath());
 		if (!logsFile.exists()) {
 			Files.write(logsFile.toPath(),
-					"[DATETIME] [ID] [NAME] [LASTNAME] [SSN] [BIRTH_DATA] [MALE/FEMALE]".getBytes(),
+					"[DATETIME] [ID] [NAME] [LASTNAME] [SSN] [BIRTH_DATA] [MALE/FEMALE]\n".getBytes(),
 					StandardOpenOption.CREATE_NEW);
 		}
 	}
 
 	@Override
 	public synchronized void addPersonToLogs(PostPersonDto dto) throws IOException {
-		String line = String.format("[%s] %s %s %s %s %s %s", LocalDateTime.now(), dto.getPersonId(), dto.getName(),
-				dto.getLastName(), dto.getSsn(), dto.getBirthDate(), dto.isMale());
+		String line = String.format("[%s] %s %s %s %s %s %s\n", LocalDateTime.now(), dto.getPersonId(), dto.getName(),
+				dto.getLastName(), dto.getSsn(), dto.getBirthDate(), dto.getIsMale());
 		try {
 			Files.write(logsFile.toPath(), line.getBytes(), StandardOpenOption.APPEND);
 		} catch (IOException e) {

@@ -379,14 +379,7 @@ public class Main {
 			if (!attemptLoginAction())
 				return;
 
-			// TODO set username in disabled textfield
-			// TODO set marker - connected to server
-			// TODO show panel below with the messages
-			// TODO create selector for message type
-			// TODO chat client
-
 			try {
-				// TODO initialize above
 				sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
 				SSLSocket sockets = (SSLSocket) sf.createSocket(chatSettings.getHost(), chatSettings.getPort());
 				thread = new ClientThread(terminal.getId(), new BigInteger(passageIdTextField.getText()),

@@ -21,12 +21,13 @@ public class Main {
 		}
 
 		SettingsLoader.loadSettings("fileServer", props -> {
+			var rmiHost = props.getProperty("rmiHost");
 			var rmiPort = Integer.valueOf(props.getProperty("rmiPort"));
 			var shouldCreateRegistry = Boolean.valueOf(props.getProperty("shouldCreateRegistry"));
 			var personIdentifyingDocumentsServiceBindingName = props
 					.getProperty("personIdentifyingDocumentsServiceBindingName");
 
-			settings = new FileServerSettings(rmiPort, shouldCreateRegistry,
+			settings = new FileServerSettings(rmiHost, rmiPort, shouldCreateRegistry,
 					personIdentifyingDocumentsServiceBindingName);
 		});
 
@@ -36,7 +37,7 @@ public class Main {
 
 		if (settings.isShouldCreateRegistry())
 			LocateRegistry.createRegistry(settings.getRmiPort());
-		var registry = LocateRegistry.getRegistry();
+		var registry = LocateRegistry.getRegistry(settings.getRmiHost(), settings.getRmiPort());
 
 		registry.rebind(settings.getPersonIdentifyingDocumentsServiceBindingName(), personIdentifyingDocumentStub);
 
