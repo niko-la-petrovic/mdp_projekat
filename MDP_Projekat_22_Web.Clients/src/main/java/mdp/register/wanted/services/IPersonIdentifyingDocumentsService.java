@@ -16,5 +16,4 @@ public interface IPersonIdentifyingDocumentsService extends Remote {
 	File getArchivedPersonDocuments(BigInteger personId)
 			throws NoFilesFoundException, FileNotFoundException, IOException;
 
-
 }

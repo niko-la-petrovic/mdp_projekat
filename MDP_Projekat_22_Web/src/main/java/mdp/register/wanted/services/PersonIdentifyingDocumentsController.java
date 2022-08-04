@@ -18,7 +18,7 @@ import mdp.exceptions.NoFilesFoundException;
 
 @Path("/documents")
 public class PersonIdentifyingDocumentsController {
-private static final Logger logger  = Logger.getLogger(PersonIdentifyingDocumentsController.class.getName());
+	private static final Logger logger = Logger.getLogger(PersonIdentifyingDocumentsController.class.getName());
 
 	private IPersonIdentifyingDocumentsService documentsService;
 
@@ -30,18 +30,18 @@ private static final Logger logger  = Logger.getLogger(PersonIdentifyingDocument
 	@Path("/person/{personId}")
 	@Produces(javax.ws.rs.core.MediaType.APPLICATION_OCTET_STREAM)
 	public Response getDetectedWantedPersons(@PathParam("personId") BigInteger personId) throws IOException {
-		if (personId == null)
-		{
-logger.log(Level.WARNING, "Person id is null");
+		if (personId == null) {
+			logger.log(Level.WARNING, "Person id is null");
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
 
-	logger.log(Level.INFO, String.format("Obtaining documents of person with id '%s'", personId));
+		logger.log(Level.INFO, String.format("Obtaining documents of person with id '%s'", personId));
 		File file;
 		try {
 			file = documentsService.getArchivedPersonDocuments(personId);
 		} catch (NoFilesFoundException | IOException e) {
-			logger.log(Level.WARNING, String.format("Error with obtaining person documents for person '%s': '%s'", personId, e.getMessage()));
+			logger.log(Level.WARNING, String.format("Error with obtaining person documents for person '%s': '%s'",
+					personId, e.getMessage()));
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 

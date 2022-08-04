@@ -39,15 +39,18 @@ public class Main {
 
 			var broadcastDeclareResult = ServerThread.channel.exchangeDeclare(Constants.BROADCAST_EXCHANGE_NAME,
 					BuiltinExchangeType.FANOUT, true);
-			logger.log(Level.INFO, String.format("Binding BROADCAST EXCHANGE under name '%s'", Constants.BROADCAST_EXCHANGE_NAME));
+			logger.log(Level.INFO,
+					String.format("Binding BROADCAST EXCHANGE under name '%s'", Constants.BROADCAST_EXCHANGE_NAME));
 
 			var topicDeclareResult = ServerThread.channel.exchangeDeclare(Constants.TOPIC_EXCHANGE_NAME,
 					BuiltinExchangeType.TOPIC, true);
-			logger.log(Level.INFO, String.format("Binding TOPIC EXCHANGE under name '%s'", Constants.TOPIC_EXCHANGE_NAME));
+			logger.log(Level.INFO,
+					String.format("Binding TOPIC EXCHANGE under name '%s'", Constants.TOPIC_EXCHANGE_NAME));
 
 			var directDeclareResult = ServerThread.channel.exchangeDeclare(Constants.DIRECT_EXCHANGE_NAME,
 					BuiltinExchangeType.DIRECT, true);
-			logger.log(Level.INFO, String.format("Binding DIRECT EXCHANGE under name '%s'", Constants.DIRECT_EXCHANGE_NAME));
+			logger.log(Level.INFO,
+					String.format("Binding DIRECT EXCHANGE under name '%s'", Constants.DIRECT_EXCHANGE_NAME));
 		}
 	}
 

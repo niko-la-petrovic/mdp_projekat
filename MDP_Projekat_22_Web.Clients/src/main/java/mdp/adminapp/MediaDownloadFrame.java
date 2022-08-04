@@ -32,7 +32,7 @@ import mdp.util.client.HttpUtil;
 import mdp.util.ui.UiUtil;
 
 public class MediaDownloadFrame {
-private static final Logger logger = Logger.getLogger(MediaDownloadFrame.class.getName());
+	private static final Logger logger = Logger.getLogger(MediaDownloadFrame.class.getName());
 
 	static JFrame frame;
 

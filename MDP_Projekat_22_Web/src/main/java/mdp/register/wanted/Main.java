@@ -18,7 +18,7 @@ import mdp.register.wanted.services.PoliceCheckStepService;
 import mdp.util.SettingsLoader;
 
 public class Main {
-private static final Logger logger = Logger.getLogger(Main.class.getName());
+	private static final Logger logger = Logger.getLogger(Main.class.getName());
 
 	private static WantedRegisterServerSettings settings;
 	private static boolean shouldStop;
@@ -29,7 +29,7 @@ private static final Logger logger = Logger.getLogger(Main.class.getName());
 	public static void main(String[] args)
 			throws AlreadyBoundException, FileNotFoundException, IOException, OperationNotSupportedException {
 		logger.log(Level.INFO, "Setting security");
-				System.setProperty("java.security.policy", "server.policy");
+		System.setProperty("java.security.policy", "server.policy");
 		if (System.getSecurityManager() == null) {
 			System.setSecurityManager(new SecurityManager());
 		}
@@ -49,14 +49,16 @@ private static final Logger logger = Logger.getLogger(Main.class.getName());
 		var policeServiceStub = (IPoliceCheckStepService) UnicastRemoteObject.exportObject(policeCheckStepService, 0);
 
 		try {
-			if (settings.isShouldCreateRegistry()){
+			if (settings.isShouldCreateRegistry()) {
 				logger.log(Level.INFO, String.format("Creating RMI registry on port %s", settings.getRmiPort()));
 				LocateRegistry.createRegistry(settings.getRmiPort());
 			}
-			logger.log(Level.INFO, String.format("Obtaining RMI registry %s:%s", settings.getRmiHost(), settings.getRmiPort()));
+			logger.log(Level.INFO,
+					String.format("Obtaining RMI registry %s:%s", settings.getRmiHost(), settings.getRmiPort()));
 			var registry = LocateRegistry.getRegistry(settings.getRmiHost(), settings.getRmiPort());
 
-			logger.log(Level.INFO, String.format("Binding IPoliceCheckStepService under name '%s'", settings.getPoliceCheckStepServiceBindingName()));
+			logger.log(Level.INFO, String.format("Binding IPoliceCheckStepService under name '%s'",
+					settings.getPoliceCheckStepServiceBindingName()));
 			registry.rebind(settings.getPoliceCheckStepServiceBindingName(), policeServiceStub);
 		} catch (AccessException e) {
 			logger.log(Level.SEVERE, String.format("Access exception: %s", e.getMessage()));
@@ -79,7 +81,8 @@ private static final Logger logger = Logger.getLogger(Main.class.getName());
 			notificationSettings = new NotificationSocketSettings(port);
 		});
 
-		logger.log(Level.INFO, String.format("Starting notifications socket on port %s", notificationSettings.getPort()));
+		logger.log(Level.INFO,
+				String.format("Starting notifications socket on port %s", notificationSettings.getPort()));
 		var serverSocket = new ServerSocket(notificationSettings.getPort());
 		while (!shouldStop) {
 			var remoteSocket = serverSocket.accept();

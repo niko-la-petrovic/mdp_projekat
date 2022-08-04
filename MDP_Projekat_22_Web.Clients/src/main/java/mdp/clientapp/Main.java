@@ -101,7 +101,8 @@ public class Main {
 			terminalService = new TerminalRegisterServiceServiceLocator().getTerminalRegisterService();
 		} catch (ServiceException e) {
 			UiUtil.showErrorMessage(frame, "Failed to communicate with remote terminal registry service");
-			logger.log(Level.SEVERE, String.format("Failed to communicate with remote terminal registry service: %s", e.getMessage()));
+			logger.log(Level.SEVERE,
+					String.format("Failed to communicate with remote terminal registry service: %s", e.getMessage()));
 			return;
 		}
 
@@ -140,7 +141,7 @@ public class Main {
 		} catch (NumberFormatException ex) {
 			UiUtil.showErrorMessage(frame, "Parsing terminal parameters", "Error In Terminal Parameters",
 					"Invalid number format");
-					logger.log(Level.SEVERE, String.format("Invalid number format exception: %s", ex.getMessage()));
+			logger.log(Level.SEVERE, String.format("Invalid number format exception: %s", ex.getMessage()));
 		} catch (TerminalNotFoundException e) {
 			UiUtil.showErrorMessage(frame, "Couldn't find terminal with specified parameters");
 			logger.log(Level.SEVERE, "Couldn't find terminal with specified parameters");
@@ -398,7 +399,8 @@ public class Main {
 				UiUtil.showInfoMessage(frame, "Connected to chat server", "Chat Server Connection");
 			} catch (IOException e1) {
 				UiUtil.showErrorMessage(frame, String.format("Failed to initialize ClientThread: %s", e1.getMessage()));
-				logger.log(Level.SEVERE, String.format("Failed to initialize client thread - IO Exception: %s", e1.getMessage()));
+				logger.log(Level.SEVERE,
+						String.format("Failed to initialize client thread - IO Exception: %s", e1.getMessage()));
 			}
 		});
 

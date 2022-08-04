@@ -51,8 +51,8 @@ public class PersonsController {
 		logger.log(Level.INFO, "Providing passed persons logs");
 		var file = personsService.getPersonsLogsFile();
 
-		if (!file.exists()){
-logger.log(Level.INFO, "Passed persons logs empty");
+		if (!file.exists()) {
+			logger.log(Level.INFO, "Passed persons logs empty");
 			return Response.status(Status.NOT_FOUND).build();
 		}
 

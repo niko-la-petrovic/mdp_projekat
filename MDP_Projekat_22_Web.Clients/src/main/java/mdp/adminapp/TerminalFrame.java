@@ -43,7 +43,7 @@ import mdp.register.terminals.dtos.UpdateTerminalDto;
 import mdp.util.ui.UiUtil;
 
 public class TerminalFrame {
-private static final Logger logger = Logger.getLogger(TerminalFrame.class.getName());
+	private static final Logger logger = Logger.getLogger(TerminalFrame.class.getName());
 
 	private static final JTextField terminalNameField = new JTextField();
 	private static final JTextField terminalEntryCount = new JTextField();
@@ -182,12 +182,13 @@ private static final Logger logger = Logger.getLogger(TerminalFrame.class.getNam
 			} catch (ClassNotFoundException e) {
 				UiUtil.showErrorMessage(terminalFrame, "Implementation error",
 						"Failed to communicate with notification server socket", e.getMessage());
-						logger.log(Level.SEVERE, String.format("Failed to communicate with notification socket server: %s", e.getMessage()));
+				logger.log(Level.SEVERE,
+						String.format("Failed to communicate with notification socket server: %s", e.getMessage()));
 			}
 		} catch (IOException e) {
 			UiUtil.showErrorMessage(terminalFrame, "Sending open notification error", "Open Terminal Error",
 					e.getMessage());
-					logger.log(Level.SEVERE, String.format("Sending open notification error: %s", e.getMessage()));
+			logger.log(Level.SEVERE, String.format("Sending open notification error: %s", e.getMessage()));
 		}
 	}
 
@@ -200,7 +201,7 @@ private static final Logger logger = Logger.getLogger(TerminalFrame.class.getNam
 		} catch (TerminalNotFoundException e) {
 			UiUtil.showErrorMessage(terminalFrame, "Terminal delete error", "Terminal Delete Error",
 					"Terminal with specified ID doesn't exist");
-					logger.log(Level.SEVERE, "Terminal with specified ID doesn't exist");
+			logger.log(Level.SEVERE, "Terminal with specified ID doesn't exist");
 		} catch (RemoteException e) {
 			UiUtil.showErrorMessage(terminalFrame, "Terminal delete error", "Terminal Delete Error", e.getMessage());
 			logger.log(Level.SEVERE, String.format("Terminal delete error: %s", e.getMessage()));
@@ -302,7 +303,7 @@ private static final Logger logger = Logger.getLogger(TerminalFrame.class.getNam
 		} catch (NumberFormatException e) {
 			JOptionPane.showMessageDialog(terminalFrame, "Number format error: " + e.getMessage(),
 					"Failed to create terminal", JOptionPane.ERROR_MESSAGE);
-					logger.log(Level.SEVERE, String.format("Number format error: %s", e.getMessage()));
+			logger.log(Level.SEVERE, String.format("Number format error: %s", e.getMessage()));
 			return;
 		} catch (Exception e) {
 			UiUtil.showCreationErrorDialog(terminalFrame, e);

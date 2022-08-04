@@ -33,8 +33,9 @@ public class WantedPersonsService implements IWantedPersonsService {
 
 	@Override
 	public synchronized void addWantedPersonToLogFile(WantedPersonDetected detectedPerson) throws IOException {
-		logger.log(Level.INFO, String.format("Adding detected wanted person with id '%s' to logs", detectedPerson.getPersonId()));
-		
+		logger.log(Level.INFO,
+				String.format("Adding detected wanted person with id '%s' to logs", detectedPerson.getPersonId()));
+
 		var file = getLogsFile();
 		ArrayList<WantedPersonDetected> logs = xmlMapper.readValue(file, ArrayList.class);
 
@@ -56,7 +57,7 @@ public class WantedPersonsService implements IWantedPersonsService {
 					Arrays.asList(new WantedPersonDetected(new BigInteger("123"), LocalDateTime.now(),
 							new BigInteger("165630836651969126648801254799355469939"),
 							new BigInteger("165458481299780741793080579545399665715"))));
-							// TODO clearup
+		// TODO clearup
 
 		return file;
 	}

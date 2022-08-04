@@ -15,7 +15,7 @@ import mdp.util.PasswordUtil;
 import redis.clients.jedis.Jedis;
 
 public class CredentialsService implements ICredentialsService {
-private static final Logger logger = Logger.getLogger(CredentialsService.class.getName());
+	private static final Logger logger = Logger.getLogger(CredentialsService.class.getName());
 
 	private static final String credentialsHash = "credentials";
 
@@ -27,14 +27,14 @@ private static final Logger logger = Logger.getLogger(CredentialsService.class.g
 
 	public void addCredentials(PostCredentialsDto dto) throws UsernameExistsException {
 		String username = dto.getUsername();
-		if (username == null){
-logger.log(Level.WARNING, "Username is null");
+		if (username == null) {
+			logger.log(Level.WARNING, "Username is null");
 			throw new IllegalArgumentException();
 		}
 
 		var existingPasswordHash = getUsernameHash(username);
-		if (existingPasswordHash != null){
-logger.log(Level.WARNING, String.format("Username '%s' exists", username));
+		if (existingPasswordHash != null) {
+			logger.log(Level.WARNING, String.format("Username '%s' exists", username));
 			throw new UsernameExistsException();
 		}
 
@@ -47,34 +47,31 @@ logger.log(Level.WARNING, String.format("Username '%s' exists", username));
 	@Override
 	public boolean checkCredentials(PostCredentialsDto dto) {
 		String username = dto.getUsername();
-		if (username == null)
-		{
-logger.log(Level.WARNING, "Username is null");
+		if (username == null) {
+			logger.log(Level.WARNING, "Username is null");
 			throw new IllegalArgumentException();
 		}
 
 		var existingPasswordHash = getUsernameHash(username);
-		if (existingPasswordHash == null)
-		{
+		if (existingPasswordHash == null) {
 			logger.log(Level.WARNING, String.format("User with username '%s' does not exist", username));
 			return false;
 		}
 
-logger.log(Level.INFO, String.format("User with username '%s' attempted to log in", username));
+		logger.log(Level.INFO, String.format("User with username '%s' attempted to log in", username));
 		return PasswordUtil.checkPassword(dto.getPassword(), existingPasswordHash);
 	}
 
 	@Override
 	public void deleteCredentials(String username) throws UsernameNotFoundException {
-		if (username == null){
-logger.log(Level.WARNING, "Username is null");
+		if (username == null) {
+			logger.log(Level.WARNING, "Username is null");
 			throw new IllegalArgumentException();
 		}
 
 		var existingPasswordHash = getUsernameHash(username);
-		if (existingPasswordHash == null)
-		{
-logger.log(Level.WARNING, String.format("User with username '%s' does not exist", username));
+		if (existingPasswordHash == null) {
+			logger.log(Level.WARNING, String.format("User with username '%s' does not exist", username));
 			throw new UsernameNotFoundException();
 		}
 
@@ -94,15 +91,14 @@ logger.log(Level.WARNING, String.format("User with username '%s' does not exist"
 	@Override
 	public void updateCredentials(PutCredentialsDto dto) throws UsernameNotFoundException {
 		String username = dto.getUsername();
-		if (username == null){
-logger.log(Level.WARNING, "Username is null");
+		if (username == null) {
+			logger.log(Level.WARNING, "Username is null");
 			throw new IllegalArgumentException();
 		}
 
 		var existingPasswordHash = getUsernameHash(username);
-		if (existingPasswordHash == null)
-		{
-logger.log(Level.WARNING, String.format("User with username '%s' does not exist", username));
+		if (existingPasswordHash == null) {
+			logger.log(Level.WARNING, String.format("User with username '%s' does not exist", username));
 			throw new UsernameNotFoundException();
 		}
 

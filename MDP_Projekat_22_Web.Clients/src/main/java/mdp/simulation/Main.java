@@ -100,7 +100,8 @@ public class Main {
 			terminalService = new TerminalRegisterServiceServiceLocator().getTerminalRegisterService();
 		} catch (ServiceException e) {
 			UiUtil.showErrorMessage(frame, "Failed to communicate with remote terminal registry service");
-			logger.log(Level.SEVERE, String.format("Failed to communicate with remote terminal registry service: %s", e.getMessage()));
+			logger.log(Level.SEVERE,
+					String.format("Failed to communicate with remote terminal registry service: %s", e.getMessage()));
 			return;
 		}
 		setupMainFrame();
@@ -217,7 +218,8 @@ public class Main {
 				} catch (IOException e1) {
 					UiUtil.showErrorMessage(frame,
 							String.format("Failed to check if person is wanted: %s", e1.getMessage()));
-							logger.log(Level.SEVERE, String.format("Failed to check if person is wanted - IO Exception: %s", e1.getMessage()));
+					logger.log(Level.SEVERE,
+							String.format("Failed to check if person is wanted - IO Exception: %s", e1.getMessage()));
 					return;
 				}
 
@@ -237,7 +239,7 @@ public class Main {
 			} catch (RemoteException e1) {
 				UiUtil.showErrorMessage(frame, String.format(
 						"Error occurred while communicating with police check step service: %s", e1.getMessage()));
-						logger.log(Level.SEVERE, String.format("RemoteException: %s", e1.getMessage()));
+				logger.log(Level.SEVERE, String.format("RemoteException: %s", e1.getMessage()));
 				return;
 			} catch (PassageNotFoundException e1) {
 				UiUtil.showErrorMessage(frame, "Specified passage was not found");
@@ -248,7 +250,7 @@ public class Main {
 			if (!isOpen) {
 				UiUtil.showInfoMessage(frame, "The terminal will be closed until you are fully processed",
 						"Wanted Person Detected");
-						logger.log(Level.SEVERE, "The temrinal will be closed until you are processed");
+				logger.log(Level.SEVERE, "The temrinal will be closed until you are processed");
 				return;
 			}
 
@@ -265,7 +267,7 @@ public class Main {
 				} catch (IOException e1) {
 					UiUtil.showErrorMessage(frame,
 							String.format("Failed to read file '%s': %s", file.toPath(), e1.getMessage()));
-							logger.log(Level.SEVERE, String.format("IO Exception: %s", e1.getMessage()));
+					logger.log(Level.SEVERE, String.format("IO Exception: %s", e1.getMessage()));
 				}
 			}
 			try {
@@ -431,7 +433,7 @@ public class Main {
 		} catch (NumberFormatException ex) {
 			UiUtil.showErrorMessage(frame, "Parsing terminal parameters", "Error In Terminal Parameters",
 					"Invalid number format");
-					logger.log(Level.SEVERE, String.format("NumberFormatException: %s", ex.getMessage()));
+			logger.log(Level.SEVERE, String.format("NumberFormatException: %s", ex.getMessage()));
 		} catch (TerminalNotFoundException e) {
 			UiUtil.showErrorMessage(frame, "Couldn't find terminal with specified parameters");
 			logger.log(Level.SEVERE, "Couldn't find terminal with specified parameters");

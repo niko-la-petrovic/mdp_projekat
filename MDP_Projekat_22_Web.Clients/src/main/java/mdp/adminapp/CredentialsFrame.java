@@ -43,7 +43,7 @@ import mdp.util.client.HttpUtil;
 import mdp.util.ui.UiUtil;
 
 public class CredentialsFrame {
-private static final Logger logger = Logger.getLogger(CredentialsFrame.class.getName());
+	private static final Logger logger = Logger.getLogger(CredentialsFrame.class.getName());
 
 	static JFrame frame;
 	private static Gson gson = new Gson();
@@ -346,7 +346,7 @@ private static final Logger logger = Logger.getLogger(CredentialsFrame.class.get
 				UiUtil.showInfoMessage(frame, String.format("Successfully created user %s", username), "Success");
 				usernameSearchTextField.setText(username);
 				handleSearchAction(username);
-			} else if (responseCode == 409){
+			} else if (responseCode == 409) {
 				UiUtil.showErrorMessage(frame, "Creating user", "Error Creating User", "Username already in use");
 				logger.log(Level.SEVERE, String.format("Username is already in use"));
 			}

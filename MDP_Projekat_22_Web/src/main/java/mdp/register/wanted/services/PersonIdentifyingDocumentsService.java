@@ -21,7 +21,7 @@ import mdp.util.SettingsLoader;
 import mdp.util.Util;
 
 public class PersonIdentifyingDocumentsService implements IPersonIdentifyingDocumentsService {
-private static final Logger logger = Logger.getLogger(PersonIdentifyingDocumentsService.class.getName());
+	private static final Logger logger = Logger.getLogger(PersonIdentifyingDocumentsService.class.getName());
 	private PersonIdentifyingDocumentsServiceSettings settings;
 
 	public PersonIdentifyingDocumentsService() throws FileNotFoundException, IOException {

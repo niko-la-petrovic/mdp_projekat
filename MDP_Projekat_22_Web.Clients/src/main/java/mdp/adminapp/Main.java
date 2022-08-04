@@ -19,7 +19,7 @@ import mdp.util.client.SettingsLoader;
 import mdp.util.ui.UiUtil;
 
 public class Main {
-private static final Logger logger = Logger.getLogger(Main.class.getName());
+	private static final Logger logger = Logger.getLogger(Main.class.getName());
 
 	static JFrame mainFrame;
 	public static Toolkit toolkit;
@@ -58,7 +58,7 @@ private static final Logger logger = Logger.getLogger(Main.class.getName());
 				} catch (OperationNotSupportedException | IOException | ServiceException e1) {
 					UiUtil.showErrorMessage(mainFrame, "Initialize terminal frame", "Error Initializing Terminal Frame",
 							e1.getMessage());
-							logger.log(Level.SEVERE, String.format("Error Initializing Terminal Frame: %s", e1.getMessage()));
+					logger.log(Level.SEVERE, String.format("Error Initializing Terminal Frame: %s", e1.getMessage()));
 				}
 			}
 

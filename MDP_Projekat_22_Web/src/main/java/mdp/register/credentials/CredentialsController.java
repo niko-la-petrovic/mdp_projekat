@@ -69,26 +69,22 @@ public class CredentialsController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/login")
 	public Response loginWithCredentials(PostCredentialsDto dto) {
-		if (dto == null)
-		{
+		if (dto == null) {
 			logger.log(Level.WARNING, "Dto is null");
 			return Response.status(Status.BAD_REQUEST).build();
 		}
 
 		var violations = validator.validate(dto);
-		if (!violations.isEmpty())
-		{
+		if (!violations.isEmpty()) {
 			logger.log(Level.WARNING, "Dto validation failed");
 			return Response.status(Status.BAD_REQUEST).build();
 		}
 
-		if (credentialsService.checkCredentials(dto))
-		{
-logger.log(Level.INFO, "Login successful");
+		if (credentialsService.checkCredentials(dto)) {
+			logger.log(Level.INFO, "Login successful");
 			return Response.status(Status.OK).build();
-		}
-		else{
-logger.log(Level.INFO, "Login failed");
+		} else {
+			logger.log(Level.INFO, "Login failed");
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 	}
@@ -117,8 +113,8 @@ logger.log(Level.INFO, "Login failed");
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response putCredentials(PutCredentialsDto dto) {
-		if (dto == null){
-logger.log(Level.WARNING, "Dto is null");
+		if (dto == null) {
+			logger.log(Level.WARNING, "Dto is null");
 			return Response.status(Status.BAD_REQUEST).build();
 		}
 
@@ -135,9 +131,9 @@ logger.log(Level.WARNING, "Dto is null");
 
 	@DELETE
 	public Response deleteCredentials(@QueryParam("username") String username) {
-		if (username == null){
+		if (username == null) {
 			logger.log(Level.WARNING, "Username is null");
-				return Response.status(Status.BAD_REQUEST).build();
+			return Response.status(Status.BAD_REQUEST).build();
 		}
 
 		try {

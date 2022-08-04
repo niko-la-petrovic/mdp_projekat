@@ -42,14 +42,16 @@ public class Main {
 		var personIdentifyingDocumentStub = (IPersonIdentifyingDocumentsService) UnicastRemoteObject
 				.exportObject(personIdentifyingDocumentService, 0);
 
-		if (settings.isShouldCreateRegistry()){
+		if (settings.isShouldCreateRegistry()) {
 			logger.log(Level.INFO, String.format("Creating registry at port '%s'", settings.getRmiPort()));
 			LocateRegistry.createRegistry(settings.getRmiPort());
 		}
-		logger.log(Level.INFO, String.format("Obtaining RMI registry %s:%s", settings.getRmiHost(), settings.getRmiPort()));
+		logger.log(Level.INFO,
+				String.format("Obtaining RMI registry %s:%s", settings.getRmiHost(), settings.getRmiPort()));
 		var registry = LocateRegistry.getRegistry(settings.getRmiHost(), settings.getRmiPort());
 
-		logger.log(Level.INFO, String.format("Binding IPersonIdentifyingDocumentService under name '%s'", settings.getPersonIdentifyingDocumentsServiceBindingName()));
+		logger.log(Level.INFO, String.format("Binding IPersonIdentifyingDocumentService under name '%s'",
+				settings.getPersonIdentifyingDocumentsServiceBindingName()));
 		registry.rebind(settings.getPersonIdentifyingDocumentsServiceBindingName(), personIdentifyingDocumentStub);
 
 		logger.log(Level.INFO, "Bound all RMI services");

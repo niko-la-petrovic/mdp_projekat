@@ -23,19 +23,19 @@ public class CredentialsService {
 
 	public void updateCredentials(PutCredentialsDto dto) throws UsernameNotFoundException {
 		String username = dto.getUsername();
-		if (username == null){
+		if (username == null) {
 			logger.log(Level.WARNING, "Username is null");
 			throw new IllegalArgumentException();
 		}
 
 		String existingPasswordHash = getUsernameHash(username);
-		if (existingPasswordHash == null){
+		if (existingPasswordHash == null) {
 			logger.log(Level.WARNING, String.format("User with username '%s' does not exist", username));
 			throw new UsernameNotFoundException();
 		}
 
 		String hash = PasswordUtil.hashPassword(dto.getPassword());
-		
+
 		logger.log(Level.INFO, String.format("Setting new password for user with username '%s'", username));
 		setPassword(username, hash);
 	}

@@ -277,7 +277,8 @@ public class ServerThread extends Thread {
 		if (routingKey == null)
 			return;
 
-			// TODO remove consumer cancelling since theres one consumer per terminal - keep it running
+		// TODO remove consumer cancelling since theres one consumer per terminal - keep
+		// it running
 		var consumer = routingKeyConsumerMap.get(routingKey);
 		if (consumer == null)
 			return;

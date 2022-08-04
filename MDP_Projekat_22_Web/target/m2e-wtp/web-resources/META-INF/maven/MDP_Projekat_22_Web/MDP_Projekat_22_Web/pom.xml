@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>MDP_Projekat_22_Web</groupId>
 	<artifactId>MDP_Projekat_22_Web</artifactId>
@@ -86,7 +88,7 @@
 			<artifactId>jaxrpc</artifactId>
 			<version>1.1</version>
 		</dependency>
-		<!-- unnecessary?-->
+		<!-- unnecessary? -->
 		<dependency>
 			<groupId>org.apache.axis</groupId>
 			<artifactId>axis</artifactId>

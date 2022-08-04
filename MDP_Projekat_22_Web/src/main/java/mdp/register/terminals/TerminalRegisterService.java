@@ -32,7 +32,7 @@ import mdp.util.Util;
 public class TerminalRegisterService
 //implements ITerminalRegisterService 
 {
-private static final Logger logger = Logger.getLogger(TerminalRegisterService.class.getName());
+	private static final Logger logger = Logger.getLogger(TerminalRegisterService.class.getName());
 
 	private static final String TERMINAL_REGISTER_SETTINGS_NAME = "terminalRegister";
 	private static int serializedCount = 0;
@@ -112,13 +112,13 @@ private static final Logger logger = Logger.getLogger(TerminalRegisterService.cl
 		var exits = new CustomsPassage[exitPassageCount];
 		var name = dto.getTerminalName();
 
-logger.log(Level.INFO, String.format("Attempting to create terminal with name '%s'", name));
+		logger.log(Level.INFO, String.format("Attempting to create terminal with name '%s'", name));
 
 		var existingTerminal = terminalIdToTerminalMap.values();
 		boolean found = false;
 		for (CustomsTerminal customsTerminal : existingTerminal)
-			if (customsTerminal.getName().equals(dto.getTerminalName())){
-logger.log(Level.WARNING, String.format("Terminal with name '%s' already exists", name));
+			if (customsTerminal.getName().equals(dto.getTerminalName())) {
+				logger.log(Level.WARNING, String.format("Terminal with name '%s' already exists", name));
 				throw new TerminalNameTakenException();
 			}
 
@@ -145,14 +145,13 @@ logger.log(Level.WARNING, String.format("Terminal with name '%s' already exists"
 
 	// @Override
 	public void deleteTerminal(BigInteger id) throws TerminalNotFoundException {
-		if (id == null){
-logger.log(Level.WARNING, "Terminal id is null");
+		if (id == null) {
+			logger.log(Level.WARNING, "Terminal id is null");
 			throw new NullPointerException();
 		}
 		var filePath = getFilePath(id);
-		if (filePath == null)
-		{
-logger.log(Level.WARNING, String.format("File for terminal with id '%s' does not exist", id));
+		if (filePath == null) {
+			logger.log(Level.WARNING, String.format("File for terminal with id '%s' does not exist", id));
 			throw new TerminalNotFoundException();
 		}
 
@@ -163,7 +162,8 @@ logger.log(Level.WARNING, String.format("File for terminal with id '%s' does not
 // @Override
 	public GetCustomsTerminalDto getTerminal(BigInteger passageId, boolean isCustomsStep, String terminalName)
 			throws TerminalNotFoundException {
-				logger.log(Level.INFO, String.format("Getting terminalName:passageId:customs/policeStep '%s:%s:%s'", terminalName, passageId, isCustomsStep));
+		logger.log(Level.INFO, String.format("Getting terminalName:passageId:customs/policeStep '%s:%s:%s'",
+				terminalName, passageId, isCustomsStep));
 		var terminals = terminalIdToTerminalMap.values();
 
 		CustomsTerminal terminal = null;
@@ -182,8 +182,10 @@ logger.log(Level.WARNING, String.format("File for terminal with id '%s' does not
 				terminal = customsTerminal;
 		}
 
-		if (terminal == null){
-			logger.log(Level.INFO, String.format("Terminal terminalName:passageId:customs/policeStep '%s:%s:%s' not found", terminalName, passageId, isCustomsStep));
+		if (terminal == null) {
+			logger.log(Level.INFO,
+					String.format("Terminal terminalName:passageId:customs/policeStep '%s:%s:%s' not found",
+							terminalName, passageId, isCustomsStep));
 			return null;
 		}
 
@@ -207,7 +209,7 @@ logger.log(Level.WARNING, String.format("File for terminal with id '%s' does not
 
 	// @Override
 	public GetCustomsTerminalDto[] getTerminalsStartingWithName(String namePrefix) {
-logger.log(Level.INFO, String.format("Getting terminals with name starting with '%s'", namePrefix));
+		logger.log(Level.INFO, String.format("Getting terminals with name starting with '%s'", namePrefix));
 
 		var terminals = terminalIdToTerminalMap.values();
 		var mappedTerminals = new ArrayList<GetCustomsTerminalDto>();
@@ -220,13 +222,18 @@ logger.log(Level.INFO, String.format("Getting terminals with name starting with 
 
 	// @Override
 	public GetCustomsTerminalDto searchTerminal(SearchTerminalDto dto) throws TerminalNotFoundException {
-		logger.log(Level.INFO, String.format("Searching for terminal with parameters: passageId: '%s' isCustomsPassage: '%s' terminalName: '%s'", dto.getPassageId(), dto.isCustomsPassage(), dto.getTerminalName()));
+		logger.log(Level.INFO, String.format(
+				"Searching for terminal with parameters: passageId: '%s' isCustomsPassage: '%s' terminalName: '%s'",
+				dto.getPassageId(), dto.isCustomsPassage(), dto.getTerminalName()));
 
 		return getTerminal(dto.getPassageId(), dto.isCustomsPassage(), dto.getTerminalName());
 	}
 
-	public GetCustomsTerminalDto searchTerminalSimulation(String terminalName, BigInteger passageId, boolean isEntry){
-		logger.log(Level.INFO, String.format("Searching for terminal with parameters: terminalName: '%s' passageId: '%s' isEntry: '%s' ", terminalName, passageId, isEntry));
+	public GetCustomsTerminalDto searchTerminalSimulation(String terminalName, BigInteger passageId, boolean isEntry) {
+		logger.log(Level.INFO,
+				String.format(
+						"Searching for terminal with parameters: terminalName: '%s' passageId: '%s' isEntry: '%s' ",
+						terminalName, passageId, isEntry));
 
 		return getTerminalSimulation(terminalName, passageId, isEntry);
 	}
@@ -269,8 +276,8 @@ logger.log(Level.INFO, String.format("Getting terminals with name starting with 
 				break;
 			}
 		}
-		if (terminal == null){
-logger.log(Level.WARNING, String.format("Terminal with id '%s' not found", dto.getTerminalId()));
+		if (terminal == null) {
+			logger.log(Level.WARNING, String.format("Terminal with id '%s' not found", dto.getTerminalId()));
 			throw new TerminalNotFoundException();
 		}
 

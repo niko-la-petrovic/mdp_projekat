@@ -47,10 +47,11 @@ public class PoliceCheckStepService implements IPoliceCheckStepService {
 	}
 
 	// TODO exception if terminal is null
-	
+
 	public synchronized boolean isOpenTerminalPassage(BigInteger terminalId, boolean isEntry, BigInteger passageId)
 			throws TerminalNotFoundException, PassageNotFoundException {
-	logger.log(Level.INFO, String.format("Checking if terminalId:passageId '%s:%s' is open", terminalId, passageId));
+		logger.log(Level.INFO,
+				String.format("Checking if terminalId:passageId '%s:%s' is open", terminalId, passageId));
 
 		var terminal = getTerminal(terminalId);
 
@@ -67,14 +68,15 @@ public class PoliceCheckStepService implements IPoliceCheckStepService {
 	@Override
 	public synchronized boolean isWanted(BigInteger personId, BigInteger terminalId, BigInteger passageId)
 			throws IOException {
-				logger.log(Level.INFO, String.format("Checking if person with id '%s' is wanted", passageId));
+		logger.log(Level.INFO, String.format("Checking if person with id '%s' is wanted", passageId));
 
 		var terminal = terminalsMap.get(terminalId);
 
 		if (!wantedIds.contains(personId))
 			return false;
 
-			logger.log(Level.INFO, String.format("Person with id '%s' is wanted. Closing terminalId:passageId '%s:%s'", personId, terminalId, passageId));
+		logger.log(Level.INFO, String.format("Person with id '%s' is wanted. Closing terminalId:passageId '%s:%s'",
+				personId, terminalId, passageId));
 		var passages = Stream.concat(Arrays.asList(terminal.getEntries()).stream(),
 				Arrays.asList(terminal.getExits()).stream());
 
@@ -82,7 +84,9 @@ public class PoliceCheckStepService implements IPoliceCheckStepService {
 			p.setOpen(false);
 		});
 
-		logger.log(Level.INFO, String.format("Adding to detected persons logs person with id '%s' at terminalId:passageId '%s:%s'", personId, terminalId, passageId));
+		logger.log(Level.INFO,
+				String.format("Adding to detected persons logs person with id '%s' at terminalId:passageId '%s:%s'",
+						personId, terminalId, passageId));
 		wantedPersonsService.addWantedPersonToLogFile(
 				new WantedPersonDetected(personId, LocalDateTime.now(), terminalId, passageId));
 
@@ -92,7 +96,7 @@ public class PoliceCheckStepService implements IPoliceCheckStepService {
 	@Override
 	public synchronized void openPassages(BigInteger terminalId, BigInteger passageId)
 			throws TerminalNotFoundException {
-				logger.log(Level.INFO, String.format("Opening passages at terminal '%s'", terminalId));
+		logger.log(Level.INFO, String.format("Opening passages at terminal '%s'", terminalId));
 		var terminal = getTerminal(terminalId);
 
 		Stream.concat(Arrays.asList(terminal.getEntries()).stream(), Arrays.asList(terminal.getExits()).stream())

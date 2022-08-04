@@ -29,8 +29,7 @@ public class WantedPersonsController {
 
 		var file = wantedPersonsService.getWantedPersonsLogsFile();
 
-		if (!file.exists())
-		{
+		if (!file.exists()) {
 			logger.log(Level.INFO, "Detected wanted persons logs empty");
 			return Response.status(Status.NOT_FOUND).build();
 		}
