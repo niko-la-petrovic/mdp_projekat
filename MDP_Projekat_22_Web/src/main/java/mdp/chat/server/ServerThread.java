@@ -73,7 +73,7 @@ public class ServerThread extends Thread {
 						handleTerminate();
 					}
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.log(Level.SEVERE, String.format("Exception: %s", e.getMessage()));
 				}
 			handleTerminate();
 			in.close();
@@ -251,6 +251,7 @@ public class ServerThread extends Thread {
 						var message = messageQueue.take();
 						sendMessage(new SocketMessage(SocketMessageType.TRANSFER_MESSAGE, message, null, null));
 					} catch (InterruptedException e) {
+						logger.log(Level.WARNING, "ServerThread interrupted");
 					}
 				}
 			}
@@ -276,6 +277,7 @@ public class ServerThread extends Thread {
 		if (routingKey == null)
 			return;
 
+			// TODO remove consumer cancelling since theres one consumer per terminal - keep it running
 		var consumer = routingKeyConsumerMap.get(routingKey);
 		if (consumer == null)
 			return;

@@ -7,7 +7,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.el.ELContext;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 
@@ -26,7 +25,9 @@ public class Main {
 	private static ServerSocket ss;
 
 	public static void main(String[] args) throws FileNotFoundException, IOException, TimeoutException {
+		logger.log(Level.INFO, "Creating server thread");
 		var serverThread = startServer();
+		logger.log(Level.INFO, "Starting server thread");
 		serverThread.start();
 	}
 
@@ -38,14 +39,20 @@ public class Main {
 
 			var broadcastDeclareResult = ServerThread.channel.exchangeDeclare(Constants.BROADCAST_EXCHANGE_NAME,
 					BuiltinExchangeType.FANOUT, true);
+			logger.log(Level.INFO, String.format("Binding BROADCAST EXCHANGE under name '%s'", Constants.BROADCAST_EXCHANGE_NAME));
+
 			var topicDeclareResult = ServerThread.channel.exchangeDeclare(Constants.TOPIC_EXCHANGE_NAME,
 					BuiltinExchangeType.TOPIC, true);
+			logger.log(Level.INFO, String.format("Binding TOPIC EXCHANGE under name '%s'", Constants.TOPIC_EXCHANGE_NAME));
+
 			var directDeclareResult = ServerThread.channel.exchangeDeclare(Constants.DIRECT_EXCHANGE_NAME,
 					BuiltinExchangeType.DIRECT, true);
+			logger.log(Level.INFO, String.format("Binding DIRECT EXCHANGE under name '%s'", Constants.DIRECT_EXCHANGE_NAME));
 		}
 	}
 
 	public static Thread startServer() throws IOException, TimeoutException {
+		logger.log(Level.INFO, "Configuring message queueing");
 		configureMessageQueueing();
 		var startServerThread = new Thread() {
 
@@ -54,14 +61,18 @@ public class Main {
 
 				if (settings == null)
 					try {
+						logger.log(Level.INFO, "Loading settings");
 						loadSettings();
 					} catch (IOException e1) {
 						logger.log(Level.SEVERE, String.format("Failed to load settings: %s", e1.getMessage()));
 						return;
 					}
+
+				logger.log(Level.INFO, "Loading secure socket keystore");
 				System.setProperty("javax.net.ssl.keyStore", settings.getKeyStorePath());
 				System.setProperty("javax.net.ssl.keyStorePassword", settings.getKeyStorePassword());
 
+				logger.log(Level.INFO, String.format("Creating secure socket on port", settings.getPort()));
 				ssf = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
 				try {
 					ss = ssf.createServerSocket(settings.getPort());
@@ -72,9 +83,11 @@ public class Main {
 				var serverConnectionsThread = new Thread() {
 					@Override
 					public void run() {
+						logger.log(Level.INFO, "Started server socket handle connections loop");
 						serverHandleConnectionsLoop(ss);
 					}
 				};
+				logger.log(Level.INFO, "Starting server connections thread");
 				serverConnectionsThread.start();
 			}
 		};
@@ -89,13 +102,18 @@ public class Main {
 			SSLSocket s;
 			try {
 				s = (SSLSocket) ss.accept();
+				logger.log(Level.INFO, String.format("Accepted new client: %s", s.getInetAddress()));
+
+				logger.log(Level.INFO, String.format("Conducting handshakre with client: %s", s.getInetAddress()));
 				s.startHandshake();
+
+				logger.log(Level.INFO, String.format("Starting server thread for client: %s", s.getInetAddress()));
 				new ServerThread(s).start();
 			} catch (IOException e) {
-				logger.log(Level.INFO, "Failed to connect to client");
+				logger.log(Level.WARNING, "Failed to connect to client");
 			}
 		}
-		logger.log(Level.INFO, "Stopping server socket");
+		logger.log(Level.WARNING, "Stopping server socket");
 	}
 
 	private static void loadSettings() throws FileNotFoundException, IOException {

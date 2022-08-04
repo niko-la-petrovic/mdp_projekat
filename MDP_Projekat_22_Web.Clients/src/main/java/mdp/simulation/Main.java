@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.file.Files;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -16,6 +15,8 @@ import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -37,7 +38,6 @@ import org.jdatepicker.impl.UtilDateModel;
 import com.google.gson.Gson;
 
 import mdp.dtos.PostPersonDto;
-import mdp.dtos.SearchTerminalDto;
 import mdp.exceptions.PassageNotFoundException;
 import mdp.exceptions.TerminalNotFoundException;
 import mdp.register.terminals.TerminalRegisterService;
@@ -51,6 +51,8 @@ import mdp.util.client.SettingsLoader;
 import mdp.util.ui.UiUtil;
 
 public class Main {
+	private static final Logger logger = Logger.getLogger(Main.class.getName());
+
 	private static final Gson gson = new Gson();
 
 	static SimulationAppSettings settings;
@@ -82,6 +84,7 @@ public class Main {
 			loadWantedService();
 		} catch (RemoteException | NotBoundException e2) {
 			UiUtil.showErrorMessage(frame, String.format("Failed to load wanted service: %s", e2.getMessage()));
+			logger.log(Level.SEVERE, String.format("Failed to load wanted service: %s", e2.getMessage()));
 			return;
 		}
 
@@ -89,6 +92,7 @@ public class Main {
 			loadFileServerService();
 		} catch (RemoteException | NotBoundException e1) {
 			UiUtil.showErrorMessage(frame, String.format("Failed to load documents service: %s", e1.getMessage()));
+			logger.log(Level.SEVERE, String.format("Failed to load documents service: %s", e1.getMessage()));
 			return;
 		}
 
@@ -96,6 +100,7 @@ public class Main {
 			terminalService = new TerminalRegisterServiceServiceLocator().getTerminalRegisterService();
 		} catch (ServiceException e) {
 			UiUtil.showErrorMessage(frame, "Failed to communicate with remote terminal registry service");
+			logger.log(Level.SEVERE, String.format("Failed to communicate with remote terminal registry service: %s", e.getMessage()));
 			return;
 		}
 		setupMainFrame();
@@ -150,7 +155,7 @@ public class Main {
 					fileServerRmiHost, policeCheckStepServiceBindingName, personIdentifyingDocumentsServiceBindingName);
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.log(Level.SEVERE, String.format("IO Exception: %s", e.getMessage()));
 			System.exit(1);
 		}
 	}
@@ -212,6 +217,7 @@ public class Main {
 				} catch (IOException e1) {
 					UiUtil.showErrorMessage(frame,
 							String.format("Failed to check if person is wanted: %s", e1.getMessage()));
+							logger.log(Level.SEVERE, String.format("Failed to check if person is wanted - IO Exception: %s", e1.getMessage()));
 					return;
 				}
 
@@ -226,19 +232,23 @@ public class Main {
 				Main.isOpen = isOpen;
 			} catch (TerminalNotFoundException e1) {
 				UiUtil.showErrorMessage(frame, "Specified terminal was not found");
+				logger.log(Level.SEVERE, "Specified terminal was not found");
 				return;
 			} catch (RemoteException e1) {
 				UiUtil.showErrorMessage(frame, String.format(
 						"Error occurred while communicating with police check step service: %s", e1.getMessage()));
+						logger.log(Level.SEVERE, String.format("RemoteException: %s", e1.getMessage()));
 				return;
 			} catch (PassageNotFoundException e1) {
 				UiUtil.showErrorMessage(frame, "Specified passage was not found");
+				logger.log(Level.SEVERE, "The specified passage was not found");
 				return;
 			}
 
 			if (!isOpen) {
 				UiUtil.showInfoMessage(frame, "The terminal will be closed until you are fully processed",
 						"Wanted Person Detected");
+						logger.log(Level.SEVERE, "The temrinal will be closed until you are processed");
 				return;
 			}
 
@@ -255,6 +265,7 @@ public class Main {
 				} catch (IOException e1) {
 					UiUtil.showErrorMessage(frame,
 							String.format("Failed to read file '%s': %s", file.toPath(), e1.getMessage()));
+							logger.log(Level.SEVERE, String.format("IO Exception: %s", e1.getMessage()));
 				}
 			}
 			try {
@@ -262,6 +273,7 @@ public class Main {
 				UiUtil.showInfoMessage(frame, "You have passed the border", "Success");
 			} catch (IOException e1) {
 				UiUtil.showErrorMessage(frame, String.format("Failed to upload files: %s", e1.getMessage()));
+				logger.log(Level.SEVERE, String.format("IO Exception: %s", e1.getMessage()));
 			}
 		});
 
@@ -294,10 +306,11 @@ public class Main {
 				return false;
 			}
 
-			// TODO log
+			logger.log(Level.INFO, "Logged passage of person");
 			return true;
 		} catch (IOException e1) {
 			UiUtil.showErrorMessage(frame, String.format("Failed to log person: %s", e1.getMessage()));
+			logger.log(Level.SEVERE, String.format("IO Exception: %s", e1.getMessage()));
 			return false;
 		}
 	}
@@ -392,6 +405,7 @@ public class Main {
 			return dto;
 		} catch (Exception e) {
 			UiUtil.showErrorMessage(frame, String.format("Invalid format: %s", e.getMessage()));
+			logger.log(Level.SEVERE, String.format("Exception: %s", e.getMessage()));
 			return null;
 		}
 	}
@@ -417,12 +431,14 @@ public class Main {
 		} catch (NumberFormatException ex) {
 			UiUtil.showErrorMessage(frame, "Parsing terminal parameters", "Error In Terminal Parameters",
 					"Invalid number format");
+					logger.log(Level.SEVERE, String.format("NumberFormatException: %s", ex.getMessage()));
 		} catch (TerminalNotFoundException e) {
 			UiUtil.showErrorMessage(frame, "Couldn't find terminal with specified parameters");
+			logger.log(Level.SEVERE, "Couldn't find terminal with specified parameters");
 		} catch (RemoteException e) {
 			UiUtil.showErrorMessage(frame, "Error occurred during remote communication");
+			logger.log(Level.SEVERE, String.format("Remote exception: %s", e.getMessage()));
 		}
 		return false;
 	}
-
 }

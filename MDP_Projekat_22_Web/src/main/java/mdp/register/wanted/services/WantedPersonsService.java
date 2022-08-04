@@ -8,16 +8,17 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.fasterxml.jackson.core.exc.StreamWriteException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
 import mdp.models.wanted.WantedPersonDetected;
 import mdp.util.SettingsLoader;
 
 public class WantedPersonsService implements IWantedPersonsService {
+	private static final Logger logger = Logger.getLogger(WantedPersonsService.class.getName());
 	private static final XmlMapper xmlMapper = (XmlMapper) new XmlMapper().findAndRegisterModules();
 
 	private WantedPersonsServiceSettings settings;
@@ -32,6 +33,8 @@ public class WantedPersonsService implements IWantedPersonsService {
 
 	@Override
 	public synchronized void addWantedPersonToLogFile(WantedPersonDetected detectedPerson) throws IOException {
+		logger.log(Level.INFO, String.format("Adding detected wanted person with id '%s' to logs", detectedPerson.getPersonId()));
+		
 		var file = getLogsFile();
 		ArrayList<WantedPersonDetected> logs = xmlMapper.readValue(file, ArrayList.class);
 
@@ -53,6 +56,7 @@ public class WantedPersonsService implements IWantedPersonsService {
 					Arrays.asList(new WantedPersonDetected(new BigInteger("123"), LocalDateTime.now(),
 							new BigInteger("165630836651969126648801254799355469939"),
 							new BigInteger("165458481299780741793080579545399665715"))));
+							// TODO clearup
 
 		return file;
 	}

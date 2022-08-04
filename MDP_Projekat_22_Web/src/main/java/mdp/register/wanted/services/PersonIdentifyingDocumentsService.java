@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.InflaterInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -19,6 +21,7 @@ import mdp.util.SettingsLoader;
 import mdp.util.Util;
 
 public class PersonIdentifyingDocumentsService implements IPersonIdentifyingDocumentsService {
+private static final Logger logger = Logger.getLogger(PersonIdentifyingDocumentsService.class.getName());
 	private PersonIdentifyingDocumentsServiceSettings settings;
 
 	public PersonIdentifyingDocumentsService() throws FileNotFoundException, IOException {
@@ -30,6 +33,8 @@ public class PersonIdentifyingDocumentsService implements IPersonIdentifyingDocu
 	}
 
 	public void addPersonDocuments(BigInteger personId, HashMap<String, byte[]> fileMap) throws IOException {
+		logger.log(Level.INFO, String.format("Adding documents for person with id '%s'", personId));
+
 		var personFolderFile = getPersonFolderFile(personId);
 
 		var uploadId = Util.getStringUuid();
@@ -48,6 +53,8 @@ public class PersonIdentifyingDocumentsService implements IPersonIdentifyingDocu
 
 	public File getArchivedPersonDocuments(BigInteger personId)
 			throws NoFilesFoundException, FileNotFoundException, IOException {
+		logger.log(Level.INFO, String.format("Getting archived documents of person with id '%s'", personId));
+
 		var personFolderFile = getPersonFolderFile(personId);
 
 		final String zipFilePrefix = "_zipped_";

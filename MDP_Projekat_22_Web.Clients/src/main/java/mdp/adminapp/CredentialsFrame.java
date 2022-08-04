@@ -17,6 +17,8 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -41,6 +43,8 @@ import mdp.util.client.HttpUtil;
 import mdp.util.ui.UiUtil;
 
 public class CredentialsFrame {
+private static final Logger logger = Logger.getLogger(CredentialsFrame.class.getName());
+
 	static JFrame frame;
 	private static Gson gson = new Gson();
 	private static JTextField usernameSearchTextField;
@@ -107,6 +111,7 @@ public class CredentialsFrame {
 			setCredentialsToTableData();
 		} catch (IOException e) {
 			UiUtil.showErrorMessage(frame, "Fetching users", "Error Fetching Users", e.getMessage());
+			logger.log(Level.SEVERE, String.format("IO Exception: %s", e.getMessage()));
 		}
 	}
 
@@ -231,9 +236,11 @@ public class CredentialsFrame {
 						String.format("Successfully updated password for user '%s'", dto.getUsername()), "Success");
 			} else if (responseCode == 404) {
 				UiUtil.showErrorMessage(frame, "Updating password", "Error Updating Password", "User doesn't exist");
+				logger.log(Level.SEVERE, String.format("HTTP 404: User doesn't exist"));
 			}
 		} catch (IOException e) {
 			UiUtil.showErrorMessage(frame, "Updating user password", "Error Updating User Password", e.getMessage());
+			logger.log(Level.SEVERE, String.format("IO Exception: %s", e.getMessage()));
 		}
 	}
 
@@ -252,9 +259,13 @@ public class CredentialsFrame {
 			int responseCode = connection.getResponseCode();
 			if (responseCode == 404) {
 				UiUtil.showErrorMessage(frame, "Deleting user", "Error Deleting User", "User not found");
+				logger.log(Level.SEVERE, String.format("HTTP 404: User doesn't exist"));
+
 				return;
 			} else if (!mdp.util.client.HttpUtil.isSuccessStatusCode(responseCode)) {
 				UiUtil.showErrorMessage(frame, "Deleting user", "Error Deleting User", String.valueOf(responseCode));
+				logger.log(Level.SEVERE, String.format("Error deleting user: HTTP %s", responseCode));
+
 				return;
 			}
 
@@ -263,6 +274,7 @@ public class CredentialsFrame {
 			removeCredentialsFromGui(userCreds.getUsername(), row);
 		} catch (IOException e) {
 			UiUtil.showErrorMessage(frame, "Deleting user", "Error Deleting User", e.getMessage());
+			logger.log(Level.SEVERE, String.format("Error deleting user - IO Exception: %s", e.getMessage()));
 		}
 	}
 
@@ -301,6 +313,7 @@ public class CredentialsFrame {
 			setCredentialsToTableData();
 		} catch (IOException e) {
 			UiUtil.showErrorMessage(frame, "Fetching users", "Error Fetching Users", e.getMessage());
+			logger.log(Level.SEVERE, String.format("Error fetching users - IO Exception: %s", e.getMessage()));
 		}
 	}
 
@@ -333,10 +346,13 @@ public class CredentialsFrame {
 				UiUtil.showInfoMessage(frame, String.format("Successfully created user %s", username), "Success");
 				usernameSearchTextField.setText(username);
 				handleSearchAction(username);
-			} else if (responseCode == 409)
+			} else if (responseCode == 409){
 				UiUtil.showErrorMessage(frame, "Creating user", "Error Creating User", "Username already in use");
+				logger.log(Level.SEVERE, String.format("Username is already in use"));
+			}
 		} catch (IOException e) {
 			UiUtil.showErrorMessage(frame, "Creating user", "Failed to create user", e.getMessage());
+			logger.log(Level.SEVERE, String.format("Error creating user - IO Exception: %s", e.getMessage()));
 		}
 	}
 

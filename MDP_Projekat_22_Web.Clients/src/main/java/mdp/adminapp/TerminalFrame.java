@@ -1,28 +1,24 @@
 package mdp.adminapp;
 
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.beans.PropertyChangeListener;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStreamWriter;
 import java.math.BigInteger;
 import java.net.Socket;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.naming.OperationNotSupportedException;
-import javax.swing.Action;
 import javax.swing.BoxLayout;
-import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -47,6 +43,8 @@ import mdp.register.terminals.dtos.UpdateTerminalDto;
 import mdp.util.ui.UiUtil;
 
 public class TerminalFrame {
+private static final Logger logger = Logger.getLogger(TerminalFrame.class.getName());
+
 	private static final JTextField terminalNameField = new JTextField();
 	private static final JTextField terminalEntryCount = new JTextField();
 	private static final JTextField terminalExitCount = new JTextField();
@@ -164,6 +162,7 @@ public class TerminalFrame {
 			BigInteger selectedId = new BigInteger(selection);
 		} catch (Exception e) {
 			UiUtil.showErrorMessage(terminalFrame, "Selecting passage ID", "Error Selecting Passage", e.getMessage());
+			logger.log(Level.SEVERE, String.format("Error selecting passage: %s", e.getMessage()));
 		}
 
 		handleSendOpenNotification(terminalId, terminalId);
@@ -183,10 +182,12 @@ public class TerminalFrame {
 			} catch (ClassNotFoundException e) {
 				UiUtil.showErrorMessage(terminalFrame, "Implementation error",
 						"Failed to communicate with notification server socket", e.getMessage());
+						logger.log(Level.SEVERE, String.format("Failed to communicate with notification socket server: %s", e.getMessage()));
 			}
 		} catch (IOException e) {
 			UiUtil.showErrorMessage(terminalFrame, "Sending open notification error", "Open Terminal Error",
 					e.getMessage());
+					logger.log(Level.SEVERE, String.format("Sending open notification error: %s", e.getMessage()));
 		}
 	}
 
@@ -199,8 +200,10 @@ public class TerminalFrame {
 		} catch (TerminalNotFoundException e) {
 			UiUtil.showErrorMessage(terminalFrame, "Terminal delete error", "Terminal Delete Error",
 					"Terminal with specified ID doesn't exist");
+					logger.log(Level.SEVERE, "Terminal with specified ID doesn't exist");
 		} catch (RemoteException e) {
 			UiUtil.showErrorMessage(terminalFrame, "Terminal delete error", "Terminal Delete Error", e.getMessage());
+			logger.log(Level.SEVERE, String.format("Terminal delete error: %s", e.getMessage()));
 		}
 	}
 
@@ -239,6 +242,7 @@ public class TerminalFrame {
 				dto = new UpdateTerminalDto(Integer.valueOf(setValue), exitPassageCount, terminalName, id);
 			} catch (NumberFormatException e) {
 				UiUtil.showErrorMessage(terminalFrame, "Invalid number format for entries count");
+				logger.log(Level.SEVERE, "Invalid number format for entries count");
 			}
 			break;
 		case 3:
@@ -246,10 +250,12 @@ public class TerminalFrame {
 				dto = new UpdateTerminalDto(entryPassageCount, Integer.valueOf(setValue), terminalName, id);
 			} catch (NumberFormatException e) {
 				UiUtil.showErrorMessage(terminalFrame, "Invalid number format for exits count");
+				logger.log(Level.SEVERE, "Invalid number format for exits count");
 			}
 			break;
 		default:
 			UiUtil.showErrorMessage(terminalFrame, "Unsupported column modified");
+			logger.log(Level.SEVERE, "Unsupported column modified");
 			return;
 		}
 
@@ -257,6 +263,7 @@ public class TerminalFrame {
 			terminalRegisterClient.updateTerminal(dto);
 		} catch (RemoteException e) {
 			UiUtil.showErrorMessage(terminalFrame, "Update failed", "Update Error", e.getMessage());
+			logger.log(Level.SEVERE, String.format("Update terminal error: %s", e.getMessage()));
 		}
 	}
 
@@ -295,9 +302,11 @@ public class TerminalFrame {
 		} catch (NumberFormatException e) {
 			JOptionPane.showMessageDialog(terminalFrame, "Number format error: " + e.getMessage(),
 					"Failed to create terminal", JOptionPane.ERROR_MESSAGE);
+					logger.log(Level.SEVERE, String.format("Number format error: %s", e.getMessage()));
 			return;
 		} catch (Exception e) {
 			UiUtil.showCreationErrorDialog(terminalFrame, e);
+			logger.log(Level.SEVERE, String.format("Generic exception: %s", e.getMessage()));
 			return;
 		}
 
@@ -312,6 +321,7 @@ public class TerminalFrame {
 			UiUtil.showInfoMessage(terminalFrame, "Successfully created", "Terminal created");
 		} catch (Exception e) {
 			UiUtil.showCreationErrorDialog(terminalFrame, e);
+			logger.log(Level.SEVERE, String.format("Failed to create terminal: %s", e.getMessage()));
 		}
 	}
 
@@ -364,8 +374,7 @@ public class TerminalFrame {
 			try {
 				searchAction(nameSearchTextField.getText());
 			} catch (RemoteException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				logger.log(Level.SEVERE, String.format("Failed to conduct search: %s", e1.getMessage()));
 			}
 		});
 		terminalTopPanel.add(searchButton);

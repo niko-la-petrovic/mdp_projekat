@@ -16,6 +16,8 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -30,6 +32,8 @@ import mdp.util.client.HttpUtil;
 import mdp.util.ui.UiUtil;
 
 public class MediaDownloadFrame {
+private static final Logger logger = Logger.getLogger(MediaDownloadFrame.class.getName());
+
 	static JFrame frame;
 
 	static void setupFrame() {
@@ -91,11 +95,9 @@ public class MediaDownloadFrame {
 					String.format("http://%s/api/documents/person/%s", Main.settings.getWantedServerHost(), personId));
 			HttpUtil.downloadToFileFromUrl(frame, saveDirectoryFile, saveFile, url);
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(Level.SEVERE, String.format("Invalid URL format: %s", e.getMessage()));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(Level.SEVERE, String.format("IO Exception: %s", e.getMessage()));
 		}
 	}
 
@@ -123,11 +125,9 @@ public class MediaDownloadFrame {
 			url = new URL(String.format("http://%s/api/wanted", Main.settings.getWantedServerHost()));
 			HttpUtil.downloadToFileFromUrl(frame, saveDirectoryFile, saveFile, url);
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(Level.SEVERE, String.format("Invalid URL format: %s", e.getMessage()));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(Level.SEVERE, String.format("IO Exception: %s", e.getMessage()));
 		}
 	}
 

@@ -48,6 +48,7 @@ public class CredentialsController {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getCredentials() {
+		logger.log(Level.INFO, "Getting credentials");
 		var creds = credentialsService.getCredentials();
 
 		return Response.ok(creds).build();
@@ -57,8 +58,8 @@ public class CredentialsController {
 	@Path("/search")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response searchCredentials(@QueryParam("username") String username) {
-		var creds = credentialsService.getCredentialsStartingWith(username);
 		logger.log(Level.INFO, String.format("Searching for username '%s...'", username));
+		var creds = credentialsService.getCredentialsStartingWith(username);
 
 		return Response.ok(creds).build();
 	}
@@ -69,16 +70,27 @@ public class CredentialsController {
 	@Path("/login")
 	public Response loginWithCredentials(PostCredentialsDto dto) {
 		if (dto == null)
+		{
+			logger.log(Level.WARNING, "Dto is null");
 			return Response.status(Status.BAD_REQUEST).build();
+		}
 
 		var violations = validator.validate(dto);
 		if (!violations.isEmpty())
+		{
+			logger.log(Level.WARNING, "Dto validation failed");
 			return Response.status(Status.BAD_REQUEST).build();
+		}
 
 		if (credentialsService.checkCredentials(dto))
+		{
+logger.log(Level.INFO, "Login successful");
 			return Response.status(Status.OK).build();
-		else
+		}
+		else{
+logger.log(Level.INFO, "Login failed");
 			return Response.status(Status.UNAUTHORIZED).build();
+		}
 	}
 
 	@POST
@@ -105,10 +117,13 @@ public class CredentialsController {
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response putCredentials(PutCredentialsDto dto) {
-		if (dto == null)
+		if (dto == null){
+logger.log(Level.WARNING, "Dto is null");
 			return Response.status(Status.BAD_REQUEST).build();
+		}
 
 		try {
+			logger.log(Level.INFO, String.format("Updating user with username '%s'", dto.getUsername()));
 			credentialsService.updateCredentials(dto);
 			logger.log(Level.INFO, String.format("Updated user with username '%s'", dto.getUsername()));
 			return Response.ok().build();
@@ -120,10 +135,13 @@ public class CredentialsController {
 
 	@DELETE
 	public Response deleteCredentials(@QueryParam("username") String username) {
-		if (username == null)
-			return Response.status(Status.BAD_REQUEST).build();
+		if (username == null){
+			logger.log(Level.WARNING, "Username is null");
+				return Response.status(Status.BAD_REQUEST).build();
+		}
 
 		try {
+			logger.log(Level.INFO, String.format("Deleting user with username '%s'", username));
 			credentialsService.deleteCredentials(username);
 			logger.log(Level.INFO, String.format("Deleted user with username '%s'", username));
 			return Response.ok().build();

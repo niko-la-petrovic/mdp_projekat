@@ -2,7 +2,6 @@ package mdp.clientapp;
 
 import java.awt.Color;
 import java.awt.Desktop;
-import java.awt.GridBagLayout;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -16,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -32,7 +30,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -104,6 +101,7 @@ public class Main {
 			terminalService = new TerminalRegisterServiceServiceLocator().getTerminalRegisterService();
 		} catch (ServiceException e) {
 			UiUtil.showErrorMessage(frame, "Failed to communicate with remote terminal registry service");
+			logger.log(Level.SEVERE, String.format("Failed to communicate with remote terminal registry service: %s", e.getMessage()));
 			return;
 		}
 
@@ -111,6 +109,7 @@ public class Main {
 			credentialsService = new CredentialsService();
 		} catch (Exception e1) {
 			UiUtil.showErrorMessage(frame, "Failed to initialize credentials service");
+			logger.log(Level.SEVERE, String.format("Failed to initialize credentials service: %s", e1.getMessage()));
 			return;
 		}
 		setupMainFrame();
@@ -141,10 +140,13 @@ public class Main {
 		} catch (NumberFormatException ex) {
 			UiUtil.showErrorMessage(frame, "Parsing terminal parameters", "Error In Terminal Parameters",
 					"Invalid number format");
+					logger.log(Level.SEVERE, String.format("Invalid number format exception: %s", ex.getMessage()));
 		} catch (TerminalNotFoundException e) {
 			UiUtil.showErrorMessage(frame, "Couldn't find terminal with specified parameters");
+			logger.log(Level.SEVERE, "Couldn't find terminal with specified parameters");
 		} catch (RemoteException e) {
 			UiUtil.showErrorMessage(frame, "Error occurred during remote communication");
+			logger.log(Level.SEVERE, String.format("Error occurred during remote communication: %s", e.getMessage()));
 		}
 		return false;
 	}
@@ -245,18 +247,21 @@ public class Main {
 			Desktop.getDesktop().open(file);
 		} catch (IOException e) {
 			UiUtil.showErrorMessage(frame, String.format("Failed to download persons logs: %s", e.getMessage()));
+			logger.log(Level.SEVERE, String.format("IO Exception: %s", e.getMessage()));
 		}
 	}
 
 	private static void handleChangePassword() {
 		if (username == null || username.equals("")) {
 			UiUtil.showErrorMessage(frame, "You must be logged in first");
+			logger.log(Level.SEVERE, "You must be logged in first");
 			return;
 		}
 
 		String password = UiUtil.getPassword(frame);
 		if (password == null || password.equals("")) {
 			UiUtil.showErrorMessage(frame, "Invalid password provided");
+			logger.log(Level.SEVERE, "Invalid password provided");
 			return;
 		}
 
@@ -265,8 +270,8 @@ public class Main {
 			credentialsService.updateCredentials(dto);
 			UiUtil.showInfoMessage(frame, "Successfully changed password", "Password Change");
 		} catch (UsernameNotFoundException e) {
-
 			UiUtil.showErrorMessage(frame, String.format("Username '%s' not found", username));
+			logger.log(Level.SEVERE, String.format("Username '%s' not found", username));
 		}
 	}
 
@@ -331,6 +336,7 @@ public class Main {
 			doc.insertString(doc.getEndPosition().getOffset(), msg, aset);
 		} catch (BadLocationException e) {
 			UiUtil.showErrorMessage(frame, String.format("Failed to show message:", e.getMessage()));
+			logger.log(Level.SEVERE, String.format("Bad location exception: %s", e.getMessage()));
 		}
 	}
 
@@ -392,6 +398,7 @@ public class Main {
 				UiUtil.showInfoMessage(frame, "Connected to chat server", "Chat Server Connection");
 			} catch (IOException e1) {
 				UiUtil.showErrorMessage(frame, String.format("Failed to initialize ClientThread: %s", e1.getMessage()));
+				logger.log(Level.SEVERE, String.format("Failed to initialize client thread - IO Exception: %s", e1.getMessage()));
 			}
 		});
 
@@ -436,8 +443,10 @@ public class Main {
 			}
 		} catch (MalformedURLException e) {
 			UiUtil.showErrorMessage(frame, "Invalid URL");
+			logger.log(Level.SEVERE, String.format("Invalid URL: %s", e.getMessage()));
 		} catch (IOException e) {
 			UiUtil.showErrorMessage(frame, String.format("Error: %s", e.getMessage()));
+			logger.log(Level.SEVERE, String.format("IO Exception: %s", e.getMessage()));
 		}
 
 		return false;
@@ -459,7 +468,7 @@ public class Main {
 
 			chatSettings = ChatClientSettingsLoader.getSettings();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.log(Level.SEVERE, String.format("IO Exception: %s", e.getMessage()));
 			System.exit(1);
 		}
 	}

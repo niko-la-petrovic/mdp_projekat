@@ -1,6 +1,5 @@
 package mdp.register.wanted.services;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -9,16 +8,15 @@ import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import javax.naming.OperationNotSupportedException;
 
 import com.google.gson.Gson;
-import com.lambdaworks.redis.KeyValue;
 
 import mdp.exceptions.PassageNotFoundException;
 import mdp.exceptions.TerminalNotFoundException;
@@ -32,6 +30,8 @@ import mdp.util.SettingsLoader;
 // TODO add in-memory map of personid -> terminalid and passage id of wanted person - accept the open only if called with those arguments
 
 public class PoliceCheckStepService implements IPoliceCheckStepService {
+	private static final Logger logger = Logger.getLogger(PoliceCheckStepService.class.getName());
+
 	private static Gson gson = new Gson();
 
 	private PoliceCheckStepServiceSettings settings;
@@ -50,6 +50,8 @@ public class PoliceCheckStepService implements IPoliceCheckStepService {
 	
 	public synchronized boolean isOpenTerminalPassage(BigInteger terminalId, boolean isEntry, BigInteger passageId)
 			throws TerminalNotFoundException, PassageNotFoundException {
+	logger.log(Level.INFO, String.format("Checking if terminalId:passageId '%s:%s' is open", terminalId, passageId));
+
 		var terminal = getTerminal(terminalId);
 
 		GetCustomsPassageDto passage;
@@ -65,11 +67,14 @@ public class PoliceCheckStepService implements IPoliceCheckStepService {
 	@Override
 	public synchronized boolean isWanted(BigInteger personId, BigInteger terminalId, BigInteger passageId)
 			throws IOException {
+				logger.log(Level.INFO, String.format("Checking if person with id '%s' is wanted", passageId));
+
 		var terminal = terminalsMap.get(terminalId);
 
 		if (!wantedIds.contains(personId))
 			return false;
 
+			logger.log(Level.INFO, String.format("Person with id '%s' is wanted. Closing terminalId:passageId '%s:%s'", personId, terminalId, passageId));
 		var passages = Stream.concat(Arrays.asList(terminal.getEntries()).stream(),
 				Arrays.asList(terminal.getExits()).stream());
 
@@ -77,6 +82,7 @@ public class PoliceCheckStepService implements IPoliceCheckStepService {
 			p.setOpen(false);
 		});
 
+		logger.log(Level.INFO, String.format("Adding to detected persons logs person with id '%s' at terminalId:passageId '%s:%s'", personId, terminalId, passageId));
 		wantedPersonsService.addWantedPersonToLogFile(
 				new WantedPersonDetected(personId, LocalDateTime.now(), terminalId, passageId));
 
@@ -86,6 +92,7 @@ public class PoliceCheckStepService implements IPoliceCheckStepService {
 	@Override
 	public synchronized void openPassages(BigInteger terminalId, BigInteger passageId)
 			throws TerminalNotFoundException {
+				logger.log(Level.INFO, String.format("Opening passages at terminal '%s'", terminalId));
 		var terminal = getTerminal(terminalId);
 
 		Stream.concat(Arrays.asList(terminal.getEntries()).stream(), Arrays.asList(terminal.getExits()).stream())

@@ -3,8 +3,9 @@ package mdp.adminapp;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.naming.OperationNotSupportedException;
 import javax.swing.BorderFactory;
@@ -18,6 +19,7 @@ import mdp.util.client.SettingsLoader;
 import mdp.util.ui.UiUtil;
 
 public class Main {
+private static final Logger logger = Logger.getLogger(Main.class.getName());
 
 	static JFrame mainFrame;
 	public static Toolkit toolkit;
@@ -37,6 +39,7 @@ public class Main {
 			});
 		} catch (IOException e) {
 			UiUtil.showErrorMessage(mainFrame, String.format("Failed to load settings: %s", e.getMessage()));
+			logger.log(Level.SEVERE, String.format("Failed to load settings: %s", e.getMessage()));
 			return;
 		}
 
@@ -55,6 +58,7 @@ public class Main {
 				} catch (OperationNotSupportedException | IOException | ServiceException e1) {
 					UiUtil.showErrorMessage(mainFrame, "Initialize terminal frame", "Error Initializing Terminal Frame",
 							e1.getMessage());
+							logger.log(Level.SEVERE, String.format("Error Initializing Terminal Frame: %s", e1.getMessage()));
 				}
 			}
 

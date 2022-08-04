@@ -37,6 +37,8 @@ public class PersonsService implements IPersonsService {
 
 	@Override
 	public synchronized void addPersonToLogs(PostPersonDto dto) throws IOException {
+		logger.log(Level.INFO, String.format("Adding person with id '%s' to logs", dto.getPersonId()));
+		
 		String line = String.format("[%s] %s %s %s %s %s %s\n", LocalDateTime.now(), dto.getPersonId(), dto.getName(),
 				dto.getLastName(), dto.getSsn(), dto.getBirthDate(), dto.getIsMale());
 		try {

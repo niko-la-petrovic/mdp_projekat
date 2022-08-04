@@ -30,12 +30,14 @@ public class PersonsController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response postPersonToLogs(PostPersonDto dto) {
 		if (dto == null) {
-			logger.log(Level.INFO, "Invalid request");
+			logger.log(Level.WARNING, "Invalid request");
 			return Response.status(Status.BAD_REQUEST).build();
 		}
 
 		try {
+			logger.log(Level.INFO, String.format("Logging person with ID '%s'", dto.getPersonId()));
 			personsService.addPersonToLogs(dto);
+			logger.log(Level.INFO, String.format("Logged person with ID '%s'", dto.getPersonId()));
 			return Response.ok().build();
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, String.format("Failed to add persons log: %s", e.getMessage()));
@@ -45,12 +47,16 @@ public class PersonsController {
 
 	@GET
 	@Produces(javax.ws.rs.core.MediaType.APPLICATION_OCTET_STREAM)
-	public Response getDetectedWantedPersons() throws IOException {
+	public Response getPassedPersonsLogs() throws IOException {
+		logger.log(Level.INFO, "Providing passed persons logs");
 		var file = personsService.getPersonsLogsFile();
 
-		if (!file.exists())
+		if (!file.exists()){
+logger.log(Level.INFO, "Passed persons logs empty");
 			return Response.status(Status.NOT_FOUND).build();
+		}
 
+		logger.log(Level.INFO, "Sending passed persons logs to client");
 		return Response.ok(file, MediaType.APPLICATION_OCTET_STREAM)
 				.header("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"").build();
 	}
