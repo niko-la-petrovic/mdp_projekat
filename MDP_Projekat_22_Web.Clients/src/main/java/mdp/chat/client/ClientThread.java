@@ -41,7 +41,7 @@ public class ClientThread extends Thread {
 		this.onDisconnect = onDisconnect;
 	}
 
-	public ClientThread(BigInteger terminalId, BigInteger passageId, boolean isCustomsPassage,
+	public ClientThread(String username, BigInteger terminalId, BigInteger passageId, boolean isCustomsPassage,
 			ChatClientSocketSettings settings, SSLSocket socket, Consumer<ChatMessage> messageConsumer)
 			throws IOException {
 		super();
@@ -55,7 +55,7 @@ public class ClientThread extends Thread {
 		out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
 
 		SocketMessage establishmentMessage = new SocketMessage(SocketMessageType.ESTABLISHMENT_MESSAGE,
-				new ChatMessage(null, "user1", terminalId, passageId, true, ChatMessageType.INFO), null, null);
+				new ChatMessage(null, username, terminalId, passageId, isCustomsPassage, ChatMessageType.INFO), null, null);
 		sendMessage(establishmentMessage);
 	}
 

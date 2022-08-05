@@ -70,6 +70,7 @@ public class ServerThread extends Thread {
 
 				catch (SocketException e) {
 					{
+						logger.log(Level.INFO, String.format("Socket exception: %s", e.getMessage()));
 						handleTerminate();
 					}
 				} catch (Exception e) {
@@ -99,8 +100,7 @@ public class ServerThread extends Thread {
 					messageQueue.add(chatMessage);
 				}
 			}
-			// TODO retrieve all
-			// TODO add thread to sub map
+			
 			var subscribers = routingKeySubscriberMap.get(routingKey);
 			if (subscribers == null) {
 				subscribers = new ConcurrentSet<>();
@@ -148,8 +148,6 @@ public class ServerThread extends Thread {
 						}
 					}
 				}
-				// sendMessage(new SocketMessage(SocketMessageType.TRANSFER_MESSAGE, message,
-				// null, null));
 			}
 		};
 
@@ -277,23 +275,14 @@ public class ServerThread extends Thread {
 		if (routingKey == null)
 			return;
 
-		// TODO remove consumer cancelling since theres one consumer per terminal - keep
-		// it running
 		var consumer = routingKeyConsumerMap.get(routingKey);
 		if (consumer == null)
 			return;
 
-		var consumerTag = consumerTagMap.get(consumer);
-		if (consumerTag == null)
-			return;
-
-		channel.basicCancel(consumerTag);
-		routingKeyConsumerMap.remove(routingKey);
 		ConcurrentSet<ServerThread> subscribers = routingKeySubscriberMap.get(routingKey);
 		synchronized (subscribers) {
 			subscribers.remove(this);
 		}
-		consumerTagMap.remove(consumer);
 		threadRoutingKey.remove();
 	}
 }

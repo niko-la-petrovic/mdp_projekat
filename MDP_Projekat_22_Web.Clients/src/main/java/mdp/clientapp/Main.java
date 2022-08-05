@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -68,7 +69,6 @@ import mdp.util.ui.UiUtil;
 public class Main {
 	private static final Logger logger = Logger.getLogger(Main.class.getName());
 
-	// TODO terminal register service with map of terminal id -> name
 	static ClientAppSettings settings;
 	static ChatClientSocketSettings chatSettings;
 	private static JFrame frame;
@@ -87,22 +87,30 @@ public class Main {
 	private static SSLSocketFactory sf;
 
 	private static JTextPane textPane;
-
 	private static JTextField passageIdTextField;
-
 	private static JCheckBox customsOrPoliceCheckbox;
-
 	private static JComboBox<ChatMessageType> messageTypeComboBox;
+
+	private static GetCustomsTerminalDto[] terminals;
+	private static HashMap<BigInteger, String> terminalIdToNameMap = new HashMap<>();
 
 	public static void main(String[] args) {
 		loadSettings();
 		initializeSecurity();
 		try {
 			terminalService = new TerminalRegisterServiceServiceLocator().getTerminalRegisterService();
+			terminals = terminalService.getTerminals();
+			for (GetCustomsTerminalDto dto : terminals) {
+				terminalIdToNameMap.put(dto.getId(), dto.getName());
+			}
 		} catch (ServiceException e) {
 			UiUtil.showErrorMessage(frame, "Failed to communicate with remote terminal registry service");
 			logger.log(Level.SEVERE,
 					String.format("Failed to communicate with remote terminal registry service: %s", e.getMessage()));
+			return;
+		} catch (RemoteException e) {
+			UiUtil.showErrorMessage(frame, String.format("Remote exception: %s", e.getMessage()));
+			logger.log(Level.SEVERE, String.format("Remote exception: %s", e.getMessage()));
 			return;
 		}
 
@@ -322,9 +330,10 @@ public class Main {
 	}
 
 	private synchronized static void addChatMessageToLogs(ChatMessage message) {
-		appendToPane(textPane, String.format("[%s] ", message.getTerminalId()), Color.RED);
-		appendToPane(textPane, String.format("[%s] ", message.getPassageId()), Color.GREEN);
+		appendToPane(textPane, String.format("[%s] ", message.getPassageId()), Color.RED);
+		appendToPane(textPane, String.format("[%s] ", terminalIdToNameMap.get(message.getTerminalId())), Color.GREEN);
 		appendToPane(textPane, String.format("(%s) ", message.getType()), Color.BLUE);
+		appendToPane(textPane, String.format("%s:", message.getUsername()), Color.DARK_GRAY);
 		appendToPane(textPane, String.format("%s\n", message.getText()), Color.BLACK);
 	}
 
@@ -389,7 +398,7 @@ public class Main {
 			try {
 				sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
 				SSLSocket sockets = (SSLSocket) sf.createSocket(chatSettings.getHost(), chatSettings.getPort());
-				thread = new ClientThread(terminal.getId(), new BigInteger(passageIdTextField.getText()),
+				thread = new ClientThread(username, terminal.getId(), new BigInteger(passageIdTextField.getText()),
 						customsOrPoliceCheckbox.isSelected(), chatSettings, sockets, m -> addChatMessageToLogs(m));
 				thread.setOnDisconnect(() -> {
 					UiUtil.showInfoMessage(frame, "Chat Server disconnected", "Chat Server Disconnected");

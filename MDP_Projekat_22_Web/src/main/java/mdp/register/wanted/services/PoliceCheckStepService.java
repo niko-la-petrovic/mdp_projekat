@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -15,6 +16,8 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import javax.naming.OperationNotSupportedException;
+
+import org.javatuples.Pair;
 
 import com.google.gson.Gson;
 
@@ -26,9 +29,6 @@ import mdp.register.terminals.dtos.GetCustomsPassageDto;
 import mdp.register.terminals.dtos.GetCustomsTerminalDto;
 import mdp.util.SettingsLoader;
 
-// TODO add persistence of open and closed states
-// TODO add in-memory map of personid -> terminalid and passage id of wanted person - accept the open only if called with those arguments
-
 public class PoliceCheckStepService implements IPoliceCheckStepService {
 	private static final Logger logger = Logger.getLogger(PoliceCheckStepService.class.getName());
 
@@ -38,6 +38,8 @@ public class PoliceCheckStepService implements IPoliceCheckStepService {
 	private HashSet<BigInteger> wantedIds = new HashSet<>();
 	private ConcurrentHashMap<BigInteger, GetCustomsTerminalDto> terminalsMap = new ConcurrentHashMap<>();
 	private WantedPersonsService wantedPersonsService;
+
+private ConcurrentHashMap<BigInteger, BigInteger> terminalIdPassageIdMap = new ConcurrentHashMap<>();
 
 	public PoliceCheckStepService() throws FileNotFoundException, IOException, OperationNotSupportedException {
 		loadSettings();
@@ -80,6 +82,7 @@ public class PoliceCheckStepService implements IPoliceCheckStepService {
 		var passages = Stream.concat(Arrays.asList(terminal.getEntries()).stream(),
 				Arrays.asList(terminal.getExits()).stream());
 
+		terminalIdPassageIdMap.put(terminalId, passageId);
 		passages.forEach(p -> {
 			p.setOpen(false);
 		});
@@ -99,8 +102,14 @@ public class PoliceCheckStepService implements IPoliceCheckStepService {
 		logger.log(Level.INFO, String.format("Opening passages at terminal '%s'", terminalId));
 		var terminal = getTerminal(terminalId);
 
+		var closedPassageId = terminalIdPassageIdMap.get(terminalId);
+		if(closedPassageId == null || !closedPassageId.equals(passageId)){
+			// TODO exception or return false
+			return;
+		}
 		Stream.concat(Arrays.asList(terminal.getEntries()).stream(), Arrays.asList(terminal.getExits()).stream())
 				.forEach(p -> p.setOpen(true));
+		terminalIdPassageIdMap.remove(terminalId);
 	}
 
 	@Override

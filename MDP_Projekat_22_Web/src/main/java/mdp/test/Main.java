@@ -181,17 +181,6 @@ public class Main {
 	}
 
 	private static void testChatServer() throws FileNotFoundException, IOException, TimeoutException {
-// NOTE: problem with running both
-//		var startServerThread = mdp.chat.server.Main.startServer();
-//		startServerThread.start();
-//
-//		try {
-//			startServerThread.join();
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-
 		var gson = new Gson();
 		System.out.println(gson.toJson(new ChatMessage("test", "username", new BigInteger(terminalId1),
 				new BigInteger(passageId1), passageStep1, ChatMessageType.UNICAST)));
@@ -203,7 +192,6 @@ public class Main {
 		SSLSocketFactory sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
 		SSLSocket s = (SSLSocket) sf.createSocket(clientSettings.getHost(), clientSettings.getPort());
 
-//		s.setSoTimeout(10000);
 		BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
 		PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(s.getOutputStream())), true);
 
