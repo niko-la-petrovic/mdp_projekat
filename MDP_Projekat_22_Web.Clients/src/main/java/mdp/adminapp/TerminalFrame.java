@@ -160,12 +160,11 @@ public class TerminalFrame {
 
 		try {
 			BigInteger selectedId = new BigInteger(selection);
+			handleSendOpenNotification(terminalId, selectedId);
 		} catch (Exception e) {
 			UiUtil.showErrorMessage(terminalFrame, "Selecting passage ID", "Error Selecting Passage", e.getMessage());
 			logger.log(Level.SEVERE, String.format("Error selecting passage: %s", e.getMessage()));
 		}
-
-		handleSendOpenNotification(terminalId, terminalId);
 	}
 
 	private static void handleSendOpenNotification(BigInteger terminalId, BigInteger passageId) {
