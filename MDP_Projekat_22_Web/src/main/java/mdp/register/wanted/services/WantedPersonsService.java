@@ -53,11 +53,7 @@ public class WantedPersonsService implements IWantedPersonsService {
 		var filePath = settings.getWantedPersonsDetectedFilePath();
 		var file = new File(filePath);
 		if (!file.exists())
-			initializeWantedPersonsLogFile(file,
-					Arrays.asList(new WantedPersonDetected(new BigInteger("123"), LocalDateTime.now(),
-							new BigInteger("165630836651969126648801254799355469939"),
-							new BigInteger("165458481299780741793080579545399665715"))));
-		// TODO clearup
+			initializeWantedPersonsLogFile(file, Arrays.asList());
 
 		return file;
 	}
