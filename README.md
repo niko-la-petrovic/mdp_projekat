@@ -54,13 +54,13 @@ MDP_Projekat_22_Web.Clients\\resources
 
 ```MDP_Projekat_22_Web, mdp.chat.server.Main```
 
-### File Server
-
-```MDP_Projekat_22_Web, mdp.fileserver.Main```
-
 ### Notification Server
 
 ```MDP_Projekat_22_Web, mdp.register.wanted.Main```
+
+### File Server
+
+```MDP_Projekat_22_Web, mdp.fileserver.Main```
 
 ---
 

@@ -24,9 +24,15 @@ public class Main {
 	private static SSLServerSocketFactory ssf;
 	private static ServerSocket ss;
 
-	public static void main(String[] args) throws FileNotFoundException, IOException, TimeoutException {
+	public static void main(String[] args) {
 		logger.log(Level.INFO, "Creating server thread");
-		var serverThread = startServer();
+		Thread serverThread;
+		try {
+			serverThread = startServer();
+		} catch (IOException | TimeoutException e) {
+			logger.log(Level.SEVERE, "Failed to initialize server thread", e);
+			return;
+		}
 		logger.log(Level.INFO, "Starting server thread");
 		serverThread.start();
 	}

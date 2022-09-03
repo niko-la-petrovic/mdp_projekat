@@ -24,10 +24,8 @@ public class Main {
 	private static boolean shouldStop;
 	private static NotificationSocketSettings notificationSettings;
 
-	// TODO remove thrown exceptions in this and other classes
 	@SuppressWarnings("unused")
-	public static void main(String[] args)
-			throws AlreadyBoundException, FileNotFoundException, IOException, OperationNotSupportedException {
+	public static void main(String[] args) {
 		logger.log(Level.INFO, "Setting security");
 		System.setProperty("java.security.policy", "server.policy");
 		if (System.getSecurityManager() == null) {
@@ -35,18 +33,35 @@ public class Main {
 		}
 
 		logger.log(Level.INFO, "Loading settings");
-		SettingsLoader.loadSettings("wantedRegisterServer", props -> {
-			var rmiHost = props.getProperty("rmiHost");
-			var rmiPort = Integer.valueOf(props.getProperty("rmiPort"));
-			var policeCheckStepServiceBindingName = props.getProperty("policeCheckStepServiceBindingName");
-			var shouldCreateRegistry = Boolean.valueOf(props.getProperty("shouldCreateRegistry"));
-			settings = new WantedRegisterServerSettings(rmiHost, rmiPort, policeCheckStepServiceBindingName,
-					shouldCreateRegistry);
-		});
+		try {
+			SettingsLoader.loadSettings("wantedRegisterServer", props -> {
+				var rmiHost = props.getProperty("rmiHost");
+				var rmiPort = Integer.valueOf(props.getProperty("rmiPort"));
+				var policeCheckStepServiceBindingName = props.getProperty("policeCheckStepServiceBindingName");
+				var shouldCreateRegistry = Boolean.valueOf(props.getProperty("shouldCreateRegistry"));
+				settings = new WantedRegisterServerSettings(rmiHost, rmiPort, policeCheckStepServiceBindingName,
+						shouldCreateRegistry);
+			});
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, "Failed to parse settings", e);
+			return;
+		}
 
 		logger.log(Level.INFO, "Creating PoliceCheckStepService");
-		var policeCheckStepService = new PoliceCheckStepService();
-		var policeServiceStub = (IPoliceCheckStepService) UnicastRemoteObject.exportObject(policeCheckStepService, 0);
+		PoliceCheckStepService policeCheckStepService;
+		try {
+			policeCheckStepService = new PoliceCheckStepService();
+		} catch (OperationNotSupportedException | IOException e) {
+			logger.log(Level.SEVERE, "Failed to initialize service settings", e);
+			return;
+		}
+		IPoliceCheckStepService policeServiceStub;
+		try {
+			policeServiceStub = (IPoliceCheckStepService) UnicastRemoteObject.exportObject(policeCheckStepService, 0);
+		} catch (RemoteException e) {
+			logger.log(Level.SEVERE, "Failed to export service", e);
+			return;
+		}
 
 		try {
 			if (settings.isShouldCreateRegistry()) {
@@ -71,7 +86,12 @@ public class Main {
 		logger.log(Level.INFO, "Bound all RMI services");
 
 		logger.log(Level.INFO, "Setting up notification socket");
-		setupNotificationSocket(policeCheckStepService);
+		try {
+			setupNotificationSocket(policeCheckStepService);
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, "Failed to setup notification socket", e);
+			return;
+		}
 	}
 
 	private static void setupNotificationSocket(PoliceCheckStepService policeCheckStepService) throws IOException {
