@@ -1,86 +1,99 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<wsdl:definitions targetNamespace="http://test.mdp" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://test.mdp" xmlns:intf="http://test.mdp" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-<!--WSDL created by Apache Axis version: 1.4
-Built on Apr 22, 2006 (06:55:48 PDT)-->
- <wsdl:types>
-  <schema elementFormDefault="qualified" targetNamespace="http://test.mdp" xmlns="http://www.w3.org/2001/XMLSchema">
-   <element name="result">
-    <complexType/>
-   </element>
-   <element name="resultResponse">
-    <complexType>
-     <sequence>
-      <element name="resultReturn" type="xsd:string"/>
-     </sequence>
-    </complexType>
-   </element>
-  </schema>
- </wsdl:types>
+<wsdl:definitions targetNamespace="http://test.mdp"
+	xmlns:apachesoap="http://xml.apache.org/xml-soap"
+	xmlns:impl="http://test.mdp" xmlns:intf="http://test.mdp"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<!--WSDL created by Apache Axis version: 1.4 Built on Apr 22, 2006 (06:55:48 
+		PDT) -->
+	<wsdl:types>
+		<schema elementFormDefault="qualified"
+			targetNamespace="http://test.mdp"
+			xmlns="http://www.w3.org/2001/XMLSchema">
+			<element name="result">
+				<complexType />
+			</element>
+			<element name="resultResponse">
+				<complexType>
+					<sequence>
+						<element name="resultReturn" type="xsd:string" />
+					</sequence>
+				</complexType>
+			</element>
+		</schema>
+	</wsdl:types>
 
-   <wsdl:message name="resultResponse">
+	<wsdl:message name="resultResponse">
 
-      <wsdl:part element="impl:resultResponse" name="parameters">
+		<wsdl:part element="impl:resultResponse" name="parameters">
 
-      </wsdl:part>
+		</wsdl:part>
 
-   </wsdl:message>
+	</wsdl:message>
 
-   <wsdl:message name="resultRequest">
+	<wsdl:message name="resultRequest">
 
-      <wsdl:part element="impl:result" name="parameters">
+		<wsdl:part element="impl:result" name="parameters">
 
-      </wsdl:part>
+		</wsdl:part>
 
-   </wsdl:message>
+	</wsdl:message>
 
-   <wsdl:portType name="TestSoapService">
+	<wsdl:portType name="TestSoapService">
 
-      <wsdl:operation name="result">
+		<wsdl:operation name="result">
 
-         <wsdl:input message="impl:resultRequest" name="resultRequest">
+			<wsdl:input message="impl:resultRequest"
+				name="resultRequest">
 
-       </wsdl:input>
+			</wsdl:input>
 
-         <wsdl:output message="impl:resultResponse" name="resultResponse">
+			<wsdl:output message="impl:resultResponse"
+				name="resultResponse">
 
-       </wsdl:output>
+			</wsdl:output>
 
-      </wsdl:operation>
+		</wsdl:operation>
 
-   </wsdl:portType>
+	</wsdl:portType>
 
-   <wsdl:binding name="TestSoapServiceSoapBinding" type="impl:TestSoapService">
+	<wsdl:binding name="TestSoapServiceSoapBinding"
+		type="impl:TestSoapService">
 
-      <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdlsoap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
 
-      <wsdl:operation name="result">
+		<wsdl:operation name="result">
 
-         <wsdlsoap:operation soapAction=""/>
+			<wsdlsoap:operation soapAction="" />
 
-         <wsdl:input name="resultRequest">
+			<wsdl:input name="resultRequest">
 
-            <wsdlsoap:body use="literal"/>
+				<wsdlsoap:body use="literal" />
 
-         </wsdl:input>
+			</wsdl:input>
 
-         <wsdl:output name="resultResponse">
+			<wsdl:output name="resultResponse">
 
-            <wsdlsoap:body use="literal"/>
+				<wsdlsoap:body use="literal" />
 
-         </wsdl:output>
+			</wsdl:output>
 
-      </wsdl:operation>
+		</wsdl:operation>
 
-   </wsdl:binding>
+	</wsdl:binding>
 
-   <wsdl:service name="TestSoapServiceService">
+	<wsdl:service name="TestSoapServiceService">
 
-      <wsdl:port binding="impl:TestSoapServiceSoapBinding" name="TestSoapService">
+		<wsdl:port binding="impl:TestSoapServiceSoapBinding"
+			name="TestSoapService">
 
-         <wsdlsoap:address location="http://localhost:8080/MDP_Projekat_22_Web/services/TestSoapService"/>
+			<wsdlsoap:address
+				location="http://localhost:8080/MDP_Projekat_22_Web/services/TestSoapService" />
 
-      </wsdl:port>
+		</wsdl:port>
 
-   </wsdl:service>
+	</wsdl:service>
 
 </wsdl:definitions>

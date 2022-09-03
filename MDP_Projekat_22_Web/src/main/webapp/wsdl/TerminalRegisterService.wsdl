@@ -1,0 +1,692 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+	targetNamespace="http://terminals.register.mdp"
+	xmlns:apachesoap="http://xml.apache.org/xml-soap"
+	xmlns:impl="http://terminals.register.mdp"
+	xmlns:intf="http://terminals.register.mdp"
+	xmlns:tns1="http://dtos.terminals.register.mdp"
+	xmlns:tns2="http://dtos.mdp" xmlns:tns3="http://exceptions.mdp"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<!--WSDL created by Apache Axis version: 1.4 Built on Apr 22, 2006 (06:55:48 
+		PDT) -->
+	<wsdl:types>
+		<schema elementFormDefault="qualified"
+			targetNamespace="http://terminals.register.mdp"
+			xmlns="http://www.w3.org/2001/XMLSchema">
+			<import namespace="http://dtos.terminals.register.mdp" />
+			<import namespace="http://exceptions.mdp" />
+			<import namespace="http://dtos.mdp" />
+			<element name="getTerminalsStartingWithName">
+				<complexType>
+					<sequence>
+						<element name="namePrefix" type="xsd:string" />
+					</sequence>
+				</complexType>
+			</element>
+			<element name="getTerminalsStartingWithNameResponse">
+				<complexType>
+					<sequence>
+						<element maxOccurs="unbounded"
+							name="getTerminalsStartingWithNameReturn"
+							type="tns1:GetCustomsTerminalDto" />
+					</sequence>
+				</complexType>
+			</element>
+			<complexType name="ArrayOf_tns1_GetCustomsPassageStepDto">
+				<sequence>
+					<element maxOccurs="unbounded" minOccurs="0" name="item"
+						type="tns1:GetCustomsPassageStepDto" />
+				</sequence>
+			</complexType>
+			<complexType name="ArrayOf_tns1_GetCustomsPassageDto">
+				<sequence>
+					<element maxOccurs="unbounded" minOccurs="0" name="item"
+						type="tns1:GetCustomsPassageDto" />
+				</sequence>
+			</complexType>
+			<element name="searchTerminalSimulation">
+				<complexType>
+					<sequence>
+						<element name="terminalName" type="xsd:string" />
+						<element name="passageId" type="xsd:integer" />
+						<element name="isEntry" type="xsd:boolean" />
+					</sequence>
+				</complexType>
+			</element>
+			<element name="searchTerminalSimulationResponse">
+				<complexType>
+					<sequence>
+						<element name="searchTerminalSimulationReturn"
+							type="tns1:GetCustomsTerminalDto" />
+					</sequence>
+				</complexType>
+			</element>
+			<element name="createTerminal">
+				<complexType>
+					<sequence>
+						<element name="dto" type="tns1:CreateTerminalDto" />
+					</sequence>
+				</complexType>
+			</element>
+			<element name="createTerminalResponse">
+				<complexType>
+					<sequence>
+						<element name="createTerminalReturn"
+							type="tns1:GetCustomsTerminalDto" />
+					</sequence>
+				</complexType>
+			</element>
+			<element name="getTerminals">
+				<complexType />
+			</element>
+			<element name="getTerminalsResponse">
+				<complexType>
+					<sequence>
+						<element maxOccurs="unbounded" name="getTerminalsReturn"
+							type="tns1:GetCustomsTerminalDto" />
+					</sequence>
+				</complexType>
+			</element>
+			<element name="searchTerminal">
+				<complexType>
+					<sequence>
+						<element name="dto" type="tns2:SearchTerminalDto" />
+					</sequence>
+				</complexType>
+			</element>
+			<element name="searchTerminalResponse">
+				<complexType>
+					<sequence>
+						<element name="searchTerminalReturn"
+							type="tns1:GetCustomsTerminalDto" />
+					</sequence>
+				</complexType>
+			</element>
+			<element name="fault" type="tns3:TerminalNotFoundException" />
+			<element name="deleteTerminal">
+				<complexType>
+					<sequence>
+						<element name="id" type="xsd:integer" />
+					</sequence>
+				</complexType>
+			</element>
+			<element name="deleteTerminalResponse">
+				<complexType />
+			</element>
+			<element name="getTerminal">
+				<complexType>
+					<sequence>
+						<element name="passageId" type="xsd:integer" />
+						<element name="isCustomsStep" type="xsd:boolean" />
+						<element name="terminalName" type="xsd:string" />
+					</sequence>
+				</complexType>
+			</element>
+			<element name="getTerminalResponse">
+				<complexType>
+					<sequence>
+						<element name="getTerminalReturn"
+							type="tns1:GetCustomsTerminalDto" />
+					</sequence>
+				</complexType>
+			</element>
+			<element name="updateTerminal">
+				<complexType>
+					<sequence>
+						<element name="dto" type="tns1:UpdateTerminalDto" />
+					</sequence>
+				</complexType>
+			</element>
+			<element name="updateTerminalResponse">
+				<complexType>
+					<sequence>
+						<element name="updateTerminalReturn"
+							type="tns1:GetCustomsTerminalDto" />
+					</sequence>
+				</complexType>
+			</element>
+		</schema>
+		<schema elementFormDefault="qualified"
+			targetNamespace="http://dtos.terminals.register.mdp"
+			xmlns="http://www.w3.org/2001/XMLSchema">
+			<import namespace="http://terminals.register.mdp" />
+			<import namespace="http://exceptions.mdp" />
+			<import namespace="http://dtos.mdp" />
+			<complexType name="GetCustomsPassageStepDto">
+				<sequence>
+					<element name="customsCheck" type="xsd:boolean" />
+				</sequence>
+			</complexType>
+			<complexType name="GetCustomsPassageDto">
+				<sequence>
+					<element name="entry" type="xsd:boolean" />
+					<element name="id" nillable="true" type="xsd:integer" />
+					<element name="open" type="xsd:boolean" />
+					<element name="passageSteps" nillable="true"
+						type="impl:ArrayOf_tns1_GetCustomsPassageStepDto" />
+				</sequence>
+			</complexType>
+			<complexType name="GetCustomsTerminalDto">
+				<sequence>
+					<element name="entries" nillable="true"
+						type="impl:ArrayOf_tns1_GetCustomsPassageDto" />
+					<element name="exits" nillable="true"
+						type="impl:ArrayOf_tns1_GetCustomsPassageDto" />
+					<element name="id" nillable="true" type="xsd:integer" />
+					<element name="name" nillable="true" type="xsd:string" />
+				</sequence>
+			</complexType>
+			<complexType name="CreateTerminalDto">
+				<sequence>
+					<element name="entryPassageCount" type="xsd:int" />
+					<element name="exitPassageCount" type="xsd:int" />
+					<element name="terminalName" nillable="true"
+						type="xsd:string" />
+				</sequence>
+			</complexType>
+			<complexType name="UpdateTerminalDto">
+				<sequence>
+					<element name="entryPassageCount" type="xsd:int" />
+					<element name="exitPassageCount" type="xsd:int" />
+					<element name="name" nillable="true" type="xsd:string" />
+					<element name="terminalId" nillable="true"
+						type="xsd:integer" />
+				</sequence>
+			</complexType>
+		</schema>
+		<schema elementFormDefault="qualified"
+			targetNamespace="http://dtos.mdp"
+			xmlns="http://www.w3.org/2001/XMLSchema">
+			<import namespace="http://dtos.terminals.register.mdp" />
+			<import namespace="http://terminals.register.mdp" />
+			<import namespace="http://exceptions.mdp" />
+			<complexType name="SearchTerminalDto">
+				<sequence>
+					<element name="customsPassage" type="xsd:boolean" />
+					<element name="passageId" nillable="true"
+						type="xsd:integer" />
+					<element name="terminalName" nillable="true"
+						type="xsd:string" />
+				</sequence>
+			</complexType>
+		</schema>
+		<schema elementFormDefault="qualified"
+			targetNamespace="http://exceptions.mdp"
+			xmlns="http://www.w3.org/2001/XMLSchema">
+			<import namespace="http://dtos.terminals.register.mdp" />
+			<import namespace="http://terminals.register.mdp" />
+			<import namespace="http://dtos.mdp" />
+			<complexType name="TerminalNotFoundException">
+				<sequence />
+			</complexType>
+		</schema>
+	</wsdl:types>
+
+	<wsdl:message name="TerminalNotFoundException">
+
+		<wsdl:part element="impl:fault" name="fault">
+
+		</wsdl:part>
+
+	</wsdl:message>
+
+	<wsdl:message name="getTerminalsStartingWithNameRequest">
+
+		<wsdl:part element="impl:getTerminalsStartingWithName"
+			name="parameters">
+
+		</wsdl:part>
+
+	</wsdl:message>
+
+	<wsdl:message name="searchTerminalSimulationRequest">
+
+		<wsdl:part element="impl:searchTerminalSimulation"
+			name="parameters">
+
+		</wsdl:part>
+
+	</wsdl:message>
+
+	<wsdl:message name="searchTerminalResponse">
+
+		<wsdl:part element="impl:searchTerminalResponse"
+			name="parameters">
+
+		</wsdl:part>
+
+	</wsdl:message>
+
+	<wsdl:message name="createTerminalResponse">
+
+		<wsdl:part element="impl:createTerminalResponse"
+			name="parameters">
+
+		</wsdl:part>
+
+	</wsdl:message>
+
+	<wsdl:message name="getTerminalsStartingWithNameResponse">
+
+		<wsdl:part
+			element="impl:getTerminalsStartingWithNameResponse" name="parameters">
+
+		</wsdl:part>
+
+	</wsdl:message>
+
+	<wsdl:message name="getTerminalRequest">
+
+		<wsdl:part element="impl:getTerminal" name="parameters">
+
+		</wsdl:part>
+
+	</wsdl:message>
+
+	<wsdl:message name="getTerminalResponse">
+
+		<wsdl:part element="impl:getTerminalResponse"
+			name="parameters">
+
+		</wsdl:part>
+
+	</wsdl:message>
+
+	<wsdl:message name="getTerminalsResponse">
+
+		<wsdl:part element="impl:getTerminalsResponse"
+			name="parameters">
+
+		</wsdl:part>
+
+	</wsdl:message>
+
+	<wsdl:message name="searchTerminalSimulationResponse">
+
+		<wsdl:part element="impl:searchTerminalSimulationResponse"
+			name="parameters">
+
+		</wsdl:part>
+
+	</wsdl:message>
+
+	<wsdl:message name="getTerminalsRequest">
+
+		<wsdl:part element="impl:getTerminals" name="parameters">
+
+		</wsdl:part>
+
+	</wsdl:message>
+
+	<wsdl:message name="deleteTerminalResponse">
+
+		<wsdl:part element="impl:deleteTerminalResponse"
+			name="parameters">
+
+		</wsdl:part>
+
+	</wsdl:message>
+
+	<wsdl:message name="createTerminalRequest">
+
+		<wsdl:part element="impl:createTerminal" name="parameters">
+
+		</wsdl:part>
+
+	</wsdl:message>
+
+	<wsdl:message name="searchTerminalRequest">
+
+		<wsdl:part element="impl:searchTerminal" name="parameters">
+
+		</wsdl:part>
+
+	</wsdl:message>
+
+	<wsdl:message name="updateTerminalRequest">
+
+		<wsdl:part element="impl:updateTerminal" name="parameters">
+
+		</wsdl:part>
+
+	</wsdl:message>
+
+	<wsdl:message name="updateTerminalResponse">
+
+		<wsdl:part element="impl:updateTerminalResponse"
+			name="parameters">
+
+		</wsdl:part>
+
+	</wsdl:message>
+
+	<wsdl:message name="deleteTerminalRequest">
+
+		<wsdl:part element="impl:deleteTerminal" name="parameters">
+
+		</wsdl:part>
+
+	</wsdl:message>
+
+	<wsdl:portType name="TerminalRegisterService">
+
+		<wsdl:operation name="getTerminalsStartingWithName">
+
+			<wsdl:input
+				message="impl:getTerminalsStartingWithNameRequest"
+				name="getTerminalsStartingWithNameRequest">
+
+			</wsdl:input>
+
+			<wsdl:output
+				message="impl:getTerminalsStartingWithNameResponse"
+				name="getTerminalsStartingWithNameResponse">
+
+			</wsdl:output>
+
+		</wsdl:operation>
+
+		<wsdl:operation name="searchTerminalSimulation">
+
+			<wsdl:input message="impl:searchTerminalSimulationRequest"
+				name="searchTerminalSimulationRequest">
+
+			</wsdl:input>
+
+			<wsdl:output
+				message="impl:searchTerminalSimulationResponse"
+				name="searchTerminalSimulationResponse">
+
+			</wsdl:output>
+
+		</wsdl:operation>
+
+		<wsdl:operation name="createTerminal">
+
+			<wsdl:input message="impl:createTerminalRequest"
+				name="createTerminalRequest">
+
+			</wsdl:input>
+
+			<wsdl:output message="impl:createTerminalResponse"
+				name="createTerminalResponse">
+
+			</wsdl:output>
+
+		</wsdl:operation>
+
+		<wsdl:operation name="getTerminals">
+
+			<wsdl:input message="impl:getTerminalsRequest"
+				name="getTerminalsRequest">
+
+			</wsdl:input>
+
+			<wsdl:output message="impl:getTerminalsResponse"
+				name="getTerminalsResponse">
+
+			</wsdl:output>
+
+		</wsdl:operation>
+
+		<wsdl:operation name="searchTerminal">
+
+			<wsdl:input message="impl:searchTerminalRequest"
+				name="searchTerminalRequest">
+
+			</wsdl:input>
+
+			<wsdl:output message="impl:searchTerminalResponse"
+				name="searchTerminalResponse">
+
+			</wsdl:output>
+
+			<wsdl:fault message="impl:TerminalNotFoundException"
+				name="TerminalNotFoundException">
+
+			</wsdl:fault>
+
+		</wsdl:operation>
+
+		<wsdl:operation name="deleteTerminal">
+
+			<wsdl:input message="impl:deleteTerminalRequest"
+				name="deleteTerminalRequest">
+
+			</wsdl:input>
+
+			<wsdl:output message="impl:deleteTerminalResponse"
+				name="deleteTerminalResponse">
+
+			</wsdl:output>
+
+			<wsdl:fault message="impl:TerminalNotFoundException"
+				name="TerminalNotFoundException">
+
+			</wsdl:fault>
+
+		</wsdl:operation>
+
+		<wsdl:operation name="getTerminal">
+
+			<wsdl:input message="impl:getTerminalRequest"
+				name="getTerminalRequest">
+
+			</wsdl:input>
+
+			<wsdl:output message="impl:getTerminalResponse"
+				name="getTerminalResponse">
+
+			</wsdl:output>
+
+			<wsdl:fault message="impl:TerminalNotFoundException"
+				name="TerminalNotFoundException">
+
+			</wsdl:fault>
+
+		</wsdl:operation>
+
+		<wsdl:operation name="updateTerminal">
+
+			<wsdl:input message="impl:updateTerminalRequest"
+				name="updateTerminalRequest">
+
+			</wsdl:input>
+
+			<wsdl:output message="impl:updateTerminalResponse"
+				name="updateTerminalResponse">
+
+			</wsdl:output>
+
+		</wsdl:operation>
+
+	</wsdl:portType>
+
+	<wsdl:binding name="TerminalRegisterServiceSoapBinding"
+		type="impl:TerminalRegisterService">
+
+		<wsdlsoap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+
+		<wsdl:operation name="getTerminalsStartingWithName">
+
+			<wsdlsoap:operation soapAction="" />
+
+			<wsdl:input name="getTerminalsStartingWithNameRequest">
+
+				<wsdlsoap:body use="literal" />
+
+			</wsdl:input>
+
+			<wsdl:output name="getTerminalsStartingWithNameResponse">
+
+				<wsdlsoap:body use="literal" />
+
+			</wsdl:output>
+
+		</wsdl:operation>
+
+		<wsdl:operation name="searchTerminalSimulation">
+
+			<wsdlsoap:operation soapAction="" />
+
+			<wsdl:input name="searchTerminalSimulationRequest">
+
+				<wsdlsoap:body use="literal" />
+
+			</wsdl:input>
+
+			<wsdl:output name="searchTerminalSimulationResponse">
+
+				<wsdlsoap:body use="literal" />
+
+			</wsdl:output>
+
+		</wsdl:operation>
+
+		<wsdl:operation name="createTerminal">
+
+			<wsdlsoap:operation soapAction="" />
+
+			<wsdl:input name="createTerminalRequest">
+
+				<wsdlsoap:body use="literal" />
+
+			</wsdl:input>
+
+			<wsdl:output name="createTerminalResponse">
+
+				<wsdlsoap:body use="literal" />
+
+			</wsdl:output>
+
+		</wsdl:operation>
+
+		<wsdl:operation name="getTerminals">
+
+			<wsdlsoap:operation soapAction="" />
+
+			<wsdl:input name="getTerminalsRequest">
+
+				<wsdlsoap:body use="literal" />
+
+			</wsdl:input>
+
+			<wsdl:output name="getTerminalsResponse">
+
+				<wsdlsoap:body use="literal" />
+
+			</wsdl:output>
+
+		</wsdl:operation>
+
+		<wsdl:operation name="searchTerminal">
+
+			<wsdlsoap:operation soapAction="" />
+
+			<wsdl:input name="searchTerminalRequest">
+
+				<wsdlsoap:body use="literal" />
+
+			</wsdl:input>
+
+			<wsdl:output name="searchTerminalResponse">
+
+				<wsdlsoap:body use="literal" />
+
+			</wsdl:output>
+
+			<wsdl:fault name="TerminalNotFoundException">
+
+				<wsdlsoap:fault name="TerminalNotFoundException"
+					use="literal" />
+
+			</wsdl:fault>
+
+		</wsdl:operation>
+
+		<wsdl:operation name="deleteTerminal">
+
+			<wsdlsoap:operation soapAction="" />
+
+			<wsdl:input name="deleteTerminalRequest">
+
+				<wsdlsoap:body use="literal" />
+
+			</wsdl:input>
+
+			<wsdl:output name="deleteTerminalResponse">
+
+				<wsdlsoap:body use="literal" />
+
+			</wsdl:output>
+
+			<wsdl:fault name="TerminalNotFoundException">
+
+				<wsdlsoap:fault name="TerminalNotFoundException"
+					use="literal" />
+
+			</wsdl:fault>
+
+		</wsdl:operation>
+
+		<wsdl:operation name="getTerminal">
+
+			<wsdlsoap:operation soapAction="" />
+
+			<wsdl:input name="getTerminalRequest">
+
+				<wsdlsoap:body use="literal" />
+
+			</wsdl:input>
+
+			<wsdl:output name="getTerminalResponse">
+
+				<wsdlsoap:body use="literal" />
+
+			</wsdl:output>
+
+			<wsdl:fault name="TerminalNotFoundException">
+
+				<wsdlsoap:fault name="TerminalNotFoundException"
+					use="literal" />
+
+			</wsdl:fault>
+
+		</wsdl:operation>
+
+		<wsdl:operation name="updateTerminal">
+
+			<wsdlsoap:operation soapAction="" />
+
+			<wsdl:input name="updateTerminalRequest">
+
+				<wsdlsoap:body use="literal" />
+
+			</wsdl:input>
+
+			<wsdl:output name="updateTerminalResponse">
+
+				<wsdlsoap:body use="literal" />
+
+			</wsdl:output>
+
+		</wsdl:operation>
+
+	</wsdl:binding>
+
+	<wsdl:service name="TerminalRegisterServiceService">
+
+		<wsdl:port binding="impl:TerminalRegisterServiceSoapBinding"
+			name="TerminalRegisterService">
+
+			<wsdlsoap:address
+				location="http://localhost:8080/MDP_Projekat_22_Web/services/TerminalRegisterService" />
+
+		</wsdl:port>
+
+	</wsdl:service>
+
+</wsdl:definitions>

@@ -11,7 +11,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.math.BigInteger;
-import java.nio.file.Files;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -23,13 +22,11 @@ import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Stream;
 import java.util.zip.DeflaterInputStream;
-import java.util.zip.DeflaterOutputStream;
 
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
 import com.google.gson.Gson;
-import com.lambdaworks.redis.output.ByteArrayOutput;
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
@@ -58,7 +55,6 @@ import mdp.register.terminals.dtos.CreateTerminalDto;
 import mdp.register.terminals.dtos.UpdateTerminalDto;
 import mdp.register.wanted.services.IPersonIdentifyingDocumentsService;
 import mdp.register.wanted.services.IPoliceCheckStepService;
-import mdp.test.client.TestSoapServiceService;
 import mdp.util.PasswordUtil;
 import mdp.util.Serialization;
 import mdp.util.SerializationType;
@@ -185,17 +181,6 @@ public class Main {
 	}
 
 	private static void testChatServer() throws FileNotFoundException, IOException, TimeoutException {
-// NOTE: problem with running both
-//		var startServerThread = mdp.chat.server.Main.startServer();
-//		startServerThread.start();
-//
-//		try {
-//			startServerThread.join();
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-
 		var gson = new Gson();
 		System.out.println(gson.toJson(new ChatMessage("test", "username", new BigInteger(terminalId1),
 				new BigInteger(passageId1), passageStep1, ChatMessageType.UNICAST)));
@@ -207,7 +192,6 @@ public class Main {
 		SSLSocketFactory sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
 		SSLSocket s = (SSLSocket) sf.createSocket(clientSettings.getHost(), clientSettings.getPort());
 
-//		s.setSoTimeout(10000);
 		BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
 		PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(s.getOutputStream())), true);
 
@@ -388,13 +372,6 @@ public class Main {
 		System.out.println("Terminal XML");
 		System.out.println();
 
-	}
-
-	@SuppressWarnings("unused")
-	private static void testSoap() {
-		var testService = new TestSoapServiceService().getTestSoapService();
-		var result = testService.result();
-		System.out.println(result);
 	}
 
 	@SuppressWarnings("unused")

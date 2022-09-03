@@ -5,13 +5,15 @@ import java.io.Serializable;
 public class FileServerSettings implements Serializable {
 	private static final long serialVersionUID = 7258106168618485788L;
 
+	private String rmiHost;
 	private int rmiPort;
 	private boolean shouldCreateRegistry;
 	private String personIdentifyingDocumentsServiceBindingName;
 
-	public FileServerSettings(int rmiPort, boolean shouldCreateRegistry,
+	public FileServerSettings(String rmiHost, int rmiPort, boolean shouldCreateRegistry,
 			String personIdentifyingDocumentsServiceBindingName) {
 		super();
+		this.rmiHost = rmiHost;
 		this.rmiPort = rmiPort;
 		this.shouldCreateRegistry = shouldCreateRegistry;
 		this.personIdentifyingDocumentsServiceBindingName = personIdentifyingDocumentsServiceBindingName;
@@ -19,6 +21,10 @@ public class FileServerSettings implements Serializable {
 
 	public String getPersonIdentifyingDocumentsServiceBindingName() {
 		return personIdentifyingDocumentsServiceBindingName;
+	}
+
+	public String getRmiHost() {
+		return rmiHost;
 	}
 
 	public int getRmiPort() {
@@ -33,6 +39,10 @@ public class FileServerSettings implements Serializable {
 		this.personIdentifyingDocumentsServiceBindingName = personIdentifyingDocumentsServiceBindingName;
 	}
 
+	public void setRmiHost(String rmiHost) {
+		this.rmiHost = rmiHost;
+	}
+
 	public void setRmiPort(int rmiPort) {
 		this.rmiPort = rmiPort;
 	}
@@ -40,5 +50,4 @@ public class FileServerSettings implements Serializable {
 	public void setShouldCreateRegistry(boolean shouldCreateRegistry) {
 		this.shouldCreateRegistry = shouldCreateRegistry;
 	}
-
 }

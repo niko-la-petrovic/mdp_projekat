@@ -7,11 +7,15 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.google.gson.Gson;
+import com.rabbitmq.client.AlreadyClosedException;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.Consumer;
@@ -25,6 +29,7 @@ import mdp.models.chat.ChatMessage;
 import mdp.mq.rabbitmq.Constants;
 
 public class ServerThread extends Thread {
+	private static final Logger logger = Logger.getLogger(ServerThread.class.getName());
 
 	private static final Gson gson = new Gson();
 	static Channel channel;
@@ -57,21 +62,26 @@ public class ServerThread extends Thread {
 
 	@Override
 	public void run() {
-		System.out.println("Client connected");
 		try {
 			while (!isShouldTerminate())
 				try {
 					communicate();
+				}
+
+				catch (SocketException e) {
+					{
+						logger.log(Level.INFO, String.format("Socket exception: %s", e.getMessage()));
+						handleTerminate();
+					}
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.log(Level.SEVERE, String.format("Exception: %s", e.getMessage()));
 				}
 			handleTerminate();
 			in.close();
 			out.close();
 			socket.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(Level.SEVERE, String.format("Error while stopping client communication: %s", e.getMessage()));
 		}
 	}
 
@@ -90,8 +100,7 @@ public class ServerThread extends Thread {
 					messageQueue.add(chatMessage);
 				}
 			}
-			// TODO retrieve all
-			// TODO add thread to sub map
+			
 			var subscribers = routingKeySubscriberMap.get(routingKey);
 			if (subscribers == null) {
 				subscribers = new ConcurrentSet<>();
@@ -106,11 +115,15 @@ public class ServerThread extends Thread {
 		if (consumer != null)
 			return consumer;
 
-		var declareQueueResult = channel.queueDeclare(routingKey, true, false, false, null);
-		var bindBroadcastExchangeResult = channel.queueBind(routingKey, Constants.BROADCAST_EXCHANGE_NAME, "");
-		var bindMulticastExchangeResult = channel.queueBind(routingKey, Constants.TOPIC_EXCHANGE_NAME,
-				Constants.getTerminalBindingKey(terminalId.toString()));
-		var bindDirectExchangeResult = channel.queueBind(routingKey, Constants.DIRECT_EXCHANGE_NAME, routingKey);
+		try {
+			var declareQueueResult = channel.queueDeclare(routingKey, true, false, false, null);
+			var bindBroadcastExchangeResult = channel.queueBind(routingKey, Constants.BROADCAST_EXCHANGE_NAME, "");
+			var bindMulticastExchangeResult = channel.queueBind(routingKey, Constants.TOPIC_EXCHANGE_NAME,
+					Constants.getTerminalBindingKey(terminalId.toString()));
+			var bindDirectExchangeResult = channel.queueBind(routingKey, Constants.DIRECT_EXCHANGE_NAME, routingKey);
+		} catch (AlreadyClosedException e) {
+			logger.log(Level.WARNING, String.format("Channel already closed: %s", e.getMessage()));
+		}
 
 		if (!routingKeyChatMessageMap.contains(routingKey))
 			routingKeyChatMessageMap.put(routingKey, new ConcurrentLinkedDeque<>());
@@ -135,8 +148,6 @@ public class ServerThread extends Thread {
 						}
 					}
 				}
-				// sendMessage(new SocketMessage(SocketMessageType.TRANSFER_MESSAGE, message,
-				// null, null));
 			}
 		};
 
@@ -149,14 +160,12 @@ public class ServerThread extends Thread {
 
 	private void communicate() throws IOException {
 		String jsonLine = null;
-		System.out.println("Reading next line..");
 		try {
 			jsonLine = in.readLine();
 			if (jsonLine == null)
 				setShouldTerminate(true);
 		} catch (IOException e) {
-			// TODO log
-			e.printStackTrace();
+			logger.log(Level.SEVERE, String.format("Error while communicating with client: %s", e.getMessage()));
 			setShouldTerminate(true);
 		}
 
@@ -240,8 +249,7 @@ public class ServerThread extends Thread {
 						var message = messageQueue.take();
 						sendMessage(new SocketMessage(SocketMessageType.TRANSFER_MESSAGE, message, null, null));
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-//						e.printStackTrace();
+						logger.log(Level.WARNING, "ServerThread interrupted");
 					}
 				}
 			}
@@ -254,6 +262,7 @@ public class ServerThread extends Thread {
 		setShouldTerminate(true);
 		unbindConsumer();
 		transferMessageThread.interrupt();
+		logger.log(Level.INFO, String.format("Terminating client '%s'", socket.getInetAddress()));
 	}
 
 	private synchronized void sendMessage(SocketMessage message) {
@@ -270,13 +279,10 @@ public class ServerThread extends Thread {
 		if (consumer == null)
 			return;
 
-		var consumerTag = consumerTagMap.get(consumer);
-		if (consumerTag == null)
-			return;
-
-		channel.basicCancel(consumerTag);
-		routingKeyConsumerMap.remove(routingKey);
-		consumerTagMap.remove(consumer);
+		ConcurrentSet<ServerThread> subscribers = routingKeySubscriberMap.get(routingKey);
+		synchronized (subscribers) {
+			subscribers.remove(this);
+		}
 		threadRoutingKey.remove();
 	}
 }

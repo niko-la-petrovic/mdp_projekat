@@ -4,6 +4,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
@@ -15,13 +17,23 @@ import mdp.mq.rabbitmq.Constants;
 import mdp.util.SettingsLoader;
 
 public class Main {
+	private static final Logger logger = Logger.getLogger(Main.class.getName());
+
 	private static ServerSocketSettings settings;
 	private static boolean shouldRun = true;
 	private static SSLServerSocketFactory ssf;
 	private static ServerSocket ss;
 
-	public static void main(String[] args) throws FileNotFoundException, IOException, TimeoutException {
-		var serverThread = startServer();
+	public static void main(String[] args) {
+		logger.log(Level.INFO, "Creating server thread");
+		Thread serverThread;
+		try {
+			serverThread = startServer();
+		} catch (IOException | TimeoutException e) {
+			logger.log(Level.SEVERE, "Failed to initialize server thread", e);
+			return;
+		}
+		logger.log(Level.INFO, "Starting server thread");
 		serverThread.start();
 	}
 
@@ -33,14 +45,23 @@ public class Main {
 
 			var broadcastDeclareResult = ServerThread.channel.exchangeDeclare(Constants.BROADCAST_EXCHANGE_NAME,
 					BuiltinExchangeType.FANOUT, true);
+			logger.log(Level.INFO,
+					String.format("Binding BROADCAST EXCHANGE under name '%s'", Constants.BROADCAST_EXCHANGE_NAME));
+
 			var topicDeclareResult = ServerThread.channel.exchangeDeclare(Constants.TOPIC_EXCHANGE_NAME,
 					BuiltinExchangeType.TOPIC, true);
+			logger.log(Level.INFO,
+					String.format("Binding TOPIC EXCHANGE under name '%s'", Constants.TOPIC_EXCHANGE_NAME));
+
 			var directDeclareResult = ServerThread.channel.exchangeDeclare(Constants.DIRECT_EXCHANGE_NAME,
 					BuiltinExchangeType.DIRECT, true);
+			logger.log(Level.INFO,
+					String.format("Binding DIRECT EXCHANGE under name '%s'", Constants.DIRECT_EXCHANGE_NAME));
 		}
 	}
 
 	public static Thread startServer() throws IOException, TimeoutException {
+		logger.log(Level.INFO, "Configuring message queueing");
 		configureMessageQueueing();
 		var startServerThread = new Thread() {
 
@@ -49,49 +70,59 @@ public class Main {
 
 				if (settings == null)
 					try {
+						logger.log(Level.INFO, "Loading settings");
 						loadSettings();
 					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						logger.log(Level.SEVERE, String.format("Failed to load settings: %s", e1.getMessage()));
 						return;
 					}
+
+				logger.log(Level.INFO, "Loading secure socket keystore");
 				System.setProperty("javax.net.ssl.keyStore", settings.getKeyStorePath());
 				System.setProperty("javax.net.ssl.keyStorePassword", settings.getKeyStorePassword());
 
+				logger.log(Level.INFO, String.format("Creating secure socket on port", settings.getPort()));
 				ssf = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
 				try {
 					ss = ssf.createServerSocket(settings.getPort());
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					logger.log(Level.SEVERE, String.format("Failed to create server socket: %s", e1.getMessage()));
 					return;
 				}
 				var serverConnectionsThread = new Thread() {
 					@Override
 					public void run() {
-						try {
-							serverHandleConnectionsLoop(ss);
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
+						logger.log(Level.INFO, "Started server socket handle connections loop");
+						serverHandleConnectionsLoop(ss);
 					}
 				};
+				logger.log(Level.INFO, "Starting server connections thread");
 				serverConnectionsThread.start();
 			}
 		};
 		return startServerThread;
+
 	}
 
-	private static void serverHandleConnectionsLoop(ServerSocket ss) throws IOException {
-		System.out.println("Server je pokrenut");
+	private static void serverHandleConnectionsLoop(ServerSocket ss) {
+		logger.log(Level.INFO, String.format("Started server socket"));
 		while (shouldRun) {
-			System.out.println("Waiting for client...");
-			SSLSocket s = (SSLSocket) ss.accept();
-			s.startHandshake();
-			new ServerThread(s).start();
+			logger.log(Level.INFO, "Awaiting next client...");
+			SSLSocket s;
+			try {
+				s = (SSLSocket) ss.accept();
+				logger.log(Level.INFO, String.format("Accepted new client: %s", s.getInetAddress()));
+
+				logger.log(Level.INFO, String.format("Conducting handshakre with client: %s", s.getInetAddress()));
+				s.startHandshake();
+
+				logger.log(Level.INFO, String.format("Starting server thread for client: %s", s.getInetAddress()));
+				new ServerThread(s).start();
+			} catch (IOException e) {
+				logger.log(Level.WARNING, "Failed to connect to client");
+			}
 		}
-		System.out.println("Stopping connection handling loop");
+		logger.log(Level.WARNING, "Stopping server socket");
 	}
 
 	private static void loadSettings() throws FileNotFoundException, IOException {

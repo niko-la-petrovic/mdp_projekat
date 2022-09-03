@@ -5,13 +5,15 @@ import java.io.Serializable;
 public class WantedRegisterServerSettings implements Serializable {
 	private static final long serialVersionUID = -5779115822411899346L;
 
+	private String rmiHost;
 	private int rmiPort;
 	private String policeCheckStepServiceBindingName;
 	private boolean shouldCreateRegistry;
 
-	public WantedRegisterServerSettings(int rmiPort, String policeCheckStepServiceBindingName,
+	public WantedRegisterServerSettings(String rmiHost, int rmiPort, String policeCheckStepServiceBindingName,
 			boolean shouldCreateRegistry) {
 		super();
+		this.rmiHost = rmiHost;
 		this.rmiPort = rmiPort;
 		this.policeCheckStepServiceBindingName = policeCheckStepServiceBindingName;
 		this.shouldCreateRegistry = shouldCreateRegistry;
@@ -19,6 +21,10 @@ public class WantedRegisterServerSettings implements Serializable {
 
 	public String getPoliceCheckStepServiceBindingName() {
 		return policeCheckStepServiceBindingName;
+	}
+
+	public String getRmiHost() {
+		return rmiHost;
 	}
 
 	public int getRmiPort() {
@@ -31,6 +37,10 @@ public class WantedRegisterServerSettings implements Serializable {
 
 	public void setPoliceCheckStepServiceBindingName(String policeCheckStepServiceBindingName) {
 		this.policeCheckStepServiceBindingName = policeCheckStepServiceBindingName;
+	}
+
+	public void setRmiHost(String rmiHost) {
+		this.rmiHost = rmiHost;
 	}
 
 	public void setRmiPort(int rmiPort) {

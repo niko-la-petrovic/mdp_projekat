@@ -1,63 +1,243 @@
-<ns1:deployment xmlns="http://xml.apache.org/axis/wsdd/" xmlns:java="http://xml.apache.org/axis/wsdd/providers/java" xmlns:ns1="http://xml.apache.org/axis/wsdd/">
- <ns1:globalConfiguration>
-  <ns1:parameter name="sendMultiRefs" value="true"/>
-  <ns1:parameter name="disablePrettyXML" value="true"/>
-  <ns1:parameter name="adminPassword" value="admin"/>
-  <ns1:parameter name="attachments.Directory" value="C:\Users\Blue-Glass\eclipse-workspace\mdp\.metadata\.plugins\org.eclipse.wst.server.core\tmp0\wtpwebapps\MDP_Projekat_22_Web\WEB-INF\attachments"/>
-  <ns1:parameter name="dotNetSoapEncFix" value="true"/>
-  <ns1:parameter name="enableNamespacePrefixOptimization" value="false"/>
-  <ns1:parameter name="sendXMLDeclaration" value="true"/>
-  <ns1:parameter name="sendXsiTypes" value="true"/>
-  <ns1:parameter name="attachments.implementation" value="org.apache.axis.attachments.AttachmentsImpl"/>
-  <ns1:requestFlow>
-   <ns1:handler type="java:org.apache.axis.handlers.JWSHandler">
-    <ns1:parameter name="scope" value="session"/>
-   </ns1:handler>
-   <ns1:handler type="java:org.apache.axis.handlers.JWSHandler">
-    <ns1:parameter name="scope" value="request"/>
-    <ns1:parameter name="extension" value=".jwr"/>
-   </ns1:handler>
-  </ns1:requestFlow>
- </ns1:globalConfiguration>
- <ns1:handler name="URLMapper" type="java:org.apache.axis.handlers.http.URLMapper"/>
- <ns1:handler name="Authenticate" type="java:org.apache.axis.handlers.SimpleAuthenticationHandler"/>
- <ns1:handler name="LocalResponder" type="java:org.apache.axis.transport.local.LocalResponder"/>
- <ns1:service name="AdminService" provider="java:MSG">
-  <ns1:parameter name="allowedMethods" value="AdminService"/>
-  <ns1:parameter name="enableRemoteAdmin" value="false"/>
-  <ns1:parameter name="className" value="org.apache.axis.utils.Admin"/>
-  <ns1:namespace>http://xml.apache.org/axis/wsdd/</ns1:namespace>
- </ns1:service>
- <ns1:service name="Version" provider="java:RPC">
-  <ns1:parameter name="allowedMethods" value="getVersion"/>
-  <ns1:parameter name="className" value="org.apache.axis.Version"/>
- </ns1:service>
- <ns1:service name="TestSoapService" provider="java:RPC" style="wrapped" use="literal">
-  <ns2:operation name="result" qname="ns1:result" returnQName="ns1:resultReturn" returnType="xsd:string" soapAction="" xmlns:ns1="http://test.mdp" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://xml.apache.org/axis/wsdd/"/>
-  <ns1:parameter name="allowedMethods" value="result"/>
-  <ns1:parameter name="typeMappingVersion" value="1.2"/>
-  <ns1:parameter name="wsdlPortType" value="TestSoapService"/>
-  <ns1:parameter name="className" value="mdp.test.TestSoapService"/>
-  <ns1:parameter name="wsdlServicePort" value="TestSoapService"/>
-  <ns1:parameter name="schemaQualified" value="http://test.mdp"/>
-  <ns1:parameter name="wsdlTargetNamespace" value="http://test.mdp"/>
-  <ns1:parameter name="wsdlServiceElement" value="TestSoapServiceService"/>
- </ns1:service>
- <ns1:transport name="http">
-  <ns1:requestFlow>
-   <ns1:handler type="URLMapper"/>
-   <ns1:handler type="java:org.apache.axis.handlers.http.HTTPAuthHandler"/>
-  </ns1:requestFlow>
-  <ns1:parameter name="qs:list" value="org.apache.axis.transport.http.QSListHandler"/>
-  <ns1:parameter name="qs:wsdl" value="org.apache.axis.transport.http.QSWSDLHandler"/>
-  <ns1:parameter name="qs.list" value="org.apache.axis.transport.http.QSListHandler"/>
-  <ns1:parameter name="qs.method" value="org.apache.axis.transport.http.QSMethodHandler"/>
-  <ns1:parameter name="qs:method" value="org.apache.axis.transport.http.QSMethodHandler"/>
-  <ns1:parameter name="qs.wsdl" value="org.apache.axis.transport.http.QSWSDLHandler"/>
- </ns1:transport>
- <ns1:transport name="local">
-  <ns1:responseFlow>
-   <ns1:handler type="LocalResponder"/>
-  </ns1:responseFlow>
- </ns1:transport>
+<ns1:deployment xmlns="http://xml.apache.org/axis/wsdd/"
+	xmlns:java="http://xml.apache.org/axis/wsdd/providers/java"
+	xmlns:ns1="http://xml.apache.org/axis/wsdd/">
+	<ns1:globalConfiguration>
+		<ns1:parameter name="sendMultiRefs" value="true" />
+		<ns1:parameter name="disablePrettyXML" value="true" />
+		<ns1:parameter name="adminPassword" value="admin" />
+		<ns1:parameter name="attachments.Directory"
+			value="C:\Users\Blue-Glass\eclipse-workspace\mdp\.metadata\.plugins\org.eclipse.wst.server.core\tmp0\wtpwebapps\MDP_Projekat_22_Web\WEB-INF\attachments" />
+		<ns1:parameter name="dotNetSoapEncFix" value="true" />
+		<ns1:parameter name="enableNamespacePrefixOptimization"
+			value="false" />
+		<ns1:parameter name="sendXMLDeclaration" value="true" />
+		<ns1:parameter name="sendXsiTypes" value="true" />
+		<ns1:parameter name="attachments.implementation"
+			value="org.apache.axis.attachments.AttachmentsImpl" />
+		<ns1:requestFlow>
+			<ns1:handler
+				type="java:org.apache.axis.handlers.JWSHandler">
+				<ns1:parameter name="scope" value="session" />
+			</ns1:handler>
+			<ns1:handler
+				type="java:org.apache.axis.handlers.JWSHandler">
+				<ns1:parameter name="scope" value="request" />
+				<ns1:parameter name="extension" value=".jwr" />
+			</ns1:handler>
+		</ns1:requestFlow>
+	</ns1:globalConfiguration>
+	<ns1:handler name="URLMapper"
+		type="java:org.apache.axis.handlers.http.URLMapper" />
+	<ns1:handler name="Authenticate"
+		type="java:org.apache.axis.handlers.SimpleAuthenticationHandler" />
+	<ns1:handler name="LocalResponder"
+		type="java:org.apache.axis.transport.local.LocalResponder" />
+	<ns1:service name="AdminService" provider="java:MSG">
+		<ns1:parameter name="allowedMethods"
+			value="AdminService" />
+		<ns1:parameter name="enableRemoteAdmin" value="false" />
+		<ns1:parameter name="className"
+			value="org.apache.axis.utils.Admin" />
+		<ns1:namespace>http://xml.apache.org/axis/wsdd/</ns1:namespace>
+	</ns1:service>
+	<ns1:service name="Version" provider="java:RPC">
+		<ns1:parameter name="allowedMethods" value="getVersion" />
+		<ns1:parameter name="className"
+			value="org.apache.axis.Version" />
+	</ns1:service>
+	<ns1:service name="TestSoapService" provider="java:RPC"
+		style="wrapped" use="literal">
+		<ns2:operation name="result" qname="ns1:result"
+			returnQName="ns1:resultReturn" returnType="xsd:string" soapAction=""
+			xmlns:ns1="http://test.mdp"
+			xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			xmlns:ns2="http://xml.apache.org/axis/wsdd/" />
+		<ns1:parameter name="allowedMethods" value="result" />
+		<ns1:parameter name="typeMappingVersion" value="1.2" />
+		<ns1:parameter name="wsdlPortType"
+			value="TestSoapService" />
+		<ns1:parameter name="className"
+			value="mdp.test.TestSoapService" />
+		<ns1:parameter name="wsdlServicePort"
+			value="TestSoapService" />
+		<ns1:parameter name="schemaQualified"
+			value="http://test.mdp" />
+		<ns1:parameter name="wsdlTargetNamespace"
+			value="http://test.mdp" />
+		<ns1:parameter name="wsdlServiceElement"
+			value="TestSoapServiceService" />
+	</ns1:service>
+	<ns1:service name="TerminalRegisterService"
+		provider="java:RPC" style="wrapped" use="literal">
+		<ns1:operation name="getTerminalsStartingWithName"
+			qname="ns2:getTerminalsStartingWithName"
+			returnQName="ns2:getTerminalsStartingWithNameReturn"
+			returnType="ns3:GetCustomsTerminalDto" soapAction=""
+			xmlns:ns2="http://terminals.register.mdp"
+			xmlns:ns3="http://dtos.terminals.register.mdp">
+			<ns1:parameter qname="ns2:namePrefix" type="xsd:string"
+				xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+		</ns1:operation>
+		<ns1:operation name="searchTerminalSimulation"
+			qname="ns4:searchTerminalSimulation"
+			returnQName="ns4:searchTerminalSimulationReturn"
+			returnType="ns5:GetCustomsTerminalDto" soapAction=""
+			xmlns:ns4="http://terminals.register.mdp"
+			xmlns:ns5="http://dtos.terminals.register.mdp">
+			<ns1:parameter qname="ns4:terminalName"
+				type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+			<ns1:parameter qname="ns4:passageId" type="xsd:integer"
+				xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+			<ns1:parameter qname="ns4:isEntry" type="xsd:boolean"
+				xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+		</ns1:operation>
+		<ns1:operation name="createTerminal"
+			qname="ns6:createTerminal" returnQName="ns6:createTerminalReturn"
+			returnType="ns7:GetCustomsTerminalDto" soapAction=""
+			xmlns:ns6="http://terminals.register.mdp"
+			xmlns:ns7="http://dtos.terminals.register.mdp">
+			<ns1:parameter qname="ns6:dto"
+				type="ns7:CreateTerminalDto" />
+		</ns1:operation>
+		<ns1:operation name="getTerminals"
+			qname="ns8:getTerminals" returnQName="ns8:getTerminalsReturn"
+			returnType="ns9:GetCustomsTerminalDto" soapAction=""
+			xmlns:ns8="http://terminals.register.mdp"
+			xmlns:ns9="http://dtos.terminals.register.mdp" />
+		<ns1:operation name="searchTerminal"
+			qname="ns10:searchTerminal" returnQName="ns10:searchTerminalReturn"
+			returnType="ns11:GetCustomsTerminalDto" soapAction=""
+			xmlns:ns10="http://terminals.register.mdp"
+			xmlns:ns11="http://dtos.terminals.register.mdp">
+			<ns1:parameter qname="ns10:dto"
+				type="ns12:SearchTerminalDto" xmlns:ns12="http://dtos.mdp" />
+			<ns1:fault class="mdp.exceptions.TerminalNotFoundException"
+				qname="ns10:fault" type="ns13:TerminalNotFoundException"
+				xmlns:ns13="http://exceptions.mdp" />
+		</ns1:operation>
+		<ns1:operation name="deleteTerminal"
+			qname="ns14:deleteTerminal" soapAction=""
+			xmlns:ns14="http://terminals.register.mdp">
+			<ns1:parameter qname="ns14:id" type="xsd:integer"
+				xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+			<ns1:fault class="mdp.exceptions.TerminalNotFoundException"
+				qname="ns14:fault" type="ns15:TerminalNotFoundException"
+				xmlns:ns15="http://exceptions.mdp" />
+		</ns1:operation>
+		<ns1:operation name="getTerminal"
+			qname="ns16:getTerminal" returnQName="ns16:getTerminalReturn"
+			returnType="ns17:GetCustomsTerminalDto" soapAction=""
+			xmlns:ns16="http://terminals.register.mdp"
+			xmlns:ns17="http://dtos.terminals.register.mdp">
+			<ns1:parameter qname="ns16:passageId"
+				type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+			<ns1:parameter qname="ns16:isCustomsStep"
+				type="xsd:boolean" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+			<ns1:parameter qname="ns16:terminalName"
+				type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+			<ns1:fault class="mdp.exceptions.TerminalNotFoundException"
+				qname="ns16:fault" type="ns18:TerminalNotFoundException"
+				xmlns:ns18="http://exceptions.mdp" />
+		</ns1:operation>
+		<ns1:operation name="updateTerminal"
+			qname="ns19:updateTerminal" returnQName="ns19:updateTerminalReturn"
+			returnType="ns20:GetCustomsTerminalDto" soapAction=""
+			xmlns:ns19="http://terminals.register.mdp"
+			xmlns:ns20="http://dtos.terminals.register.mdp">
+			<ns1:parameter qname="ns19:dto"
+				type="ns20:UpdateTerminalDto" />
+		</ns1:operation>
+		<ns1:parameter name="allowedMethods"
+			value="updateTerminal getTerminal searchTerminal getTerminals searchTerminalSimulation getTerminalsStartingWithName createTerminal deleteTerminal" />
+		<ns1:parameter name="typeMappingVersion" value="1.2" />
+		<ns1:parameter name="wsdlPortType"
+			value="TerminalRegisterService" />
+		<ns1:parameter name="className"
+			value="mdp.register.terminals.TerminalRegisterService" />
+		<ns1:parameter name="wsdlServicePort"
+			value="TerminalRegisterService" />
+		<ns1:parameter name="schemaQualified"
+			value="http://dtos.mdp,http://exceptions.mdp,http://terminals.register.mdp,http://dtos.terminals.register.mdp" />
+		<ns1:parameter name="wsdlTargetNamespace"
+			value="http://terminals.register.mdp" />
+		<ns1:parameter name="wsdlServiceElement"
+			value="TerminalRegisterServiceService" />
+		<ns1:typeMapping
+			deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+			encodingStyle="" qname="ns21:UpdateTerminalDto"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+			type="java:mdp.register.terminals.dtos.UpdateTerminalDto"
+			xmlns:ns21="http://dtos.terminals.register.mdp" />
+		<ns1:typeMapping
+			deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+			encodingStyle="" qname="ns22:GetCustomsPassageStepDto"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+			type="java:mdp.register.terminals.dtos.GetCustomsPassageStepDto"
+			xmlns:ns22="http://dtos.terminals.register.mdp" />
+		<ns1:typeMapping
+			deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+			encodingStyle="" qname="ns23:GetCustomsPassageDto"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+			type="java:mdp.register.terminals.dtos.GetCustomsPassageDto"
+			xmlns:ns23="http://dtos.terminals.register.mdp" />
+		<ns1:typeMapping
+			deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+			encodingStyle="" qname="ns24:SearchTerminalDto"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+			type="java:mdp.dtos.SearchTerminalDto" xmlns:ns24="http://dtos.mdp" />
+		<ns1:typeMapping
+			deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+			encodingStyle="" qname="ns25:CreateTerminalDto"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+			type="java:mdp.register.terminals.dtos.CreateTerminalDto"
+			xmlns:ns25="http://dtos.terminals.register.mdp" />
+		<ns1:typeMapping
+			deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+			encodingStyle="" qname="ns26:GetCustomsTerminalDto"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+			type="java:mdp.register.terminals.dtos.GetCustomsTerminalDto"
+			xmlns:ns26="http://dtos.terminals.register.mdp" />
+		<ns1:typeMapping
+			deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+			encodingStyle="" qname="ns27:TerminalNotFoundException"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+			type="java:mdp.exceptions.TerminalNotFoundException"
+			xmlns:ns27="http://exceptions.mdp" />
+		<ns1:arrayMapping
+			innerType="ns29:GetCustomsPassageDto"
+			languageSpecificType="java:mdp.register.terminals.dtos.GetCustomsPassageDto[]"
+			qname="ns28:ArrayOf_tns1_GetCustomsPassageDto"
+			xmlns:ns28="http://terminals.register.mdp"
+			xmlns:ns29="http://dtos.terminals.register.mdp" />
+		<ns1:arrayMapping
+			innerType="ns31:GetCustomsPassageStepDto"
+			languageSpecificType="java:mdp.register.terminals.dtos.GetCustomsPassageStepDto[]"
+			qname="ns30:ArrayOf_tns1_GetCustomsPassageStepDto"
+			xmlns:ns30="http://terminals.register.mdp"
+			xmlns:ns31="http://dtos.terminals.register.mdp" />
+	</ns1:service>
+	<ns1:transport name="http">
+		<ns1:requestFlow>
+			<ns1:handler type="URLMapper" />
+			<ns1:handler
+				type="java:org.apache.axis.handlers.http.HTTPAuthHandler" />
+		</ns1:requestFlow>
+		<ns1:parameter name="qs:list"
+			value="org.apache.axis.transport.http.QSListHandler" />
+		<ns1:parameter name="qs:wsdl"
+			value="org.apache.axis.transport.http.QSWSDLHandler" />
+		<ns1:parameter name="qs.list"
+			value="org.apache.axis.transport.http.QSListHandler" />
+		<ns1:parameter name="qs.method"
+			value="org.apache.axis.transport.http.QSMethodHandler" />
+		<ns1:parameter name="qs:method"
+			value="org.apache.axis.transport.http.QSMethodHandler" />
+		<ns1:parameter name="qs.wsdl"
+			value="org.apache.axis.transport.http.QSWSDLHandler" />
+	</ns1:transport>
+	<ns1:transport name="local">
+		<ns1:responseFlow>
+			<ns1:handler type="LocalResponder" />
+		</ns1:responseFlow>
+	</ns1:transport>
 </ns1:deployment>

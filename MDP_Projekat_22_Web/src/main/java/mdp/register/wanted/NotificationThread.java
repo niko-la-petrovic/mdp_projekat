@@ -5,11 +5,14 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import mdp.exceptions.TerminalNotFoundException;
 import mdp.register.wanted.services.PoliceCheckStepService;
 
 public class NotificationThread extends Thread {
+	private static final Logger logger = Logger.getLogger(NotificationThread.class.getName());
 
 	private ObjectOutputStream out;
 	private ObjectInputStream in;
@@ -28,19 +31,19 @@ public class NotificationThread extends Thread {
 		try {
 			communicate();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(Level.SEVERE, String.format("Class not found exception with client %s: %s",
+					socket.getInetAddress(), e.getMessage()));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(Level.SEVERE,
+					String.format("IO Exception with client %s: %s", socket.getInetAddress(), e.getMessage()));
 		}
 		try {
 			in.close();
 			out.close();
 			socket.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(Level.SEVERE, String.format("Failed to close socket with client %s: %s", socket.getInetAddress(),
+					e.getMessage()));
 		}
 	}
 
@@ -48,12 +51,19 @@ public class NotificationThread extends Thread {
 		BigInteger terminalId = (BigInteger) in.readObject();
 		BigInteger passageId = (BigInteger) in.readObject();
 		try {
+			logger.log(Level.INFO,
+					String.format("Opening customs passage of terminal '%s' with passage '%s'", terminalId, passageId));
+
 			policeCheckStepService.openPassages(terminalId, passageId);
 			out.writeObject("Success");
 			out.flush();
+
+			logger.log(Level.INFO,
+					String.format("Opened customs passage of terminal '%s' with passage '%s'", terminalId, passageId));
 		} catch (TerminalNotFoundException e) {
 			out.writeObject("Terminal not found");
 			out.flush();
+			logger.log(Level.INFO, String.format("Terminal '%s' not found", terminalId));
 		}
 	}
 }

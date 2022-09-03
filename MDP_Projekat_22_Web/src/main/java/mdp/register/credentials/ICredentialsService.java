@@ -1,5 +1,6 @@
 package mdp.register.credentials;
 
+import mdp.dtos.GetCredentialsDto;
 import mdp.dtos.PostCredentialsDto;
 import mdp.dtos.PutCredentialsDto;
 import mdp.exceptions.UsernameExistsException;
@@ -14,5 +15,9 @@ public interface ICredentialsService {
 	boolean checkCredentials(PostCredentialsDto dto);
 
 	void deleteCredentials(String username) throws UsernameNotFoundException;
+
+	GetCredentialsDto[] getCredentials();
+
+	GetCredentialsDto[] getCredentialsStartingWith(String username);
 
 }
